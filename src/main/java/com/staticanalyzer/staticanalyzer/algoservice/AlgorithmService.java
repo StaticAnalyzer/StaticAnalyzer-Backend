@@ -15,10 +15,11 @@ public class AlgorithmService {
     @GrpcClient("grpc-alg-server")
     private AlgServiceBlockingStub algServiceBlockingStub;
 
-    public Map<String, String> JustReturn(byte[] file){
+    public String JustReturn(byte[] file, String config){
         JustReturnRequest justReturnRequest = JustReturnRequest.newBuilder()
                 .setFile(ByteString.copyFrom(file))
+                .setConfig(config)
                 .build();
-        return algServiceBlockingStub.justReturn(justReturnRequest).getResultMap();
+        return algServiceBlockingStub.justReturn(justReturnRequest).getResult();
     }
 }
