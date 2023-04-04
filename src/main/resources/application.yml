@@ -17,3 +17,7 @@ grpc:
       # plaintext | plaintext_upgrade | tls
       # 明文通信且http/2 | 明文通信且升级http/1.1为http/2 | 使用TLS（ALPN/NPN）通信
       negotiationType: plaintext
+
+jwt:
+  key: 'fe72fd8d724713558db100c50e42497632bcc0d570850231bbc9f9a0b4b804e1'
+  expiration: '3600'

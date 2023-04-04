@@ -1,7 +1,6 @@
 package com.staticanalyzer.staticanalyzer.entities;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 
 import javax.validation.constraints.NotNull;
 

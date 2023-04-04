@@ -1,8 +1,6 @@
 package com.staticanalyzer.staticanalyzer.entities;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -10,9 +8,11 @@ import java.util.List;
 public class User {
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
-    @Size(min=2, max = 30, message = "用户名不符合要求")
+
+    @Size(min = 2, max = 30, message = "bad username")
     private String username;
-    @Size(min=8, max = 30, message = "密码不符合要求")
+
+    @Size(min = 8, max = 30, message = "bad password")
     private String password;
 
     @TableField(exist = false)
@@ -52,10 +52,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                '}';
+        return String.format(
+                "User{id=%d,username=%s,password=%s}", id, username, password);
     }
 }

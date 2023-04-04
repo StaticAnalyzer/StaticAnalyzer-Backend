@@ -1,4 +1,4 @@
-package com.staticanalyzer.staticanalyzer.algoservice;
+package com.staticanalyzer.staticanalyzer.service;
 
 import com.google.protobuf.ByteString;
 import com.staticanalyzer.algservice.AlgServiceGrpc.AlgServiceBlockingStub;
@@ -7,8 +7,6 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 public class AlgorithmService {

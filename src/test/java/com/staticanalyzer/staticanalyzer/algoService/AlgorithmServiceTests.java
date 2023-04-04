@@ -1,6 +1,6 @@
 package com.staticanalyzer.staticanalyzer.algoService;
 
-import com.staticanalyzer.staticanalyzer.algoservice.AlgorithmService;
+import com.staticanalyzer.staticanalyzer.service.AlgorithmService;
 import com.staticanalyzer.staticanalyzer.utils.TarGzFileCreator;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
