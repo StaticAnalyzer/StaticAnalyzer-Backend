@@ -33,6 +33,7 @@ public class ProjectTest {
     public void TestProjectBasic() throws IOException {
         Project project = new Project();
         project.setSourceCode(CppExampleFile());
+        project.setConfig("test-config");
         // 用户名不存在
         project.setUserId(10086);
         Assertions.assertThrows(Exception.class, () -> projectMapper.insert(project));
