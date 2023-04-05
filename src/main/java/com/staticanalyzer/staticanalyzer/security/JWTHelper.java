@@ -16,14 +16,10 @@ public class JWTHelper {
     private final SignatureAlgorithm algorithm;
     private final Key secretKey;
 
-    public JWTHelper(
-            @Value("${jwt.key}") String secret,
-            @Value("${jwt.expiration}") String expiration) {
+    public JWTHelper(@Value("${jwt.key}") String secret, @Value("${jwt.expiration}") String expiration) {
         this.expiration = Integer.parseInt(expiration);
         algorithm = SignatureAlgorithm.HS256;
-        secretKey = new SecretKeySpec(
-                secret.getBytes(),
-                algorithm.getJcaName());
+        secretKey = new SecretKeySpec(secret.getBytes(), algorithm.getJcaName());
     }
 
     public String generate(int userId) {
@@ -34,20 +30,15 @@ public class JWTHelper {
                 .setIssuedAt(now)
                 .setExpiration(expireDate)
                 .signWith(secretKey);
-
         return builder.compact();
     }
 
-    public int parse(String jwt) {
+    public Claims parse(String jwt) {
         try {
-            JwtParser parser = Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build();
-            Claims claims = parser.parseClaimsJws(jwt).getBody();
-
-            return Integer.parseInt(claims.getSubject());
+            JwtParser parser = Jwts.parserBuilder().setSigningKey(secretKey).build();
+            return parser.parseClaimsJws(jwt).getBody();
         } catch (JwtException je) {
-            return -1;
+            return null;
         }
     }
 }

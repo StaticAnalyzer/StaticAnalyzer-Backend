@@ -3,6 +3,9 @@ package com.staticanalyzer.staticanalyzer.entities;
 import java.util.Map;
 
 public class Result {
+    public static int SUCCESS = 0;
+    public static int FAILURE = -1;
+
     private int code;
     private Map<String, Object> data;
 
@@ -24,7 +27,7 @@ public class Result {
     }
 
     public Result() {
-        code = 0;
+        code = Result.SUCCESS;
     }
 
     public Result(int code) {
@@ -32,11 +35,11 @@ public class Result {
     }
 
     public static Result success() {
-        return new Result(0);
+        return new Result(Result.SUCCESS);
     }
 
     public static Result failure() {
-        return new Result(-1);
+        return new Result(Result.FAILURE);
     }
 
 }
