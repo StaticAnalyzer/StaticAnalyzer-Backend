@@ -2,7 +2,13 @@ package com.staticanalyzer.staticanalyzer.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.staticanalyzer.staticanalyzer.entities.User;
-import org.apache.ibatis.annotations.*;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Many;
 
 import java.util.List;
 
@@ -13,8 +19,7 @@ public interface UserMapper extends BaseMapper<User> {
             @Result(column = "id", property = "id"),
             @Result(column = "username", property = "username"),
             @Result(column = "password", property = "password"),
-            @Result(column = "id", property = "projectList", javaType = List.class,
-                    many = @Many(select = "com.staticanalyzer.staticanalyzer.mapper.ProjectMapper.selectByUserId"))
+            @Result(column = "id", property = "projectList", javaType = List.class, many = @Many(select = "com.staticanalyzer.staticanalyzer.mapper.ProjectMapper.selectByUserId"))
     })
     User selectWithProjectById(@Param("id") int id);
 }

@@ -1,13 +1,11 @@
 package com.staticanalyzer.staticanalyzer.entities;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.IdType;
 
 import javax.validation.constraints.NotNull;
 
 public class Project {
-    public static int FINISHED = 1;
-    public static int WAITING = 2;
-
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
 

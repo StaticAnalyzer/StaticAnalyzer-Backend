@@ -1,12 +1,18 @@
 package com.staticanalyzer.staticanalyzer.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.staticanalyzer.staticanalyzer.entities.Project;
@@ -47,43 +53,42 @@ public class ProjectController {
     }
 
     @PostMapping("/user/{id}/project")
-    public Result upload(@PathVariable int id,
-            @RequestBody MultipartFile sourceCode,
-            @RequestBody String config) {
+    public Result upload(@PathVariable int id, @RequestBody MultipartFile sourceCode, @RequestBody String config) {
         Project project = new Project();
         project.setUserId(id);
         try {
             project.setSourceCode(sourceCode.getBytes());
         } catch (IOException ioe) {
-            return Result.failure().setField("message", "bad input");
+            return new Result(Result.FAILURE).setField("msg", "bad project");
         }
         project.setConfig(config);
+
         projectMapper.insert(project);
         taskPool.submit(new Task(project));
-        return Result.success().setField("message", "project uploaded");
+        return new Result(Result.SUCCESS).setField("msg", "project uploaded");
     }
 
     @GetMapping("/user/{id}/project")
     public Result queryStatus(@PathVariable int id) {
         List<Project> savedProjects = projectMapper.selectByUserId(id);
-        Result result = Result.success();
+        Map<String, String> results = new HashMap<>();
+
         for (Project project : savedProjects) {
             String msg = String.valueOf(project.getId());
-            if (project.getAnalyseResult() != null)
-                result.setField(msg, Project.FINISHED);
-            else
-                result.setField(msg, Project.WAITING);
+            results.put(msg, project.getAnalyseResult());
         }
-        return result;
+        return new Result(Result.SUCCESS).setField("result", results);
     }
 
-    @GetMapping("/user/{id}/project/{projId}")
-    public Result getResult(@PathVariable int id, @PathVariable int projId) {
-        Project savedProject = projectMapper.selectById(projId);
+    @GetMapping("/user/{id}/project/{projectId}")
+    public Result getResult(@PathVariable int id, @PathVariable int projectId) {
+        Project savedProject = projectMapper.selectById(projectId);
+        Map<String, String> results = new HashMap<>();
 
         if (savedProject == null || savedProject.getUserId() != id)
-            return Result.failure().setField("message", "query failure");
+            return new Result(Result.FAILURE).setField("msg", "query failure");
 
-        return Result.success().setField(String.valueOf(savedProject.getId()), savedProject.getAnalyseResult());
+        results.put(String.valueOf(projectId), savedProject.getAnalyseResult());
+        return new Result(Result.FAILURE).setField("result", results);
     }
 }

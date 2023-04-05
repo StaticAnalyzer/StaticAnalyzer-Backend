@@ -2,7 +2,12 @@ package com.staticanalyzer.staticanalyzer.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
@@ -20,13 +25,13 @@ public class UserController {
     private JWTHelper jwtHelper;
 
     @PostMapping("/login")
-    public Result login(@RequestBody User user) {
+    public Result login(@Validated @RequestBody User user) {
         User userSaved = userMapper.selectOne(new QueryWrapper<User>().eq("username", user.getUsername()));
         if (userSaved == null || !userSaved.getPassword().equals(userSaved.getPassword()))
-            return Result.failure().setField("message", "auth failed");
+            return new Result(Result.FAILURE).setField("msg", "auth failed");
 
         String token = jwtHelper.generate(userSaved.getId());
-        return Result.success()
+        return new Result(Result.SUCCESS)
                 .setField("token", token)
                 .setField("user", userSaved);
     }
@@ -35,34 +40,31 @@ public class UserController {
     public Result add(@Validated @RequestBody User user) {
         User userSaved = userMapper.selectOne(new QueryWrapper<User>().eq("username", user.getUsername()));
         if (userSaved != null)
-            return Result.failure().setField("message", "dup username");
+            return new Result(Result.FAILURE).setField("msg", "dup username");
 
         userMapper.insert(user);
         String token = jwtHelper.generate(user.getId());
-        return Result.success()
+        return new Result(Result.SUCCESS)
                 .setField("token", token)
                 .setField("user", user);
     }
 
     @GetMapping("/user/{id}")
-    public Result queryById(@PathVariable int id) {
+    public Result query(@PathVariable int id) {
         User userSaved = userMapper.selectById(id);
         if (userSaved == null)
-            return Result.failure().setField("message", "unk id");
+            return new Result(Result.FAILURE).setField("msg", "unk id");
 
-        return Result.success().setField("user", userSaved);
+        return new Result(Result.SUCCESS).setField("user", userSaved);
     }
 
     @PutMapping("/user/{id}")
     public Result update(@PathVariable int id, @Validated @RequestBody User user) {
-        if (user.getId() != id)
-            return Result.failure().setField("message", "id mismatched");
-
         User userSaved = userMapper.selectById(id);
-        if (userSaved == null)
-            return Result.failure().setField("message", "unk id");
+        if (userSaved == null || !userSaved.getUsername().equals(user.getUsername()))
+            return new Result(Result.FAILURE).setField("msg", "wrong username");
 
         userMapper.updateById(user);
-        return Result.success().setField("message", "user updated");
+        return new Result(Result.SUCCESS).setField("msg", "user updated");
     }
 }

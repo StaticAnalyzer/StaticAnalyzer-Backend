@@ -34,12 +34,4 @@ public class Result {
         this.code = code;
     }
 
-    public static Result success() {
-        return new Result(Result.SUCCESS);
-    }
-
-    public static Result failure() {
-        return new Result(Result.FAILURE);
-    }
-
 }
