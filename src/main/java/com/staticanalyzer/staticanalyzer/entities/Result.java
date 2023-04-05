@@ -17,21 +17,17 @@ public class Result {
         this.code = code;
     }
 
-    public Object getField(String name) {
-        return data.get(name);
+    public Map<String, Object> getData() {
+        return data;
     }
 
-    public Result setField(String name, Object obj) {
-        data.put(name, obj);
-        return this;
+    public void setData(Map<String, Object> data) {
+        this.data = data;
     }
 
-    public Result() {
-        code = Result.SUCCESS;
-    }
-
-    public Result(int code) {
+    public Result(int code, Map<String, Object> data) {
         this.code = code;
+        this.data = data;
     }
 
 }

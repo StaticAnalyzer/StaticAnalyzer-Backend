@@ -1,11 +1,13 @@
 package com.staticanalyzer.staticanalyzer.models;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 import com.staticanalyzer.staticanalyzer.entities.User;
 import com.staticanalyzer.staticanalyzer.mapper.UserMapper;
-import org.junit.Assert;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
@@ -21,21 +23,23 @@ public class UserTest {
     private UserMapper userMapper;
 
     @Test
-    public void TestUserBasic(){
-        // 获取所有用户，按照id降序
+    public void TestUserBasic() {
+        System.out.println("TEST: GET ALL USERS");
         List<User> users = userMapper.selectList(new QueryWrapper<User>().orderByDesc("id"));
         System.out.println(users);
-        // 测试正常插入，获取插入的id
+
+        System.out.println("TEST: INSERT USER");
         User user = new User();
         user.setUsername("test");
-        user.setPassword("test");
+        user.setPassword("123456");
         userMapper.insert(user);
-        int id = user.getId();
-        System.out.println(id);
-        // 测试重名用户
+        User savedUser = userMapper.selectById(user.getId());
+        System.out.println(savedUser);
+
+        System.out.println("TEST: DUPLICATED USER");
         User dupUser = new User();
         dupUser.setUsername("test");
-        dupUser.setPassword("test");
+        dupUser.setPassword("654321");
         Assertions.assertThrows(Exception.class, () -> userMapper.insert(dupUser));
     }
 }

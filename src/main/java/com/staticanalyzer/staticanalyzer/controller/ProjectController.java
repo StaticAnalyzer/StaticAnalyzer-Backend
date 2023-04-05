@@ -1,9 +1,7 @@
 package com.staticanalyzer.staticanalyzer.controller;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -17,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.staticanalyzer.staticanalyzer.entities.Project;
 import com.staticanalyzer.staticanalyzer.entities.Result;
+import com.staticanalyzer.staticanalyzer.entities.ResultBuilder;
 import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
 import com.staticanalyzer.staticanalyzer.service.AlgorithmService;
 
@@ -59,36 +58,32 @@ public class ProjectController {
         try {
             project.setSourceCode(sourceCode.getBytes());
         } catch (IOException ioe) {
-            return new Result(Result.FAILURE).setField("msg", "bad project");
+            return new ResultBuilder().setCode(Result.FAILURE).build();
         }
         project.setConfig(config);
 
         projectMapper.insert(project);
         taskPool.submit(new Task(project));
-        return new Result(Result.SUCCESS).setField("msg", "project uploaded");
+        return new ResultBuilder().setCode(Result.SUCCESS).build();
     }
 
     @GetMapping("/user/{id}/project")
-    public Result queryStatus(@PathVariable int id) {
+    public Result queryAll(@PathVariable int id) {
         List<Project> savedProjects = projectMapper.selectByUserId(id);
-        Map<String, String> results = new HashMap<>();
-
-        for (Project project : savedProjects) {
-            String msg = String.valueOf(project.getId());
-            results.put(msg, project.getAnalyseResult());
-        }
-        return new Result(Result.SUCCESS).setField("result", results);
+        return new ResultBuilder().setCode(Result.SUCCESS)
+                .addField("projects", savedProjects)
+                .build();
     }
 
     @GetMapping("/user/{id}/project/{projectId}")
-    public Result getResult(@PathVariable int id, @PathVariable int projectId) {
+    public Result query(@PathVariable int id, @PathVariable int projectId) {
         Project savedProject = projectMapper.selectById(projectId);
-        Map<String, String> results = new HashMap<>();
+        if (savedProject == null || savedProject.getUserId() != id) {
+            return new ResultBuilder().setCode(Result.FAILURE).build();
+        }
 
-        if (savedProject == null || savedProject.getUserId() != id)
-            return new Result(Result.FAILURE).setField("msg", "query failure");
-
-        results.put(String.valueOf(projectId), savedProject.getAnalyseResult());
-        return new Result(Result.FAILURE).setField("result", results);
+        return new ResultBuilder().setCode(Result.SUCCESS)
+                .addField("project", savedProject)
+                .build();
     }
 }

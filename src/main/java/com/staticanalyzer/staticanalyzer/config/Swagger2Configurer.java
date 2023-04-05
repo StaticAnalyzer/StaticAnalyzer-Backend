@@ -25,8 +25,8 @@ public class Swagger2Configurer {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Demo API")
-                .description("demo for studying")
+                .title("Static-Analysis Backend API")
+                .description("a very cool API document")
                 .build();
     }
 }

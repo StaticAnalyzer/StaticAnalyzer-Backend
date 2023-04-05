@@ -7,8 +7,6 @@ import com.google.protobuf.ByteString;
 import com.staticanalyzer.algservice.AlgServiceGrpc.AlgServiceBlockingStub;
 import com.staticanalyzer.algservice.JustReturnRequest;
 
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
 @Service

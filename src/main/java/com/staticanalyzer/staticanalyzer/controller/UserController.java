@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import com.staticanalyzer.staticanalyzer.entities.Result;
+import com.staticanalyzer.staticanalyzer.entities.ResultBuilder;
 import com.staticanalyzer.staticanalyzer.entities.User;
 import com.staticanalyzer.staticanalyzer.mapper.UserMapper;
 import com.staticanalyzer.staticanalyzer.security.JWTHelper;
@@ -27,44 +28,52 @@ public class UserController {
     @PostMapping("/login")
     public Result login(@Validated @RequestBody User user) {
         User userSaved = userMapper.selectOne(new QueryWrapper<User>().eq("username", user.getUsername()));
-        if (userSaved == null || !userSaved.getPassword().equals(userSaved.getPassword()))
-            return new Result(Result.FAILURE).setField("msg", "auth failed");
+        if (userSaved == null || !userSaved.getPassword().equals(user.getPassword())) {
+            return new ResultBuilder().setCode(Result.FAILURE).build();
+        }
 
         String token = jwtHelper.generate(userSaved.getId());
-        return new Result(Result.SUCCESS)
-                .setField("token", token)
-                .setField("user", userSaved);
+        return new ResultBuilder().setCode(Result.SUCCESS)
+                .addField("token", token)
+                .addField("user", userSaved)
+                .build();
     }
 
     @PostMapping("/user")
     public Result add(@Validated @RequestBody User user) {
         User userSaved = userMapper.selectOne(new QueryWrapper<User>().eq("username", user.getUsername()));
-        if (userSaved != null)
-            return new Result(Result.FAILURE).setField("msg", "dup username");
+        if (userSaved != null) {
+            return new ResultBuilder().setCode(Result.FAILURE).build();
+        }
 
         userMapper.insert(user);
         String token = jwtHelper.generate(user.getId());
-        return new Result(Result.SUCCESS)
-                .setField("token", token)
-                .setField("user", user);
+        return new ResultBuilder().setCode(Result.SUCCESS)
+                .addField("token", token)
+                .addField("user", user)
+                .build();
     }
 
     @GetMapping("/user/{id}")
     public Result query(@PathVariable int id) {
         User userSaved = userMapper.selectById(id);
-        if (userSaved == null)
-            return new Result(Result.FAILURE).setField("msg", "unk id");
+        if (userSaved == null) {
+            return new ResultBuilder().setCode(Result.FAILURE).build();
+        }
 
-        return new Result(Result.SUCCESS).setField("user", userSaved);
+        return new ResultBuilder().setCode(Result.SUCCESS)
+                .addField("user", userSaved)
+                .build();
     }
 
     @PutMapping("/user/{id}")
     public Result update(@PathVariable int id, @Validated @RequestBody User user) {
         User userSaved = userMapper.selectById(id);
-        if (userSaved == null || !userSaved.getUsername().equals(user.getUsername()))
-            return new Result(Result.FAILURE).setField("msg", "wrong username");
+        if (userSaved == null || !userSaved.getUsername().equals(user.getUsername())) {
+            return new ResultBuilder().setCode(Result.FAILURE).build();
+        }
 
         userMapper.updateById(user);
-        return new Result(Result.SUCCESS).setField("msg", "user updated");
+        return new ResultBuilder().setCode(Result.SUCCESS).build();
     }
 }

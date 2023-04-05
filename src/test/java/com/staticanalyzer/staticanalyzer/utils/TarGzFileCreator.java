@@ -3,7 +3,8 @@ package com.staticanalyzer.staticanalyzer.utils;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
 
 public class TarGzFileCreator {

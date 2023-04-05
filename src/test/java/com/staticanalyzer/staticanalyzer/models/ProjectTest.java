@@ -5,8 +5,10 @@ import com.staticanalyzer.staticanalyzer.entities.User;
 import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
 import com.staticanalyzer.staticanalyzer.mapper.UserMapper;
 import com.staticanalyzer.staticanalyzer.utils.TarGzFileCreator;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
@@ -26,31 +28,31 @@ public class ProjectTest {
 
     private byte[] CppExampleFile() throws IOException {
         TarGzFileCreator tarGzFileCreator = new TarGzFileCreator();
-        tarGzFileCreator.addFileToTarGz("main.cpp", "int main(){int a = 1;return 0;}");
+        tarGzFileCreator.addFileToTarGz("main.cpp", "int main(){printf(\"hello world\");}");
         return tarGzFileCreator.getTarGzBytes();
     }
+
     @Test
     public void TestProjectBasic() throws IOException {
+        System.out.println("TEST: INSERT PROJECT");
         Project project = new Project();
         project.setSourceCode(CppExampleFile());
-        project.setConfig("test-config");
-        // 用户名不存在
+        project.setConfig("{\"test\":\"some_config\"}");
         project.setUserId(10086);
         Assertions.assertThrows(Exception.class, () -> projectMapper.insert(project));
 
-        // 创建新用户并插入项目
+        System.out.println("TEST: CREATE USER AND INSERT PROJECT");
         User newUser = new User();
         newUser.setUsername("test");
         newUser.setPassword("test");
         userMapper.insert(newUser);
-        int userId = newUser.getId();
 
-        project.setUserId(userId);
+        project.setUserId(newUser.getId());
         projectMapper.insert(project);
         project.setAnalyseResult("{\"test\": 1}");
         projectMapper.updateById(project);
 
-        User user = userMapper.selectWithProjectById(userId);
+        User user = userMapper.selectWithProjectById(newUser.getId());
         Assertions.assertEquals(1, user.getProjectList().size());
     }
 }
