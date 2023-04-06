@@ -53,6 +53,11 @@ public class ProjectTest {
         projectMapper.updateById(project);
 
         User user = userMapper.selectWithProjectById(newUser.getId());
+        System.out.println(user.getProjectList());
         Assertions.assertEquals(1, user.getProjectList().size());
+
+        User user2 = userMapper.selectWithProjectIdById(newUser.getId());
+        System.out.println(user2.getProjectIdList());
+        Assertions.assertEquals(1, user2.getProjectIdList().size());
     }
 }

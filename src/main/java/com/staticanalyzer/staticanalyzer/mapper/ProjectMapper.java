@@ -13,4 +13,7 @@ import java.util.List;
 public interface ProjectMapper extends BaseMapper<Project> {
     @Select("SELECT * FROM project WHERE user_id=#{userId}")
     List<Project> selectByUserId(@Param("userId") int userId);
+
+    @Select("SELECT id FROM project WHERE user_id=#{userId}")
+    List<Integer> selectIdByUserId(@Param("userId") int userId);
 }

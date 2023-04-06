@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.Size;
 import java.util.List;
 
 public class User {
@@ -19,7 +18,15 @@ public class User {
     private String password;
 
     @TableField(exist = false)
-    private List<Project> projectList;
+    private List<Integer> projectIdList;
+
+    public List<Integer> getProjectIdList() {
+        return projectIdList;
+    }
+
+    public void setProjectIdList(List<Integer> projectIdList) {
+        this.projectIdList = projectIdList;
+    }
 
     public int getId() {
         return id;
@@ -43,14 +50,6 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public List<Project> getProjectList() {
-        return projectList;
-    }
-
-    public void setProjectList(List<Project> projectList) {
-        this.projectList = projectList;
     }
 
     @Override
