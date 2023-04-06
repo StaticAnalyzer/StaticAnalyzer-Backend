@@ -3,6 +3,7 @@ package com.staticanalyzer.staticanalyzer.entities;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -11,10 +12,10 @@ public class User {
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
-    @Size(min = 2, max = 30, message = "bad username")
+    @Length(min = 2, max = 30, message = "用户名长度需要在{min}和{max}之间")
     private String username;
 
-    @Size(min = 8, max = 30, message = "bad password")
+    @Length(min = 8, max = 30, message = "密码长度需要在{min}和{max}之间")
     private String password;
 
     @TableField(exist = false)
