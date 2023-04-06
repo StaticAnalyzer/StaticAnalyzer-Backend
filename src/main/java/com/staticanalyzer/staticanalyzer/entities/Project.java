@@ -3,21 +3,13 @@ package com.staticanalyzer.staticanalyzer.entities;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.IdType;
 
-import javax.validation.constraints.NotNull;
-
 public class Project {
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
-    @NotNull
     private int userId;
-
-    @NotNull
     private byte[] sourceCode;
-
-    @NotNull
     private String config;
-
     private String analyseResult;
 
     public int getId() {

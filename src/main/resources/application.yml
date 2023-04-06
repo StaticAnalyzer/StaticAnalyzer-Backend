@@ -20,4 +20,4 @@ grpc:
 
 jwt:
   key: 'fe72fd8d724713558db100c50e42497632bcc0d570850231bbc9f9a0b4b804e1'
-  expiration: '3600'
+  expiration: '1800000'

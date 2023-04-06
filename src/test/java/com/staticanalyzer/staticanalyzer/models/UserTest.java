@@ -24,11 +24,9 @@ public class UserTest {
 
     @Test
     public void TestUserBasic() {
-        System.out.println("TEST: GET ALL USERS");
         List<User> users = userMapper.selectList(new QueryWrapper<User>().orderByDesc("id"));
         System.out.println(users);
 
-        System.out.println("TEST: INSERT USER");
         User user = new User();
         user.setUsername("test");
         user.setPassword("123456");
@@ -36,7 +34,6 @@ public class UserTest {
         User savedUser = userMapper.selectById(user.getId());
         System.out.println(savedUser);
 
-        System.out.println("TEST: DUPLICATED USER");
         User dupUser = new User();
         dupUser.setUsername("test");
         dupUser.setPassword("654321");

@@ -18,13 +18,11 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JWTHelper {
     private final long expiration;
-    private final SignatureAlgorithm algorithm;
     private final Key secretKey;
 
     public JWTHelper(@Value("${jwt.key}") String secret, @Value("${jwt.expiration}") String expiration) {
         this.expiration = Integer.parseInt(expiration);
-        algorithm = SignatureAlgorithm.HS256;
-        secretKey = new SecretKeySpec(secret.getBytes(), algorithm.getJcaName());
+        secretKey = new SecretKeySpec(secret.getBytes(), SignatureAlgorithm.HS256.getJcaName());
     }
 
     public String generate(int userId) {
@@ -46,18 +44,5 @@ public class JWTHelper {
         } catch (JwtException je) {
             return -1;
         }
-    }
-
-    public boolean isExpired(String jwt) {
-        try {
-            JwtParser parser = Jwts.parserBuilder().setSigningKey(secretKey).build();
-            Claims claims = parser.parseClaimsJws(jwt).getBody();
-            Date now = new Date();
-            if (now.after(claims.getExpiration()))
-                return true;
-        } catch (JwtException je) {
-            return true;
-        }
-        return false;
     }
 }

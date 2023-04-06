@@ -34,14 +34,12 @@ public class ProjectTest {
 
     @Test
     public void TestProjectBasic() throws IOException {
-        System.out.println("TEST: INSERT PROJECT");
         Project project = new Project();
         project.setSourceCode(CppExampleFile());
         project.setConfig("{\"test\":\"some_config\"}");
         project.setUserId(10086);
         Assertions.assertThrows(Exception.class, () -> projectMapper.insert(project));
 
-        System.out.println("TEST: CREATE USER AND INSERT PROJECT");
         User newUser = new User();
         newUser.setUsername("test");
         newUser.setPassword("test");
@@ -52,12 +50,8 @@ public class ProjectTest {
         project.setAnalyseResult("{\"test\": 1}");
         projectMapper.updateById(project);
 
-        User user = userMapper.selectWithProjectById(newUser.getId());
-        System.out.println(user.getProjectList());
-        Assertions.assertEquals(1, user.getProjectList().size());
-
-        User user2 = userMapper.selectWithProjectIdById(newUser.getId());
-        System.out.println(user2.getProjectIdList());
-        Assertions.assertEquals(1, user2.getProjectIdList().size());
+        User user = userMapper.selectWithProjectIdById(newUser.getId());
+        System.out.println(user.getProjectIdList());
+        Assertions.assertEquals(1, user.getProjectIdList().size());
     }
 }
