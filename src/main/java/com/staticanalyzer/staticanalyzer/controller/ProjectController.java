@@ -61,19 +61,14 @@ public class ProjectController {
     public Map<String, Object> upload(@PathVariable int id, @RequestBody MultipartFile sourceCode,
             @RequestBody String config) {
         Project project = new Project();
-
         try {
             project.setUserId(id);
             project.setSourceCode(sourceCode.getBytes());
             project.setConfig(config);
         } catch (IOException ioe) {
-            logger.info("Rejected upload request maded by user id " + id);
             return Map.of("code", -1, "msg", "文件上传失败");
         }
-
         projectMapper.insert(project);
-        logger.info("Successfully uploaded project " + project.getId());
-
         taskPool.submit(new Task(project));
         return Map.of("code", 0, "msg", "文件上传成功，任务编号" + project.getId());
     }
@@ -81,21 +76,14 @@ public class ProjectController {
     @GetMapping("/user/{id}/project")
     public Map<String, Object> queryAll(@PathVariable int id) {
         List<Integer> dataBaseProjectIdList = projectMapper.selectIdByUserId(id);
-
-        logger.info("Get project info of user id " + id);
         return Map.of("code", 0, "project_id", dataBaseProjectIdList);
     }
 
     @GetMapping("/user/{id}/project/{projectId}")
     public Map<String, Object> query(@PathVariable int id, @PathVariable int projectId) {
         Project dataBaseProject = projectMapper.selectById(projectId);
-
-        if (dataBaseProject == null || dataBaseProject.getUserId() != id) {
-            logger.info("Rejected query request maded by user id " + id);
+        if (dataBaseProject == null || dataBaseProject.getUserId() != id)
             return Map.of("code", -1, "msg", "查询结果失败，用户无权限或文件不存在");
-        }
-
-        logger.info("Get project " + projectId);
         return Map.of("code", 0, "project", dataBaseProject);
     }
 }
