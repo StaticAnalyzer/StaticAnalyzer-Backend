@@ -3,17 +3,27 @@ package com.staticanalyzer.staticanalyzer.entities;
 import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 
+@ApiModel("用户类")
 public class User {
+    @ApiModelProperty("用户编号")
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
+    @ApiModelProperty("用户名")
     private String username;
+
+    @ApiModelProperty("密码")
     private String password;
 
     @TableField(exist = false)
+    @ApiModelProperty("任务编号列表")
     private List<Integer> projectIdList;
 
     public List<Integer> getProjectIdList() {

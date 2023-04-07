@@ -19,10 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.staticanalyzer.staticanalyzer.entities.Project;
+import com.staticanalyzer.staticanalyzer.entities.Result;
 import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
 import com.staticanalyzer.staticanalyzer.service.AlgorithmService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
+@Api("项目控制器")
 public class ProjectController {
     @Autowired
     private AlgorithmService algorithmService;
@@ -58,32 +63,41 @@ public class ProjectController {
     }
 
     @PostMapping("/user/{id}/project")
-    public Map<String, Object> upload(@PathVariable int id, @RequestBody MultipartFile sourceCode,
+    @ApiOperation("文件上传")
+    public Result upload(@PathVariable int id, @RequestBody MultipartFile sourceCode,
             @RequestBody String config) {
         Project project = new Project();
+
         try {
             project.setUserId(id);
             project.setSourceCode(sourceCode.getBytes());
             project.setConfig(config);
         } catch (IOException ioe) {
-            return Map.of("code", -1, "msg", "文件上传失败");
+            return new Result(Result.REJECTED, Map.of("msg", "上传失败，文件错误"));
         }
+
         projectMapper.insert(project);
         taskPool.submit(new Task(project));
-        return Map.of("code", 0, "msg", "文件上传成功，任务编号" + project.getId());
+        return new Result(Result.ACCEPTED, Map.of("msg", "上传成功，编号" + project.getId()));
     }
 
     @GetMapping("/user/{id}/project")
-    public Map<String, Object> queryAll(@PathVariable int id) {
+    @ApiOperation("查询已上传的任务编号")
+    public Result queryAll(@PathVariable int id) {
         List<Integer> dataBaseProjectIdList = projectMapper.selectIdByUserId(id);
-        return Map.of("code", 0, "project_id", dataBaseProjectIdList);
+        return new Result(Result.ACCEPTED, Map.of("project_id", dataBaseProjectIdList));
     }
 
     @GetMapping("/user/{id}/project/{projectId}")
-    public Map<String, Object> query(@PathVariable int id, @PathVariable int projectId) {
+    @ApiOperation("查询任务结果")
+    public Result query(@PathVariable int id, @PathVariable int projectId) {
         Project dataBaseProject = projectMapper.selectById(projectId);
-        if (dataBaseProject == null || dataBaseProject.getUserId() != id)
-            return Map.of("code", -1, "msg", "查询结果失败，用户无权限或文件不存在");
-        return Map.of("code", 0, "project", dataBaseProject);
+        if (dataBaseProject == null)
+            return new Result(Result.REJECTED, Map.of("msg", "查询失败，任务不存在"));
+
+        if (dataBaseProject.getUserId() != id)
+            return new Result(Result.REJECTED, Map.of("msg", "查询失败，用户无权限"));
+
+        return new Result(Result.ACCEPTED, Map.of("project", dataBaseProject));
     }
 }
