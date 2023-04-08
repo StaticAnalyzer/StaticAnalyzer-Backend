@@ -64,9 +64,6 @@ public class ProjectController {
                          @RequestParam(value = "config") String config) {
         Project project = new Project();
 
-        System.out.println(sourceCode.getSize());
-        System.out.println(config);
-
         try {
             project.setUserId(id);
             project.setSourceCode(sourceCode.getBytes());
