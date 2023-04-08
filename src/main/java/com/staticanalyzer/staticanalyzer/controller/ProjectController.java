@@ -11,11 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.staticanalyzer.staticanalyzer.entities.Project;
@@ -64,9 +60,12 @@ public class ProjectController {
 
     @PostMapping("/user/{id}/project")
     @ApiOperation("文件上传")
-    public Result upload(@PathVariable int id, @RequestBody MultipartFile sourceCode,
-            @RequestBody String config) {
+    public Result upload(@PathVariable int id, @RequestParam(value = "sourceCode") MultipartFile sourceCode,
+                         @RequestParam(value = "config") String config) {
         Project project = new Project();
+
+        System.out.println(sourceCode.getSize());
+        System.out.println(config);
 
         try {
             project.setUserId(id);
