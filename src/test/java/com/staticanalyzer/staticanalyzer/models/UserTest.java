@@ -1,8 +1,7 @@
 package com.staticanalyzer.staticanalyzer.models;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-
-import com.staticanalyzer.staticanalyzer.entities.User;
+import com.staticanalyzer.staticanalyzer.entity.User;
 import com.staticanalyzer.staticanalyzer.mapper.UserMapper;
 
 import org.junit.jupiter.api.Assertions;

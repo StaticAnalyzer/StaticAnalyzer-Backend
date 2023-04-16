@@ -1,7 +1,7 @@
 package com.staticanalyzer.staticanalyzer.models;
 
-import com.staticanalyzer.staticanalyzer.entities.Project;
-import com.staticanalyzer.staticanalyzer.entities.User;
+import com.staticanalyzer.staticanalyzer.entity.Project;
+import com.staticanalyzer.staticanalyzer.entity.User;
 import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
 import com.staticanalyzer.staticanalyzer.mapper.UserMapper;
 import com.staticanalyzer.staticanalyzer.utils.TarGzFileCreator;
