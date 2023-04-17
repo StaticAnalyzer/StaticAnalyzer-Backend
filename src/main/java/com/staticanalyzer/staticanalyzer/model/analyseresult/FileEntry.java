@@ -1,10 +1,8 @@
-package com.staticanalyzer.staticanalyzer.utils.analyseresult;
+package com.staticanalyzer.staticanalyzer.model.analyseresult;
 
 import lombok.Data;
 
 import java.util.List;
-
-import com.staticanalyzer.staticanalyzer.model.AnalyseResult;
 
 @Data
 public class FileEntry {

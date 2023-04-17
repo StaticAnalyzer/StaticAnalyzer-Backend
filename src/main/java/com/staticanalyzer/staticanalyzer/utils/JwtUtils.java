@@ -1,7 +1,8 @@
-package com.staticanalyzer.staticanalyzer.utils.auth;
+package com.staticanalyzer.staticanalyzer.utils;
+
+import java.util.Date;
 
 import java.security.Key;
-import java.util.Date;
 
 import javax.crypto.spec.SecretKeySpec;
 

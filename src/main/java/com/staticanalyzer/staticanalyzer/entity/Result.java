@@ -1,4 +1,4 @@
-package com.staticanalyzer.staticanalyzer.model;
+package com.staticanalyzer.staticanalyzer.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @ApiModel(description = "封装REST响应数据")
-public class RestResult<D> {
+public class Result<D> {
     public static int OK = 0;
     public static int ERROR = 1;
     public static int NO_AUTH = 2;
@@ -23,7 +23,7 @@ public class RestResult<D> {
     @ApiModelProperty(value = "REST响应数据", required = false)
     private D data;
 
-    public RestResult(int code, String msg) {
+    public Result(int code, String msg) {
         this.code = code;
         this.msg = msg;
         this.data = null;

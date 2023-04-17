@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.staticanalyzer.staticanalyzer.entity.Project;
+import com.staticanalyzer.staticanalyzer.entity.Result;
 import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
-import com.staticanalyzer.staticanalyzer.model.RestResult;
 import com.staticanalyzer.staticanalyzer.service.AlgorithmService;
 
 import io.swagger.annotations.Api;
@@ -55,7 +55,7 @@ public class ProjectController {
 
     @PostMapping("/user/{uid}/project")
     @ApiOperation(value = "项目上传")
-    public RestResult<?> upload(
+    public Result<?> upload(
             @PathVariable int uid,
             @RequestParam(value = "sourceCode") MultipartFile sourceCode,
             @RequestParam(value = "config") String config) {
@@ -66,24 +66,24 @@ public class ProjectController {
             project.setSourceCode(sourceCode.getBytes());
             project.setConfig(config);
         } catch (IOException ioException) {
-            return new RestResult<>(RestResult.ERROR, "上传失败");
+            return new Result<>(Result.ERROR, "上传失败");
         }
 
         projectMapper.insert(project);
         taskPool.submit(new Task(project));
-        return new RestResult<>(RestResult.OK, "项目" + project.getId() + "上传成功");
+        return new Result<>(Result.OK, "项目" + project.getId() + "上传成功");
     }
 
     @GetMapping("/user/{uid}/project")
     @ApiOperation(value = "获取项目列表")
-    public RestResult<> queryList(@PathVariable int uid) {
+    public Result<> queryList(@PathVariable int uid) {
         List<Project> databaseProjectList = projectMapper.selectByUserId(uid);
         /* todo */
     }
 
     @GetMapping("/user/{uid}/project/{pid}")
     @ApiOperation(value = "获取项目目录")
-    public RestResult<> queryDirectory(
+    public Result<> queryDirectory(
             @PathVariable int uid,
             @PathVariable int pid) {
         Project databaseProject = projectMapper.selectById(pid);
@@ -92,7 +92,7 @@ public class ProjectController {
 
     @GetMapping("/user/{uid}/project/{pid}/{path}")
     @ApiOperation(value = "获取任务结果")
-    public RestResult<> queryResult(
+    public Result<> queryResult(
             @PathVariable int uid,
             @PathVariable int pid,
             @PathVariable String path) {

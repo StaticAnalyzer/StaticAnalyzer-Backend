@@ -1,10 +1,9 @@
-package com.staticanalyzer.staticanalyzer.utils.analyseresult;
+package com.staticanalyzer.staticanalyzer.model.analyseresult;
 
 import lombok.Data;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Data

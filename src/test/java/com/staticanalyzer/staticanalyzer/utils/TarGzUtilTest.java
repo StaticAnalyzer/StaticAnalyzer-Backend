@@ -1,9 +1,9 @@
 package com.staticanalyzer.staticanalyzer.utils;
 
-import com.staticanalyzer.staticanalyzer.utils.analyseresult.DirectoryEntry;
-import com.staticanalyzer.staticanalyzer.utils.targz.TarGzUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import com.staticanalyzer.staticanalyzer.model.analyseresult.DirectoryEntry;
 
 import java.io.File;
 import java.io.FileInputStream;

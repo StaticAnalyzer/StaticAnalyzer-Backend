@@ -10,9 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.staticanalyzer.staticanalyzer.model.RestResult;
-import com.staticanalyzer.staticanalyzer.utils.auth.JwtUtils;
+import com.staticanalyzer.staticanalyzer.entity.Result;
+import com.staticanalyzer.staticanalyzer.utils.JwtUtils;
 
 import io.jsonwebtoken.ExpiredJwtException;
 
@@ -34,7 +33,7 @@ public class UserInterceptor implements HandlerInterceptor {
     }
 
     private void setResponseMessage(HttpServletResponse response, String message) throws IOException {
-        RestResult<?> result = new RestResult<>(RestResult.NO_AUTH, message);
+        Result<?> result = new Result<>(Result.NO_AUTH, message);
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().println(new ObjectMapper().writeValueAsString(result));
     }
