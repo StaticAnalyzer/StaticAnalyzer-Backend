@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @ApiModel(description = "封装项目数据")
-public class Project {
+public class ProjectDO {
 
     @TableId(value = "id", type = IdType.AUTO)
     @ApiModelProperty(value = "项目id", required = false)

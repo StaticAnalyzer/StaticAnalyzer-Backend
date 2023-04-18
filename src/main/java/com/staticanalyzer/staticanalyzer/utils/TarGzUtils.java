@@ -8,21 +8,24 @@ import java.util.zip.GZIPInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 
-import com.staticanalyzer.staticanalyzer.model.analyseresult.DirectoryEntry;
+import org.springframework.stereotype.Component;
 
+import com.staticanalyzer.staticanalyzer.entity.data.SourceDirectory;
+
+@Component
 public class TarGzUtils {
 
-    public static DirectoryEntry decompress(byte[] fileBytes) throws IOException {
-        DirectoryEntry root = new DirectoryEntry();
+    public SourceDirectory decompress(byte[] fileBytes) throws IOException {
         TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(
                 new GZIPInputStream(new ByteArrayInputStream(fileBytes)));
-        TarArchiveEntry entry = tarArchiveInputStream.getNextTarEntry();
 
+        SourceDirectory root = new SourceDirectory();
+        TarArchiveEntry entry = tarArchiveInputStream.getNextTarEntry();
         while (entry != null) {
             if (entry.isFile()) {
                 byte[] content = new byte[(int) entry.getSize()];
                 tarArchiveInputStream.read(content, 0, content.length);
-                root.addFile("", entry.getName(), new String(content));
+                root.addFile(entry.getName(), new String(content));
             } else if (entry.isDirectory()) {
                 root.addDirectory(entry.getName());
             }

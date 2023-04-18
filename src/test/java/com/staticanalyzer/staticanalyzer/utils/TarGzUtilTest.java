@@ -3,7 +3,7 @@ package com.staticanalyzer.staticanalyzer.utils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.staticanalyzer.staticanalyzer.model.analyseresult.DirectoryEntry;
+import com.staticanalyzer.staticanalyzer.entity.data.SourceDirectory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +18,7 @@ public class TarGzUtilTest {
         File file = new File(fileName);
 
         FileInputStream fileInputStream = new FileInputStream(file);
-        DirectoryEntry root = TarGzUtils.decompress(fileInputStream.readAllBytes());
+        SourceDirectory root = TarGzUtils.decompress(fileInputStream.readAllBytes());
 
         System.out.println(root);
     }

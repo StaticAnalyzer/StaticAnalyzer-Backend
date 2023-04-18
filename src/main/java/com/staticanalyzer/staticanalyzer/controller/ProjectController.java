@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.staticanalyzer.staticanalyzer.entity.Project;
+import com.staticanalyzer.staticanalyzer.entity.ProjectDO;
 import com.staticanalyzer.staticanalyzer.entity.Result;
 import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
 import com.staticanalyzer.staticanalyzer.service.AlgorithmService;
@@ -42,7 +42,7 @@ public class ProjectController {
     @Setter
     @AllArgsConstructor
     class Task implements Runnable {
-        private Project project;
+        private ProjectDO project;
 
         @Override
         public void run() {
@@ -59,7 +59,7 @@ public class ProjectController {
             @PathVariable int uid,
             @RequestParam(value = "sourceCode") MultipartFile sourceCode,
             @RequestParam(value = "config") String config) {
-        Project project = new Project();
+        ProjectDO project = new ProjectDO();
 
         try {
             project.setUserId(uid);
@@ -77,7 +77,7 @@ public class ProjectController {
     @GetMapping("/user/{uid}/project")
     @ApiOperation(value = "获取项目列表")
     public Result<> queryList(@PathVariable int uid) {
-        List<Project> databaseProjectList = projectMapper.selectByUserId(uid);
+        List<ProjectDO> databaseProjectList = projectMapper.selectByUserId(uid);
         /* todo */
     }
 
@@ -86,7 +86,7 @@ public class ProjectController {
     public Result<> queryDirectory(
             @PathVariable int uid,
             @PathVariable int pid) {
-        Project databaseProject = projectMapper.selectById(pid);
+        ProjectDO databaseProject = projectMapper.selectById(pid);
         /* */
     }
 
@@ -96,7 +96,7 @@ public class ProjectController {
             @PathVariable int uid,
             @PathVariable int pid,
             @PathVariable String path) {
-        Project databaseProject = projectMapper.selectById(pid);
+        ProjectDO databaseProject = projectMapper.selectById(pid);
         /* */
     }
 }

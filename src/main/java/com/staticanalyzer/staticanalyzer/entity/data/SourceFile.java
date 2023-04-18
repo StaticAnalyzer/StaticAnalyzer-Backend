@@ -1,11 +1,13 @@
-package com.staticanalyzer.staticanalyzer.model.analyseresult;
+package com.staticanalyzer.staticanalyzer.entity.data;
 
 import lombok.Data;
 
 import java.util.List;
 
+import com.staticanalyzer.staticanalyzer.entity.analysis.AnalyseResult;
+
 @Data
-public class FileEntry {
+public class SourceFile {
     private String name;
     private String path;
     private String content;

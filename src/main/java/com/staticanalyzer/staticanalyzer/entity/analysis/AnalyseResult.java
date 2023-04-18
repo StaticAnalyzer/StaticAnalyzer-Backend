@@ -1,4 +1,4 @@
-package com.staticanalyzer.staticanalyzer.model.analyseresult;
+package com.staticanalyzer.staticanalyzer.entity.analysis;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
