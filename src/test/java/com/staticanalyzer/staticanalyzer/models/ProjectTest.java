@@ -1,7 +1,7 @@
 package com.staticanalyzer.staticanalyzer.models;
 
-import com.staticanalyzer.staticanalyzer.entities.Project;
-import com.staticanalyzer.staticanalyzer.entities.User;
+import com.staticanalyzer.staticanalyzer.entity.ProjectDO;
+import com.staticanalyzer.staticanalyzer.entity.User;
 import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
 import com.staticanalyzer.staticanalyzer.mapper.UserMapper;
 import com.staticanalyzer.staticanalyzer.utils.TarGzFileCreator;
@@ -34,7 +34,7 @@ public class ProjectTest {
 
     @Test
     public void TestProjectBasic() throws IOException {
-        Project project = new Project();
+        ProjectDO project = new ProjectDO();
         project.setSourceCode(CppExampleFile());
         project.setConfig("{\"test\":\"some_config\"}");
         project.setUserId(10086);

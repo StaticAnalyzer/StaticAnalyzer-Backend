@@ -8,7 +8,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.staticanalyzer.staticanalyzer.interceptor.UserInterceptor;
 
 @Configuration
-public class WebConfigurer implements WebMvcConfigurer {
+public class WebMvcConfig implements WebMvcConfigurer {
+
     @Autowired
     private UserInterceptor userInterceptor;
 

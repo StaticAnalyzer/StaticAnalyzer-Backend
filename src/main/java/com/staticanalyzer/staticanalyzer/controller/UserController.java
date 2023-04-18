@@ -1,9 +1,5 @@
 package com.staticanalyzer.staticanalyzer.controller;
 
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,94 +8,80 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.staticanalyzer.staticanalyzer.entities.Result;
-import com.staticanalyzer.staticanalyzer.entities.User;
-import com.staticanalyzer.staticanalyzer.mapper.UserMapper;
-import com.staticanalyzer.staticanalyzer.security.JWTHelper;
+import com.staticanalyzer.staticanalyzer.entity.Result;
+import com.staticanalyzer.staticanalyzer.entity.User;
+import com.staticanalyzer.staticanalyzer.entity.data.AuthenticateData;
+import com.staticanalyzer.staticanalyzer.service.UserService;
+import com.staticanalyzer.staticanalyzer.utils.JwtUtils;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-@Api("用户控制器")
+@Api(description = "用户控制接口")
 public class UserController {
-    @Autowired
-    private UserMapper userMapper;
 
     @Autowired
-    private JWTHelper jwtHelper;
+    private JwtUtils jwtUtils;
 
-    private static String RegularExpressionUsername = "[0-9a-zA-Z_-]{2,8}";
-    private static String RegularExpressionPassword = ".{8,20}";
-
-    private boolean verify(User user) {
-        Pattern patternUsername = Pattern.compile(RegularExpressionUsername);
-        Matcher matcherUsername = patternUsername.matcher(user.getUsername());
-        if (!matcherUsername.matches())
-            return false;
-
-        Pattern patternPassword = Pattern.compile(RegularExpressionPassword);
-        Matcher matcherPassword = patternPassword.matcher(user.getPassword());
-        if (!matcherPassword.matches())
-            return false;
-
-        return true;
-    }
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/login")
-    @ApiOperation("用户登录")
-    public Result login(@RequestBody User user) {
-        String username = user.getUsername();
-        String password = user.getPassword();
-        User dataBaseUser = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+    @ApiOperation(value = "用户登录")
+    public Result<AuthenticateData> login(@RequestBody User user) {
+        if (!userService.verifyUser(user))
+            return new Result<>(Result.ERROR, "用户名或密码格式错误");
 
-        if (dataBaseUser == null)
-            return new Result(Result.REJECTED, Map.of("msg", "登录失败，用户不存在"));
+        User databaseUser = userService.findUserByName(user.getUsername());
+        if (databaseUser == null)
+            return new Result<>(Result.ERROR, "找不到用户");
 
-        if (!dataBaseUser.getPassword().equals(password))
-            return new Result(Result.REJECTED, Map.of("msg", "登录失败，密码错误"));
+        if (!databaseUser.getPassword().equals(user.getUsername()))
+            return new Result<>(Result.ERROR, "用户名或密码错误");
 
-        String token = jwtHelper.generate(dataBaseUser.getId());
-        return new Result(Result.ACCEPTED, Map.of("user", dataBaseUser, "token", token));
+        String jws = jwtUtils.generateJws(databaseUser.getId());
+        return new Result<>(Result.OK, "登录成功", new AuthenticateData(databaseUser, jws));
     }
 
     @PostMapping("/user")
-    @ApiOperation("用户注册")
-    public Result add(@RequestBody User user) {
-        if (!verify(user))
-            return new Result(Result.REJECTED, Map.of("msg", "注册失败，格式错误"));
+    @ApiOperation(value = "用户注册")
+    public Result<AuthenticateData> add(@RequestBody User user) {
+        if (!userService.verifyUsername(user.getUsername()) ||
+                !userService.verifyPassword(user.getPassword()))
+            return new Result<>(Result.ERROR, "用户名或密码格式错误");
 
-        if (userMapper.selectOne(new QueryWrapper<User>().eq("username", user.getUsername())) != null)
-            return new Result(Result.REJECTED, Map.of("msg", "注册失败，用户重名"));
+        User databaseUser = userService.findUserByName(user.getUsername());
+        if (databaseUser != null)
+            return new Result<>(Result.ERROR, "用户名重复");
 
-        userMapper.insert(user);
-        String token = jwtHelper.generate(user.getId());
-        return new Result(Result.ACCEPTED, Map.of("user", user, "token", token));
+        userService.createUser(user);
+        String jws = jwtUtils.generateJws(user.getId());
+        return new Result<>(Result.OK, "注册成功", new AuthenticateData(user, jws));
     }
 
-    @GetMapping("/user/{id}")
-    @ApiOperation("查询用户信息")
-    public Result query(@PathVariable int id) {
-        User dataBaseUser = userMapper.selectById(id);
-        if (dataBaseUser == null)
-            return new Result(Result.REJECTED, Map.of("msg", "查询失败，找不到用户"));
+    @GetMapping("/user/{uid}")
+    @ApiOperation(value = "用户查询")
+    public Result<User> query(@PathVariable int uid) {
+        User databaseUser = userService.findUserById(uid);
+        if (databaseUser == null)
+            return new Result<>(Result.ERROR, "找不到用户");
 
-        return new Result(Result.ACCEPTED, Map.of("user", dataBaseUser));
+        return new Result<>(Result.OK, "查询成功", databaseUser);
     }
 
-    @PutMapping("/user/{id}")
-    @ApiOperation("修改用户密码")
-    public Result update(@PathVariable int id, @RequestBody String password) {
-        User dataBaseUser = userMapper.selectById(id);
-        if (dataBaseUser == null)
-            return new Result(Result.REJECTED, Map.of("msg", "更新失败，找不到用户"));
+    @PutMapping("/user/{uid}")
+    @ApiOperation(value = "用户修改")
+    public Result<?> update(@PathVariable int uid, @RequestBody String password) {
+        if (!userService.verifyPassword(password))
+            return new Result<>(Result.ERROR, "密码格式错误");
 
-        dataBaseUser.setPassword(password);
-        if (!verify(dataBaseUser))
-            return new Result(Result.REJECTED, Map.of("msg", "更新失败，格式错误"));
+        User databaseUser = userService.findUserById(uid);
+        if (databaseUser == null)
+            return new Result<>(Result.ERROR, "找不到用户");
 
-        userMapper.updateById(dataBaseUser);
-        return new Result(Result.ACCEPTED, Map.of("msg", "更新成功"));
+        databaseUser.setPassword(password);
+        userService.updateUser(databaseUser);
+        return new Result<>(Result.OK, "更新成功");
     }
 }

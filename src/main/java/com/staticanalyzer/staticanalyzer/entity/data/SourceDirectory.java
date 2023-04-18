@@ -1,22 +1,21 @@
-package com.staticanalyzer.staticanalyzer.utils.analyseresult;
+package com.staticanalyzer.staticanalyzer.entity.data;
 
 import lombok.Data;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Data
-public class DirectoryEntry {
+public class SourceDirectory {
     private String name;
-    private Map<String, DirectoryEntry> directories = new HashMap<>();
-    private Map<String, FileEntry> files = new HashMap<>();
+    private Map<String, SourceDirectory> directories = new HashMap<>();
+    private Map<String, SourceFile> files = new HashMap<>();
 
-    public void addFile(String baseDir, String name, String content) {
+    public void addFile(String path, String content) {
         String[] parts = name.split("/");
         if (parts.length == 1) {
-            FileEntry file = new FileEntry();
+            SourceFile file = new SourceFile();
             file.setName(name);
             file.setPath(baseDir);
             file.setContent(content);
@@ -28,9 +27,9 @@ public class DirectoryEntry {
                 newBaseDir = dirName;
             else
                 newBaseDir = baseDir + "/" + dirName;
-            DirectoryEntry dir = directories.get(dirName);
+            SourceDirectory dir = directories.get(dirName);
             if (dir == null) {
-                dir = new DirectoryEntry();
+                dir = new SourceDirectory();
                 dir.setName(dirName);
                 directories.put(dirName, dir);
             }
@@ -44,22 +43,26 @@ public class DirectoryEntry {
         if (parts.length == 1) {
             if (name.endsWith("/"))
                 name = name.substring(0, name.length() - 1);
-            DirectoryEntry dir = directories.get(name);
+            SourceDirectory dir = directories.get(name);
             if (dir == null) {
-                dir = new DirectoryEntry();
+                dir = new SourceDirectory();
                 dir.setName(name);
                 directories.put(name, dir);
             }
         } else {
             String dirName = parts[0];
-            DirectoryEntry dir = directories.get(dirName);
+            SourceDirectory dir = directories.get(dirName);
             if (dir == null) {
-                dir = new DirectoryEntry();
+                dir = new SourceDirectory();
                 dir.setName(dirName);
                 directories.put(dirName, dir);
             }
             String newName = String.join("/", Arrays.copyOfRange(parts, 1, parts.length));
             dir.addDirectory(newName);
         }
+    }
+
+    public void setAnalyseResults(String analyseResponse) {
+
     }
 }
