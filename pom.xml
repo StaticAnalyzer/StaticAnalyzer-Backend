@@ -113,6 +113,13 @@
 			<artifactId>lombok</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java-util</artifactId>
+			<version>3.5.0</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
