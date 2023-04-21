@@ -90,7 +90,7 @@ public class ProjectController {
         /* */
     }
 
-    @GetMapping("/user/{uid}/project/{pid}/{path}")
+    @GetMapping("/user/{uid}/project/{pid}/{path:.+}")
     @ApiOperation(value = "获取任务结果")
     public Response<> queryResult(
             @PathVariable int uid,

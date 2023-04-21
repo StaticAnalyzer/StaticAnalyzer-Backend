@@ -11,14 +11,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @SpringBootTest
-public class TarGzUtilTest {
+public class ArchiveTest {
     @Test
-    void testTarGzDecompress() throws IOException {
+    void testTarGz() throws IOException {
         String fileName = "C:\\Users\\LambdaLe\\Desktop\\test\\test.tar.gz";
         File file = new File(fileName);
 
         FileInputStream fileInputStream = new FileInputStream(file);
-        DirectoryEntry root = TarGzUtils.decompress(fileInputStream.readAllBytes());
+        DirectoryEntry root = ArchiveUtils.decompress(fileInputStream.readAllBytes());
 
         System.out.println(root);
     }

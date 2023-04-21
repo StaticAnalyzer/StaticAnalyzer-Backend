@@ -1,6 +1,8 @@
 package com.staticanalyzer.staticanalyzer.interceptor;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,27 +12,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.staticanalyzer.staticanalyzer.config.UserConfig;
 import com.staticanalyzer.staticanalyzer.entity.Response;
 import com.staticanalyzer.staticanalyzer.utils.JwtUtils;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 
 @Component
 public class UserInterceptor implements HandlerInterceptor {
 
     @Autowired
-    JwtUtils jwtUtils;
-
-    private String getJws(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        if (!header.startsWith("Bearer "))
-            return null;
-        return header.substring(7);
-    }
-
-    private int getUid(HttpServletRequest request) {
-        return Integer.parseInt(request.getRequestURI().split("/")[2]);
-    }
+    UserConfig userConfig;
 
     private void setResponseMessage(HttpServletResponse response, String message) throws IOException {
         Response<?> result = new Response<>(Response.NO_AUTH, message);
@@ -41,20 +35,25 @@ public class UserInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request,
             HttpServletResponse response, Object handler) throws Exception {
+        String requestHeader = request.getHeader("Authorization");
+        String jws = requestHeader.replaceFirst("Bearer ", "");
+        int jwtUserId = -1;
         try {
-            int jwtUserId = jwtUtils.parseJws(getJws(request));
-            int requestUserId = getUid(request);
-            if (jwtUserId != requestUserId) {
-                setResponseMessage(response, "token认证失败");
-                return false;
-            }
-            return true;
+            jwtUserId = JwtUtils.parseJws(userConfig.getKey(), jws);
         } catch (ExpiredJwtException expiredJwtException) {
             setResponseMessage(response, "token过期");
             return false;
-        } catch (Exception exception) {
-            setResponseMessage(response, "token认证错误");
+        } catch (JwtException jwtException) {
+            setResponseMessage(response, "token格式错误");
             return false;
         }
+
+        Path requestPath = Paths.get(request.getRequestURI());
+        int requestUserId = Integer.parseInt(requestPath.getName(1).toString());
+        if (jwtUserId != requestUserId) {
+            setResponseMessage(response, "token认证失败");
+            return false;
+        }
+        return true;
     }
 }
