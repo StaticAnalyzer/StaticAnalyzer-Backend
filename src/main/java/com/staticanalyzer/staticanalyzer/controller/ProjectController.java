@@ -18,6 +18,7 @@ import com.staticanalyzer.staticanalyzer.entity.Response;
 import com.staticanalyzer.staticanalyzer.entity.project.Project;
 import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
 import com.staticanalyzer.staticanalyzer.service.AlgorithmService;
+import com.staticanalyzer.staticanalyzer.service.ProjectService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,49 +30,22 @@ import lombok.Setter;
 @RestController
 @Api(description = "项目控制接口")
 public class ProjectController {
-    private static Logger logger = LoggerFactory.getLogger(Task.class);
-    private static ExecutorService taskPool = Executors.newFixedThreadPool(10);
 
     @Autowired
-    private AlgorithmService algorithmService;
-
-    @Autowired
-    private ProjectMapper projectMapper;
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    class Task implements Runnable {
-        private Project project;
-
-        @Override
-        public void run() {
-            logger.info("任务" + project.getId() + "启动");
-            project.setAnalyseResult(algorithmService.JustReturn(project.getSourceCode(), project.getConfig()));
-            projectMapper.updateById(project);
-            logger.info("任务" + project.getId() + "完成");
-        }
-    }
+    private ProjectService projectService;
 
     @PostMapping("/user/{uid}/project")
     @ApiOperation(value = "项目上传")
     public Response<?> upload(
-            @PathVariable int uid,
+            @PathVariable("uid") int userId,
             @RequestParam(value = "sourceCode") MultipartFile sourceCode,
             @RequestParam(value = "config") String config) {
-        Project project = new Project();
-
         try {
-            project.setUserId(uid);
-            project.setSourceCode(sourceCode.getBytes());
-            project.setConfig(config);
+            Project project = projectService.create(userId, sourceCode.getBytes(), config);
+            return new Response<>(Response.OK, "项目" + project.getId() + "上传成功");
         } catch (IOException ioException) {
             return new Response<>(Response.ERROR, "上传失败");
         }
-
-        projectMapper.insert(project);
-        taskPool.submit(new Task(project));
-        return new Response<>(Response.OK, "项目" + project.getId() + "上传成功");
     }
 
     @GetMapping("/user/{uid}/project")

@@ -11,7 +11,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import com.staticanalyzer.staticanalyzer.entity.analyse.DirectoryEntry;
 import com.staticanalyzer.staticanalyzer.entity.analyse.FileEntry;
 
-public class ArchiveUtils {
+public class ZipUtils {
 
     public static DirectoryEntry<FileEntry> fromTarGz(byte[] tarGzFileBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(tarGzFileBytes);
@@ -22,12 +22,16 @@ public class ArchiveUtils {
         TarArchiveEntry archiveEntry;
         while ((archiveEntry = tarArchiveInputStream.getNextTarEntry()) != null) {
             if (archiveEntry.isDirectory()) {
-                // todo
+                rootEntry.createAbsolute(archiveEntry.getName());
             } else if (archiveEntry.isFile()) {
                 int archiveEntrySize = (int) archiveEntry.getSize();
                 byte[] content = new byte[archiveEntrySize];
                 tarArchiveInputStream.read(content, 0, archiveEntrySize);
-                // todo
+
+                FileEntry fileEntry = new FileEntry();
+                fileEntry.setName(archiveEntry.getName());
+                fileEntry.setSrc(new String(content));
+                rootEntry.addFile(archiveEntry.getName(), fileEntry);
             }
         }
 
@@ -39,7 +43,7 @@ public class ArchiveUtils {
         return null;
     }
 
-    public static DirectoryEntry<FileEntry> fromZip(byte[] zipFileBytes) throws IOException {
+    public static DirectoryEntry<FileEntry> fromRar(byte[] rarFileBytes) throws IOException {
         return null;
     }
 

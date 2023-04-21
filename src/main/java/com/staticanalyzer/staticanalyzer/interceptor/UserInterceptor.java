@@ -2,7 +2,6 @@ package com.staticanalyzer.staticanalyzer.interceptor;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,7 +47,7 @@ public class UserInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        Path requestPath = Paths.get(request.getRequestURI());
+        Path requestPath = Path.of(request.getRequestURI());
         int requestUserId = Integer.parseInt(requestPath.getName(1).toString());
         if (jwtUserId != requestUserId) {
             setResponseMessage(response, "token认证失败");
