@@ -10,16 +10,16 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 
 import org.springframework.stereotype.Component;
 
-import com.staticanalyzer.staticanalyzer.entity.data.SourceDirectory;
+import com.staticanalyzer.staticanalyzer.entity.analyse.DirectoryEntry;
 
 @Component
 public class TarGzUtils {
 
-    public SourceDirectory decompress(byte[] fileBytes) throws IOException {
+    public DirectoryEntry decompress(byte[] fileBytes) throws IOException {
         TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(
                 new GZIPInputStream(new ByteArrayInputStream(fileBytes)));
 
-        SourceDirectory root = new SourceDirectory();
+        DirectoryEntry root = new DirectoryEntry();
         TarArchiveEntry entry = tarArchiveInputStream.getNextTarEntry();
         while (entry != null) {
             if (entry.isFile()) {

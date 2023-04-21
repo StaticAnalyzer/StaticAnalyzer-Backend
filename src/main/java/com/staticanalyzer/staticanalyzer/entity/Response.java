@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @ApiModel(description = "封装REST响应数据")
-public class Result<D> {
+public class Response<D> {
     public static int OK = 0;
     public static int ERROR = 1;
     public static int NO_AUTH = 2;
@@ -23,7 +23,7 @@ public class Result<D> {
     @ApiModelProperty(value = "REST响应数据", required = false)
     private D data;
 
-    public Result(int code, String msg) {
+    public Response(int code, String msg) {
         this.code = code;
         this.msg = msg;
         this.data = null;

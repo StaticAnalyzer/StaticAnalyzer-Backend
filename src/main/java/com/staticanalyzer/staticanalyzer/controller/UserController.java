@@ -8,14 +8,31 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.staticanalyzer.staticanalyzer.entity.Result;
-import com.staticanalyzer.staticanalyzer.entity.User;
-import com.staticanalyzer.staticanalyzer.entity.data.AuthenticateData;
+import com.staticanalyzer.staticanalyzer.entity.Response;
+import com.staticanalyzer.staticanalyzer.entity.user.User;
 import com.staticanalyzer.staticanalyzer.service.UserService;
 import com.staticanalyzer.staticanalyzer.utils.JwtUtils;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+@ApiModel(description = "用户认证信息")
+class AuthData {
+
+    @ApiModelProperty(value = "用户信息", required = true)
+    private User user;
+
+    @ApiModelProperty(value = "令牌", name = "jwt", required = true)
+    private String token;
+}
+
 
 @RestController
 @Api(description = "用户控制接口")
@@ -29,59 +46,59 @@ public class UserController {
 
     @PostMapping("/login")
     @ApiOperation(value = "用户登录")
-    public Result<AuthenticateData> login(@RequestBody User user) {
+    public Response<AuthData> login(@RequestBody User user) {
         if (!userService.verifyUser(user))
-            return new Result<>(Result.ERROR, "用户名或密码格式错误");
+            return new Response<>(Response.ERROR, "用户名或密码格式错误");
 
         User databaseUser = userService.findUserByName(user.getUsername());
         if (databaseUser == null)
-            return new Result<>(Result.ERROR, "找不到用户");
+            return new Response<>(Response.ERROR, "找不到用户");
 
         if (!databaseUser.getPassword().equals(user.getUsername()))
-            return new Result<>(Result.ERROR, "用户名或密码错误");
+            return new Response<>(Response.ERROR, "用户名或密码错误");
 
         String jws = jwtUtils.generateJws(databaseUser.getId());
-        return new Result<>(Result.OK, "登录成功", new AuthenticateData(databaseUser, jws));
+        return new Response<>(Response.OK, "登录成功", new AuthData(databaseUser, jws));
     }
 
     @PostMapping("/user")
     @ApiOperation(value = "用户注册")
-    public Result<AuthenticateData> add(@RequestBody User user) {
+    public Response<AuthData> add(@RequestBody User user) {
         if (!userService.verifyUsername(user.getUsername()) ||
                 !userService.verifyPassword(user.getPassword()))
-            return new Result<>(Result.ERROR, "用户名或密码格式错误");
+            return new Response<>(Response.ERROR, "用户名或密码格式错误");
 
         User databaseUser = userService.findUserByName(user.getUsername());
         if (databaseUser != null)
-            return new Result<>(Result.ERROR, "用户名重复");
+            return new Response<>(Response.ERROR, "用户名重复");
 
         userService.createUser(user);
         String jws = jwtUtils.generateJws(user.getId());
-        return new Result<>(Result.OK, "注册成功", new AuthenticateData(user, jws));
+        return new Response<>(Response.OK, "注册成功", new AuthData(user, jws));
     }
 
     @GetMapping("/user/{uid}")
     @ApiOperation(value = "用户查询")
-    public Result<User> query(@PathVariable int uid) {
+    public Response<User> query(@PathVariable int uid) {
         User databaseUser = userService.findUserById(uid);
         if (databaseUser == null)
-            return new Result<>(Result.ERROR, "找不到用户");
+            return new Response<>(Response.ERROR, "找不到用户");
 
-        return new Result<>(Result.OK, "查询成功", databaseUser);
+        return new Response<>(Response.OK, "查询成功", databaseUser);
     }
 
     @PutMapping("/user/{uid}")
     @ApiOperation(value = "用户修改")
-    public Result<?> update(@PathVariable int uid, @RequestBody String password) {
+    public Response<?> update(@PathVariable int uid, @RequestBody String password) {
         if (!userService.verifyPassword(password))
-            return new Result<>(Result.ERROR, "密码格式错误");
+            return new Response<>(Response.ERROR, "密码格式错误");
 
         User databaseUser = userService.findUserById(uid);
         if (databaseUser == null)
-            return new Result<>(Result.ERROR, "找不到用户");
+            return new Response<>(Response.ERROR, "找不到用户");
 
         databaseUser.setPassword(password);
         userService.updateUser(databaseUser);
-        return new Result<>(Result.OK, "更新成功");
+        return new Response<>(Response.OK, "更新成功");
     }
 }

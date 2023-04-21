@@ -1,4 +1,4 @@
-package com.staticanalyzer.staticanalyzer.entity;
+package com.staticanalyzer.staticanalyzer.entity.project;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @ApiModel(description = "封装项目数据")
-public class ProjectDO {
+public class Project {
 
     @TableId(value = "id", type = IdType.AUTO)
     @ApiModelProperty(value = "项目id", required = false)

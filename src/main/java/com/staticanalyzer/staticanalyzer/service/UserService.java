@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.staticanalyzer.staticanalyzer.entity.User;
+import com.staticanalyzer.staticanalyzer.entity.user.User;
 import com.staticanalyzer.staticanalyzer.mapper.UserMapper;
 
 @Service

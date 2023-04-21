@@ -1,4 +1,4 @@
-package com.staticanalyzer.staticanalyzer.entity;
+package com.staticanalyzer.staticanalyzer.entity.user;
 
 import java.io.Serializable;
 
