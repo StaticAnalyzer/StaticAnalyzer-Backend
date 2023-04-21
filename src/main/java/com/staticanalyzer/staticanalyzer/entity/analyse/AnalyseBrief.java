@@ -1,12 +1,11 @@
 package com.staticanalyzer.staticanalyzer.entity.analyse;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 @Data
-@AllArgsConstructor
 @ApiModel(description = "ProjectVO中的分析简报")
 public class AnalyseBrief {
 

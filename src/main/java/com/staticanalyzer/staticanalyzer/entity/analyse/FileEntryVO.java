@@ -20,14 +20,14 @@ public class FileEntryVO {
     public static FileEntryVO fromFileEntry(FileEntry fileEntry) {
         FileEntryVO newFileEntryVO = new FileEntryVO();
         newFileEntryVO.setName(fileEntry.getName());
-        newFileEntryVO.setSeverity(AnalyseStatus.Pass);
 
+        AnalyseStatus severity = AnalyseStatus.Pass;
         for (AnalyseResultEntry analyseResult : fileEntry.getAnalyseResults()) {
             AnalyseStatus currentSeverity = AnalyseStatus.valueOf(analyseResult.getSeverity());
-            if (currentSeverity.ordinal() > newFileEntryVO.getSeverity().ordinal())
-                newFileEntryVO.setSeverity(currentSeverity);
+            if (currentSeverity.compareTo(severity) > 0)
+                severity = currentSeverity;
         }
-
+        newFileEntryVO.setSeverity(severity);
         return newFileEntryVO;
     }
 }
