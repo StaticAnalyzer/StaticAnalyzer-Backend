@@ -63,9 +63,9 @@ public class ProjectVO {
                         if (algAnalyseResult.getCode() == 1) {
                             severity = AnalyseStatus.AnalyseError;
                         } else {
-                            Map<String, FileAnalyseResults> fileAnalyseResultsMap = algAnalyseResult
+                            Map<String, FileAnalyseResults> fileAnalyseResultMap = algAnalyseResult
                                     .getFileAnalyseResultsMap();
-                            for (Map.Entry<String, FileAnalyseResults> entry : fileAnalyseResultsMap.entrySet()) {
+                            for (Map.Entry<String, FileAnalyseResults> entry : fileAnalyseResultMap.entrySet()) {
                                 List<AnalyseResultEntry> analyseResultEntryList = entry.getValue()
                                         .getAnalyseResultsList();
                                 for (AnalyseResultEntry analyseResultEntry : analyseResultEntryList) {

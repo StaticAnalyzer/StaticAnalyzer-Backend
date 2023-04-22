@@ -1,7 +1,5 @@
 package com.staticanalyzer.staticanalyzer.entity.user;
 
-import java.io.Serializable;
-
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.IdType;
 
@@ -12,7 +10,7 @@ import lombok.Data;
 
 @Data
 @ApiModel(description = "封装用户数据")
-public class User implements Serializable {
+public class User {
 
     @TableId(value = "id", type = IdType.AUTO)
     @ApiModelProperty(value = "用户id", required = false)

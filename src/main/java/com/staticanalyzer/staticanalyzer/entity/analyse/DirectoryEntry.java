@@ -2,7 +2,14 @@ package com.staticanalyzer.staticanalyzer.entity.analyse;
 
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+
+import com.staticanalyzer.algservice.AlgAnalyseResult;
+import com.staticanalyzer.algservice.AnalyseResponse;
+import com.staticanalyzer.algservice.AnalyseResultEntry;
+import com.staticanalyzer.algservice.FileAnalyseResults;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -79,7 +86,46 @@ public class DirectoryEntry<T> {
         return parentEntry.getFiles().get(filePath.getFileName().toString());
     }
 
+    public static boolean analyse(DirectoryEntry<FileEntry> root, AnalyseResponse analyseResponse) {
+        Map<String, List<AnalyseResultEntry>> analyseMap = new HashMap<>();
+
+        if (analyseResponse.getCode() == 1)
+            return false;
+
+        List<AlgAnalyseResult> algAnalyseResultList = analyseResponse.getAlgAnalyseResultsList();
+        for (AlgAnalyseResult algAnalyseResult : algAnalyseResultList) {
+            Map<String, FileAnalyseResults> fileAnalyseResultMap = algAnalyseResult.getFileAnalyseResultsMap();
+            for (Map.Entry<String, FileAnalyseResults> entry : fileAnalyseResultMap.entrySet()) {
+                List<AnalyseResultEntry> analyseResultEntryList = analyseMap.get(entry.getKey());
+                if (analyseResultEntryList == null) {
+                    analyseResultEntryList = new LinkedList<>();
+                    analyseMap.put(entry.getKey(), analyseResultEntryList);
+                }
+                analyseResultEntryList.addAll(entry.getValue().getAnalyseResultsList());
+            }
+        }
+
+        for (Map.Entry<String, List<AnalyseResultEntry>> entry : analyseMap.entrySet()) {
+            FileEntry fileEntry = root.getFileAt(entry.getKey());
+            fileEntry.setAnalyseResults(entry.getValue());
+        }
+        return true;
+    }
+
     public static DirectoryEntry<FileEntryVO> visualize(DirectoryEntry<FileEntry> root) {
-        return null;
+        DirectoryEntry<FileEntryVO> rootVO = new DirectoryEntry<>();
+
+        Map<String, DirectoryEntry<FileEntryVO>> directoryEntryVOs = new HashMap<>();
+        for (Map.Entry<String, DirectoryEntry<FileEntry>> entry : root.getDirectories().entrySet())
+            directoryEntryVOs.put(entry.getKey(), visualize(entry.getValue()));
+
+        Map<String, FileEntryVO> fileEntryVOs = new HashMap<>();
+        for (Map.Entry<String, FileEntry> entry : root.getFiles().entrySet())
+            fileEntryVOs.put(entry.getKey(), FileEntryVO.fromFileEntry(entry.getValue()));
+
+        rootVO.setName(root.getName());
+        rootVO.setDirectories(directoryEntryVOs);
+        rootVO.setFiles(fileEntryVOs);
+        return rootVO;
     }
 }
