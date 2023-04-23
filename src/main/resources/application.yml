@@ -33,4 +33,4 @@ user:
   auth:
     regex:
       username: '[0-9a-zA-Z_-]{2,8}'
-      password: '.{8,20}'
+      password: '.{8,30}'

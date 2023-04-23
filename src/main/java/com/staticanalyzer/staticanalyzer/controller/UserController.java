@@ -49,7 +49,7 @@ public class UserController {
         if (databaseUser == null)
             return new Response<>(Response.ERROR, "找不到用户");
 
-        if (!databaseUser.getPassword().equals(user.getUsername()))
+        if (!databaseUser.getPassword().equals(user.getPassword()))
             return new Response<>(Response.ERROR, "用户名或密码错误");
 
         String jws = userService.signById(databaseUser.getId());
