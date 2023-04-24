@@ -1,16 +1,24 @@
 package com.staticanalyzer.staticanalyzer.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.staticanalyzer.staticanalyzer.entity.project.Project;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import com.staticanalyzer.staticanalyzer.entity.project.Project;
 
 @Mapper
 public interface ProjectMapper extends BaseMapper<Project> {
+
+    /**
+     * 通过所有者id获取项目列表
+     * 
+     * @param userId
+     * @return 项目列表
+     */
     @Select("SELECT * FROM project WHERE user_id=#{userId}")
     List<Project> selectByUserId(@Param("userId") int userId);
 }

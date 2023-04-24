@@ -38,7 +38,6 @@ public class ProjectVO {
 
     /**
      * 项目分析状态
-     * 
      * @see entity.project.ProjectStatus
      */
     @ApiModelProperty(value = "项目分析状态", example = "Complete", required = true)
@@ -53,7 +52,6 @@ public class ProjectVO {
     /**
      * 分析结果简报列表
      * 依据算法分类的简报
-     * 
      * @see entity.analysis.Analysis
      */
     @ApiModelProperty(value = "分析结果简报列表", required = false)

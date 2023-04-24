@@ -64,7 +64,6 @@ public class Project {
     /**
      * 分析结果
      * json字串，由算法任务获取后填入
-     * 
      * @see algservice.AnalyseResponse
      */
     @ApiModelProperty(value = "分析结果", required = false)
@@ -76,7 +75,6 @@ public class Project {
      * @apiNote 使用protobuf自带的json序列化
      * @param analyseResponse
      * @return 成功获取时返回{@code 真}，出现IOException返回{@code 假}
-     * 
      * @see com.google.protobuf.util.JsonFormat
      */
     public boolean updateAnalyseResult(AnalyseResponse analyseResponse) {
@@ -96,7 +94,6 @@ public class Project {
      * 
      * @apiNote 使用protobuf自带的json序列化
      * @return 解析失败时返回{@code null}
-     * 
      * @see com.google.protobuf.util.JsonFormat
      */
     public AnalyseResponse resolveAnalyseResponse() {

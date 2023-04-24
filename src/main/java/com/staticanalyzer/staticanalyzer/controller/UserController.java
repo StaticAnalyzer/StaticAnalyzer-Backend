@@ -41,17 +41,17 @@ public class UserController {
     @PostMapping("/login")
     @ApiOperation(value = "用户登录接口")
     public Result<Identity> login(@RequestBody User user) {
-        if (!userService.verify(user))
+        if (!userService.check(user))
             return Result.error("用户名或密码格式错误");
 
-        User databaseUser = userService.find(user.getUsername());
+        User databaseUser = userService.read(user.getUsername());
         if (databaseUser == null)
             return Result.error("找不到用户");
 
         if (!databaseUser.getPassword().equals(user.getPassword()))
             return Result.error("用户名或密码错误");
 
-        String jws = userService.sign(databaseUser.getId());
+        String jws = userService.getSignature(databaseUser.getId());
         return Result.ok("登录成功", new Identity(databaseUser, jws));
     }
 
@@ -66,15 +66,15 @@ public class UserController {
     @PostMapping("/user")
     @ApiOperation(value = "用户注册接口")
     public Result<Identity> create(@RequestBody User user) {
-        if (!userService.verify(user))
+        if (!userService.check(user))
             return Result.error("用户名或密码格式错误");
 
-        User databaseUser = userService.find(user.getUsername());
+        User databaseUser = userService.read(user.getUsername());
         if (databaseUser != null)
             return Result.error("用户已存在");
 
         userService.create(user);
-        String jws = userService.sign(user.getId());
+        String jws = userService.getSignature(user.getId());
         return Result.ok("注册成功", new Identity(user, jws));
     }
 
@@ -89,7 +89,7 @@ public class UserController {
     @GetMapping("/user/{uid}")
     @ApiOperation(value = "用户查询接口")
     public Result<User> read(@PathVariable("uid") int userId) {
-        User databaseUser = userService.find(userId);
+        User databaseUser = userService.read(userId);
         if (databaseUser == null)
             return Result.error("找不到用户");
         return Result.ok("查询成功", databaseUser);
@@ -106,12 +106,12 @@ public class UserController {
     @PutMapping("/user/{uid}")
     @ApiOperation(value = "用户修改接口")
     public Result<?> update(@PathVariable("uid") int userId, @RequestBody String password) {
-        User databaseUser = userService.find(userId);
+        User databaseUser = userService.read(userId);
         if (databaseUser == null)
             return Result.error("找不到用户");
 
         databaseUser.setPassword(password);
-        if (!userService.verify(databaseUser))
+        if (!userService.check(databaseUser))
             return Result.error("用户名或密码格式错误");
 
         userService.update(databaseUser);
