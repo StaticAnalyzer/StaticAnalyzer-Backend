@@ -12,9 +12,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import com.staticanalyzer.staticanalyzer.entity.Result;
-import com.staticanalyzer.staticanalyzer.entity.analyse.DirectoryEntry;
-import com.staticanalyzer.staticanalyzer.entity.analyse.FileEntryVO;
-import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
+import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisDe
+import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisDetail;tailFileAnalysisDetail;
+import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisBrief;
+import com.staticanalyzer.staticanalyzer.entity.project.DirectoryEntry;
 import com.staticanalyzer.staticanalyzer.entity.project.Project;
 import com.staticanalyzer.staticanalyzer.entity.project.ProjectVO;
 import com.staticanalyzer.staticanalyzer.service.ProjectService;
@@ -63,7 +64,7 @@ public class ProjectController {
      * 
      * @param userId
      * @return 项目信息组成的列表
-     * @see entity.project.ProjectVO
+     * @see com.staticanalyzer.staticanalyzer.entity.project.ProjectVO
      */
     @GetMapping("/user/{uid}/project")
     @ApiOperation(value = "项目查询接口")
@@ -79,15 +80,15 @@ public class ProjectController {
      * @param userId
      * @param projectId
      * @return 项目文件树结构
-     * @see entity.analyse.DirectoryEntry
-     * @see entity.analyse.FileEntryVO
+     * @see com.staticanalyzer.staticanalyzer.entity.project.DirectoryEntry
+     * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisBrief
      */
     @GetMapping("/user/{uid}/project/{pid}")
     @ApiOperation(value = "项目目录查询接口")
-    public Result<DirectoryEntry<FileEntryVO>> read(
+    public Result<DirectoryEntry<FileAnalysisBrief>> read(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId) {
-        DirectoryEntry<FileEntryVO> directoryEntryVO = projectService.findByProjectId(userId, projectId);
+        DirectoryEntry<FileAnalysisBrief> directoryEntryVO = projectService.findByProjectId(userId, projectId);
         return Result.ok("项目目录查询成功", directoryEntryVO);
     }
 
@@ -99,15 +100,15 @@ public class ProjectController {
      * @param projectId
      * @param path
      * @return 包括源代码和分析结果的清单
-     * @see entity.analysis.FileAnalysis
+     * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisDetail
      */
     @GetMapping("/user/{uid}/project/{pid}/{path:.+}")
     @ApiOperation(value = "文件查询接口")
-    public Result<FileAnalysis> read(
+    public Result<FileAnalysisDetail> read(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId,
             @PathVariable String path) {
-        FileAnalysis fileEntry = projectService.findByPath(userId, projectId, path);
+        FileAnalysisDetail fileEntry = projectService.findByPath(userId, projectId, path);
         return Result.ok("文件查询成功", fileEntry);
     }
 }

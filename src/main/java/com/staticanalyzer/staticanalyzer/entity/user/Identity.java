@@ -20,7 +20,7 @@ public class Identity {
     /**
      * 用户信息
      * 
-     * @see entity.user.User
+     * @see com.staticanalyzer.staticanalyzer.entity.user.User
      */
     @ApiModelProperty(value = "用户信息", required = true)
     private User user;
@@ -29,7 +29,7 @@ public class Identity {
      * 用用户id签名的令牌
      * 在一段时间后过期
      * 
-     * @see utils.JwtUtils
+     * @see com.staticanalyzer.staticanalyzer.utils.JwtUtils
      */
     @ApiModelProperty(value = "令牌", required = true)
     private String token;

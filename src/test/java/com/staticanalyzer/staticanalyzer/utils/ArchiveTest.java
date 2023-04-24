@@ -3,7 +3,7 @@ package com.staticanalyzer.staticanalyzer.utils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.staticanalyzer.staticanalyzer.entity.analyse.DirectoryEntry;
+import com.staticanalyzer.staticanalyzer.entity.project.DirectoryEntry;
 
 import java.io.File;
 import java.io.FileInputStream;

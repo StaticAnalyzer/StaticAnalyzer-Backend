@@ -1,4 +1,4 @@
-package com.staticanalyzer.staticanalyzer.config.redis;
+package com.staticanalyzer.staticanalyzer.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,16 +14,17 @@ public class RedisConfigurer {
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        GenericJackson2JsonRedisSerializer jackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
-        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-
         redisTemplate.setConnectionFactory(redisConnectionFactory);
+
+        GenericJackson2JsonRedisSerializer jackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
         redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
+        redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
+
+        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
         redisTemplate.setKeySerializer(stringRedisSerializer);
         redisTemplate.setHashKeySerializer(stringRedisSerializer);
-        redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
-        redisTemplate.afterPropertiesSet();
 
+        redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
 }

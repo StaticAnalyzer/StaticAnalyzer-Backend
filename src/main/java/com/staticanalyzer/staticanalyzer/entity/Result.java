@@ -14,10 +14,9 @@ public class Result<D> {
 
     /**
      * REST响应码
-     * 
-     * @see Result.OK
-     * @see Result.ERROR
-     * @see Result.HINT
+     * 成功 {@static 0}
+     * 失败 {@static -1}
+     * 需要登录 {@static -2}
      */
     @ApiModelProperty(value = "REST响应码", example = "0", required = true)
     private int code;
@@ -36,6 +35,7 @@ public class Result<D> {
 
     /**
      * 请求成功
+     * {@static 0}
      */
     public static int OK = 0;
 
@@ -71,6 +71,7 @@ public class Result<D> {
 
     /**
      * 请求失败
+     * {@static -1}
      */
     public static int ERROR = -1;
 
@@ -90,6 +91,7 @@ public class Result<D> {
 
     /**
      * 需要重新认证
+     * {@static -2}
      */
     public static int HINT = -2;
 

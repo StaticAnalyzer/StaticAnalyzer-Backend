@@ -8,8 +8,8 @@ import java.util.zip.GZIPInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 
-import com.staticanalyzer.staticanalyzer.entity.analyse.DirectoryEntry;
 import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
+import com.staticanalyzer.staticanalyzer.entity.project.DirectoryEntry;
 
 public class ZipUtils {
 

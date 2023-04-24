@@ -10,7 +10,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-
 import com.staticanalyzer.staticanalyzer.config.jwt.JwtProperties;
 import com.staticanalyzer.staticanalyzer.config.user.UserProperties;
 import com.staticanalyzer.staticanalyzer.entity.user.User;

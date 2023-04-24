@@ -1,4 +1,4 @@
-package com.staticanalyzer.staticanalyzer.config.swagger;
+package com.staticanalyzer.staticanalyzer.config;
 
 import com.google.common.base.Predicates;
 

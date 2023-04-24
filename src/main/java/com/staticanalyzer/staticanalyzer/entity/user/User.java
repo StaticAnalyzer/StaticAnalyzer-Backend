@@ -29,7 +29,7 @@ public class User {
      * 用户名
      * 必须符合user.username-format的规范
      * 
-     * @see config.user.UserConfigurer
+     * @see com.staticanalyzer.staticanalyzer.config.user.UserProperties
      */
     @ApiModelProperty(value = "用户名", required = true)
     private String username;
@@ -38,7 +38,7 @@ public class User {
      * 用户密码
      * 必须符合user.password-format的规范
      * 
-     * @see config.user.UserConfigurer
+     * @see com.staticanalyzer.staticanalyzer.config.user.UserProperties
      */
     @ApiModelProperty(value = "用户密码", required = true)
     private String password;

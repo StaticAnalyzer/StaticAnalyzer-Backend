@@ -36,7 +36,7 @@ public class UserController {
      * @apiNote 输出错误信息时data将被置空
      * @param user
      * @return user和token的组合
-     * @see entity.user.Identity
+     * @see com.staticanalyzer.staticanalyzer.entity.user.User
      */
     @PostMapping("/login")
     @ApiOperation(value = "用户登录接口")
@@ -61,7 +61,8 @@ public class UserController {
      * @apiNote 输出错误信息时data将被置空
      * @param user
      * @return user和token的组合
-     * @see entity.user.Identity
+     * @see com.staticanalyzer.staticanalyzer.entity.user.User
+     * @see com.staticanalyzer.staticanalyzer.entity.user.Identity
      */
     @PostMapping("/user")
     @ApiOperation(value = "用户注册接口")
@@ -84,7 +85,7 @@ public class UserController {
      * @apiNote 输出错误信息时data将被置空
      * @param userId
      * @return user作为data返回
-     * @see entity.user.User
+     * @see com.staticanalyzer.staticanalyzer.entity.user.User
      */
     @GetMapping("/user/{uid}")
     @ApiOperation(value = "用户查询接口")

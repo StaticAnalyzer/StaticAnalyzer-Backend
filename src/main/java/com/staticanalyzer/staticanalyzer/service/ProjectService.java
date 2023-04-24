@@ -13,9 +13,9 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import com.staticanalyzer.algservice.AnalyseResponse;
-import com.staticanalyzer.staticanalyzer.entity.analyse.DirectoryEntry;
-import com.staticanalyzer.staticanalyzer.entity.analyse.FileEntryVO;
 import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
+import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisBrief;
+import com.staticanalyzer.staticanalyzer.entity.project.DirectoryEntry;
 import com.staticanalyzer.staticanalyzer.entity.project.Project;
 import com.staticanalyzer.staticanalyzer.entity.project.ProjectVO;
 import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
@@ -126,7 +126,7 @@ public class ProjectService {
         return cachedProjectVOList;
     }
 
-    public DirectoryEntry<FileEntryVO> findByProjectId(int userId, int projectId) {
+    public DirectoryEntry<FileAnalysisBrief> findByProjectId(int userId, int projectId) {
         DirectoryEntry<FileAnalysis> cachedAnalysedProject = fetch(userId, projectId);
         return DirectoryEntry.visualize(cachedAnalysedProject);
     }

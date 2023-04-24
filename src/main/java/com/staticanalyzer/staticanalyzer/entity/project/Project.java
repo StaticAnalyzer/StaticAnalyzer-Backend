@@ -64,6 +64,7 @@ public class Project {
     /**
      * 分析结果
      * json字串，由算法任务获取后填入
+     * 
      * @see algservice.AnalyseResponse
      */
     @ApiModelProperty(value = "分析结果", required = false)

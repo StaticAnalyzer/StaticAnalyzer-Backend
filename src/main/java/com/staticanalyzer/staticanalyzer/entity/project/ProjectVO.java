@@ -38,7 +38,8 @@ public class ProjectVO {
 
     /**
      * 项目分析状态
-     * @see entity.project.ProjectStatus
+     * 
+     * @see com.staticanalyzer.staticanalyzer.entity.project.ProjectStatus
      */
     @ApiModelProperty(value = "项目分析状态", example = "Complete", required = true)
     private ProjectStatus status;
@@ -52,7 +53,8 @@ public class ProjectVO {
     /**
      * 分析结果简报列表
      * 依据算法分类的简报
-     * @see entity.analysis.Analysis
+     * 
+     * @see com.staticanalyzer.staticanalyzer.entity.analysis.Analysis
      */
     @ApiModelProperty(value = "分析结果简报列表", required = false)
     private List<Analysis> analyseBrief;
@@ -63,21 +65,20 @@ public class ProjectVO {
      * @param project
      * @return 项目对应的projectVO
      */
-    public static ProjectVO fromProject(Project project) {
-        ProjectVO projectVO = new ProjectVO();
-        projectVO.setId(project.getId());
-        projectVO.setTimestamp(project.getTimestamp());
-        projectVO.setConfig(project.getConfig());
+    public ProjectVO(Project project) {
+        id = project.getId();
+        timestamp = project.getTimestamp();
+        config = project.getConfig();
 
         if (project.getAnalyseResult() == null) {
-            projectVO.setStatus(ProjectStatus.Queueing);
-            return projectVO;
+            status = ProjectStatus.Queueing;
+            return;
         }
 
         AnalyseResponse analyseResponse = project.resolveAnalyseResponse();
         if (analyseResponse == null || analyseResponse.getCode() == 1) {
-            projectVO.setStatus(ProjectStatus.Error);
-            return projectVO;
+            status = ProjectStatus.Error;
+            return;
         }
 
         List<AlgAnalyseResult> algAnalyseResultList = analyseResponse.getAlgAnalyseResultsList();
@@ -99,8 +100,6 @@ public class ProjectVO {
             }
             algAnalyseBrief.setStatus(severity);
         }
-
-        projectVO.setStatus(ProjectStatus.Complete);
-        return projectVO;
+        status = ProjectStatus.Complete;
     }
 }

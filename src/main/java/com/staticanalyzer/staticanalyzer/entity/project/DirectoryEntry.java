@@ -1,4 +1,4 @@
-package com.staticanalyzer.staticanalyzer.entity.analyse;
+package com.staticanalyzer.staticanalyzer.entity.project;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -11,6 +11,7 @@ import com.staticanalyzer.algservice.AnalyseResponse;
 import com.staticanalyzer.algservice.AnalyseResultEntry;
 import com.staticanalyzer.algservice.FileAnalyseResults;
 import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
+import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisBrief;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,7 +20,7 @@ import lombok.Data;
 
 @Data
 @ApiModel(description = "目录解析结构")
-public class DirectoryEntry<T> {
+public class DirectoryEntry<T extends FileEntry> {
 
     @ApiModelProperty(value = "目录名", required = true)
     private String name;
@@ -113,16 +114,16 @@ public class DirectoryEntry<T> {
         return true;
     }
 
-    public static DirectoryEntry<FileEntryVO> visualize(DirectoryEntry<FileAnalysis> root) {
-        DirectoryEntry<FileEntryVO> rootVO = new DirectoryEntry<>();
+    public static DirectoryEntry<FileAnalysisBrief> visualize(DirectoryEntry<FileAnalysis> root) {
+        DirectoryEntry<FileAnalysisBrief> rootVO = new DirectoryEntry<>();
 
-        Map<String, DirectoryEntry<FileEntryVO>> directoryEntryVOs = new HashMap<>();
+        Map<String, DirectoryEntry<FileAnalysisBrief>> directoryEntryVOs = new HashMap<>();
         for (Map.Entry<String, DirectoryEntry<FileAnalysis>> entry : root.getDirectories().entrySet())
             directoryEntryVOs.put(entry.getKey(), visualize(entry.getValue()));
 
-        Map<String, FileEntryVO> fileEntryVOs = new HashMap<>();
+        Map<String, FileAnalysisBrief> fileEntryVOs = new HashMap<>();
         for (Map.Entry<String, FileAnalysis> entry : root.getFiles().entrySet())
-            fileEntryVOs.put(entry.getKey(), FileEntryVO.fromFileEntry(entry.getValue()));
+            fileEntryVOs.put(entry.getKey(), FileAnalysisBrief.fromFileAnalysis(entry.getValue()));
 
         rootVO.setName(root.getName());
         rootVO.setDirectories(directoryEntryVOs);
