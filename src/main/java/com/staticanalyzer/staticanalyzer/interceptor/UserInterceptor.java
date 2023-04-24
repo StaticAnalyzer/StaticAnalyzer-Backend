@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.staticanalyzer.staticanalyzer.config.jwt.JwtProperties;
-import com.staticanalyzer.staticanalyzer.entity.Response;
+import com.staticanalyzer.staticanalyzer.entity.Result;
 import com.staticanalyzer.staticanalyzer.utils.JwtUtils;
 
 @Component
@@ -26,7 +26,7 @@ public class UserInterceptor implements HandlerInterceptor {
     JwtProperties jwtProperties;
 
     private void setResponseMessage(HttpServletResponse response, String message) throws IOException {
-        Response<?> result = new Response<>(Response.NO_AUTH, message);
+        Result<?> result = Result.hint(message);
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().println(new ObjectMapper().writeValueAsString(result));
     }
@@ -40,17 +40,17 @@ public class UserInterceptor implements HandlerInterceptor {
         try {
             jwtUserId = JwtUtils.parseJws(jwtProperties.getKey(), jws);
         } catch (ExpiredJwtException expiredJwtException) {
-            setResponseMessage(response, "token过期");
+            setResponseMessage(response, "身份认证过期，请重新登录");
             return false;
         } catch (JwtException jwtException) {
-            setResponseMessage(response, "token格式错误");
+            setResponseMessage(response, "认证格式错误，请重新认证");
             return false;
         }
 
         Path requestPath = Path.of(request.getRequestURI());
         int requestUserId = Integer.parseInt(requestPath.getName(1).toString());
         if (jwtUserId != requestUserId) {
-            setResponseMessage(response, "token认证失败");
+            setResponseMessage(response, "身份认证失败，请重新认证");
             return false;
         }
         return true;

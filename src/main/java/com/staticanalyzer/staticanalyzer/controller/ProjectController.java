@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-import com.staticanalyzer.staticanalyzer.entity.Response;
+import com.staticanalyzer.staticanalyzer.entity.Result;
 import com.staticanalyzer.staticanalyzer.entity.analyse.DirectoryEntry;
 import com.staticanalyzer.staticanalyzer.entity.analyse.FileEntryVO;
 import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
@@ -19,50 +19,95 @@ import com.staticanalyzer.staticanalyzer.entity.project.Project;
 import com.staticanalyzer.staticanalyzer.entity.project.ProjectVO;
 import com.staticanalyzer.staticanalyzer.service.ProjectService;
 
+/**
+ * 项目控制器
+ * 定义所有与项目相关的请求操作
+ */
 @RestController
-@Api(description = "项目控制接口")
+@Api(description = "项目控制器")
 public class ProjectController {
 
+    /**
+     * 项目服务
+     */
     @Autowired
     private ProjectService projectService;
 
+    /**
+     * 项目上传接口
+     * 
+     * @apiNote 文件以xxx-form-data方式上传
+     * @param userId
+     * @param sourceCode
+     * @param config
+     * @return data始终置空
+     */
     @PostMapping("/user/{uid}/project")
-    @ApiOperation(value = "项目上传")
-    public Response<?> upload(
+    @ApiOperation(value = "项目上传接口")
+    public Result<?> upload(
             @PathVariable("uid") int userId,
             @RequestParam(value = "sourceCode") MultipartFile sourceCode,
             @RequestParam(value = "config") String config) {
         try {
             Project project = projectService.create(userId, sourceCode.getBytes(), config);
-            return new Response<>(Response.OK, "项目" + project.getId() + "上传成功");
+            String msg = "项目" + project.getId() + "上传成功";
+            return Result.ok(msg);
         } catch (IOException ioException) {
-            return new Response<>(Response.ERROR, "上传失败");
+            return Result.ok("上传失败");
         }
     }
 
+    /**
+     * 项目查询接口
+     * 查询当前用户下所有项目的状态
+     * 
+     * @param userId
+     * @return 项目信息组成的列表
+     * @see entity.project.ProjectVO
+     */
     @GetMapping("/user/{uid}/project")
-    @ApiOperation(value = "获取项目列表")
-    public Response<List<ProjectVO>> query(@PathVariable("uid") int userId) {
+    @ApiOperation(value = "项目查询接口")
+    public Result<List<ProjectVO>> read(@PathVariable("uid") int userId) {
         List<ProjectVO> projectVOList = projectService.findByUserId(userId);
-        return new Response<>(Response.OK, "获取项目列表成功", projectVOList);
+        return Result.ok("项目查询成功", projectVOList);
     }
 
+    /**
+     * 项目目录查询接口
+     * 查询当前用户下某一项目的目录结构
+     * 
+     * @param userId
+     * @param projectId
+     * @return 项目文件树结构
+     * @see entity.analyse.DirectoryEntry
+     * @see entity.analyse.FileEntryVO
+     */
     @GetMapping("/user/{uid}/project/{pid}")
-    @ApiOperation(value = "获取项目目录")
-    public Response<DirectoryEntry<FileEntryVO>> query(
+    @ApiOperation(value = "项目目录查询接口")
+    public Result<DirectoryEntry<FileEntryVO>> read(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId) {
         DirectoryEntry<FileEntryVO> directoryEntryVO = projectService.findByProjectId(userId, projectId);
-        return new Response<>(Response.OK, "获取项目目录成功", directoryEntryVO);
+        return Result.ok("项目目录查询成功", directoryEntryVO);
     }
 
+    /**
+     * 文件查询接口
+     * 查询当前用户下某一项目中某一文件的分析结果
+     * 
+     * @param userId
+     * @param projectId
+     * @param path
+     * @return 包括源代码和分析结果的清单
+     * @see entity.analysis.FileAnalysis
+     */
     @GetMapping("/user/{uid}/project/{pid}/{path:.+}")
-    @ApiOperation(value = "获取任务结果")
-    public Response<FileAnalysis> query(
+    @ApiOperation(value = "文件查询接口")
+    public Result<FileAnalysis> read(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId,
             @PathVariable String path) {
         FileAnalysis fileEntry = projectService.findByPath(userId, projectId, path);
-        return new Response<>(Response.OK, "获取任务结果成功", fileEntry);
+        return Result.ok("文件查询成功", fileEntry);
     }
 }

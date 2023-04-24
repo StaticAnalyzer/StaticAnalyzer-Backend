@@ -8,91 +8,113 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.staticanalyzer.staticanalyzer.entity.Response;
-import com.staticanalyzer.staticanalyzer.entity.user.User;
-import com.staticanalyzer.staticanalyzer.service.UserService;
-
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.staticanalyzer.staticanalyzer.entity.Result;
+import com.staticanalyzer.staticanalyzer.entity.user.User;
+import com.staticanalyzer.staticanalyzer.entity.user.Identity;
+import com.staticanalyzer.staticanalyzer.service.UserService;
 
-@Data
-@AllArgsConstructor
-@ApiModel(description = "用户认证信息")
-class AuthData {
-
-    @ApiModelProperty(value = "用户信息", required = true)
-    private User user;
-
-    @ApiModelProperty(value = "令牌", name = "jwt", required = true)
-    private String token;
-}
-
+/**
+ * 用户控制器
+ * 定义所有与用户相关的请求操作
+ */
 @RestController
-@Api(description = "用户控制接口")
+@Api(description = "用户控制器")
 public class UserController {
 
+    /**
+     * 用户服务
+     */
     @Autowired
     private UserService userService;
 
+    /**
+     * 用户登录接口
+     * 
+     * @apiNote 输出错误信息时data将被置空
+     * @param user
+     * @return user和token的组合
+     * @see entity.user.Identity
+     */
     @PostMapping("/login")
-    @ApiOperation(value = "用户登录")
-    public Response<AuthData> login(@RequestBody User user) {
+    @ApiOperation(value = "用户登录接口")
+    public Result<Identity> login(@RequestBody User user) {
         if (!userService.verify(user))
-            return new Response<>(Response.ERROR, "用户格式错误");
+            return Result.error("用户名或密码格式错误");
 
         User databaseUser = userService.find(user.getUsername());
         if (databaseUser == null)
-            return new Response<>(Response.ERROR, "找不到用户");
+            return Result.error("找不到用户");
 
         if (!databaseUser.getPassword().equals(user.getPassword()))
-            return new Response<>(Response.ERROR, "用户名或密码错误");
+            return Result.error("用户名或密码错误");
 
         String jws = userService.sign(databaseUser.getId());
-        return new Response<>(Response.OK, "登录成功", new AuthData(databaseUser, jws));
+        return Result.ok("登录成功", new Identity(databaseUser, jws));
     }
 
+    /**
+     * 用户注册接口
+     * 
+     * @apiNote 输出错误信息时data将被置空
+     * @param user
+     * @return user和token的组合
+     * @see entity.user.Identity
+     */
     @PostMapping("/user")
-    @ApiOperation(value = "用户注册")
-    public Response<AuthData> add(@RequestBody User user) {
+    @ApiOperation(value = "用户注册接口")
+    public Result<Identity> create(@RequestBody User user) {
         if (!userService.verify(user))
-            return new Response<>(Response.ERROR, "用户格式错误");
+            return Result.error("用户名或密码格式错误");
 
         User databaseUser = userService.find(user.getUsername());
         if (databaseUser != null)
-            return new Response<>(Response.ERROR, "用户名重复");
+            return Result.error("用户已存在");
 
         userService.create(user);
         String jws = userService.sign(user.getId());
-        return new Response<>(Response.OK, "注册成功", new AuthData(user, jws));
+        return Result.ok("注册成功", new Identity(user, jws));
     }
 
+    /**
+     * 用户查询接口
+     * 
+     * @apiNote 输出错误信息时data将被置空
+     * @param userId
+     * @return user作为data返回
+     * @see entity.user.User
+     */
     @GetMapping("/user/{uid}")
-    @ApiOperation(value = "用户查询")
-    public Response<User> query(@PathVariable("uid") int userId) {
+    @ApiOperation(value = "用户查询接口")
+    public Result<User> read(@PathVariable("uid") int userId) {
         User databaseUser = userService.find(userId);
         if (databaseUser == null)
-            return new Response<>(Response.ERROR, "找不到用户");
-
-        return new Response<>(Response.OK, "查询成功", databaseUser);
+            return Result.error("找不到用户");
+        return Result.ok("查询成功", databaseUser);
     }
 
+    /**
+     * 用户修改接口
+     * 
+     * @apiNote 只支持修改密码
+     * @param userId
+     * @param password 待修改的密码
+     * @return data始终置空
+     */
     @PutMapping("/user/{uid}")
-    @ApiOperation(value = "用户修改")
-    public Response<?> update(@PathVariable("uid") int userId, @RequestBody String password) {
+    @ApiOperation(value = "用户修改接口")
+    public Result<?> update(@PathVariable("uid") int userId, @RequestBody String password) {
         User databaseUser = userService.find(userId);
         if (databaseUser == null)
-            return new Response<>(Response.ERROR, "找不到用户");
+            return Result.error("找不到用户");
 
         databaseUser.setPassword(password);
         if (!userService.verify(databaseUser))
-            return new Response<>(Response.ERROR, "密码格式错误");
+            return Result.error("用户名或密码格式错误");
 
         userService.update(databaseUser);
-        return new Response<>(Response.OK, "更新成功");
+        return Result.ok("修改成功");
     }
 }
