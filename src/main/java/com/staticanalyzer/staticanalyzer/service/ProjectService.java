@@ -59,14 +59,13 @@ public class ProjectService {
         public void run() {
             LOGGER.info("任务" + project.getId() + "启动");
             AnalyseResponse analyseResponse = algorithmService.Analyse(project.getSourceCode(), project.getConfig());
-            try {
-                project.receiveAnalyseResponse(analyseResponse);
+            if (!project.updateAnalyseResult(analyseResponse)) {
+                LOGGER.info("任务" + project.getId() + "失败");
+            } else {
                 projectMapper.updateById(project);
                 cleanCached(project);
                 fetch(project.getUserId(), project.getId());
                 LOGGER.info("任务" + project.getId() + "完成");
-            } catch (IOException ioException) {
-                LOGGER.info("任务" + project.getId() + "失败");
             }
         }
     }
@@ -90,7 +89,7 @@ public class ProjectService {
 
             try {
                 cachedAnalysedProject = ZipUtils.fromTarGz(databaseProject.getSourceCode());
-                DirectoryEntry.analyse(cachedAnalysedProject, databaseProject.parseAnalyseResponse());
+                DirectoryEntry.analyse(cachedAnalysedProject, databaseProject.resolveAnalyseResponse());
             } catch (IOException ioException) {
                 return null;
             }
