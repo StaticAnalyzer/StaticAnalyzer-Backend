@@ -10,6 +10,7 @@ import com.staticanalyzer.algservice.AlgAnalyseResult;
 import com.staticanalyzer.algservice.AnalyseResponse;
 import com.staticanalyzer.algservice.AnalyseResultEntry;
 import com.staticanalyzer.algservice.FileAnalyseResults;
+import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -86,7 +87,7 @@ public class DirectoryEntry<T> {
         return parentEntry.getFiles().get(filePath.getFileName().toString());
     }
 
-    public static boolean analyse(DirectoryEntry<FileEntry> root, AnalyseResponse analyseResponse) {
+    public static boolean analyse(DirectoryEntry<FileAnalysis> root, AnalyseResponse analyseResponse) {
         Map<String, List<AnalyseResultEntry>> analyseMap = new HashMap<>();
 
         if (analyseResponse.getCode() == 1)
@@ -106,21 +107,21 @@ public class DirectoryEntry<T> {
         }
 
         for (Map.Entry<String, List<AnalyseResultEntry>> entry : analyseMap.entrySet()) {
-            FileEntry fileEntry = root.getFileAt(entry.getKey());
+            FileAnalysis fileEntry = root.getFileAt(entry.getKey());
             fileEntry.setAnalyseResults(entry.getValue());
         }
         return true;
     }
 
-    public static DirectoryEntry<FileEntryVO> visualize(DirectoryEntry<FileEntry> root) {
+    public static DirectoryEntry<FileEntryVO> visualize(DirectoryEntry<FileAnalysis> root) {
         DirectoryEntry<FileEntryVO> rootVO = new DirectoryEntry<>();
 
         Map<String, DirectoryEntry<FileEntryVO>> directoryEntryVOs = new HashMap<>();
-        for (Map.Entry<String, DirectoryEntry<FileEntry>> entry : root.getDirectories().entrySet())
+        for (Map.Entry<String, DirectoryEntry<FileAnalysis>> entry : root.getDirectories().entrySet())
             directoryEntryVOs.put(entry.getKey(), visualize(entry.getValue()));
 
         Map<String, FileEntryVO> fileEntryVOs = new HashMap<>();
-        for (Map.Entry<String, FileEntry> entry : root.getFiles().entrySet())
+        for (Map.Entry<String, FileAnalysis> entry : root.getFiles().entrySet())
             fileEntryVOs.put(entry.getKey(), FileEntryVO.fromFileEntry(entry.getValue()));
 
         rootVO.setName(root.getName());

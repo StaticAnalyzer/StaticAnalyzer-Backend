@@ -9,16 +9,16 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 
 import com.staticanalyzer.staticanalyzer.entity.analyse.DirectoryEntry;
-import com.staticanalyzer.staticanalyzer.entity.analyse.FileEntry;
+import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
 
 public class ZipUtils {
 
-    public static DirectoryEntry<FileEntry> fromTarGz(byte[] tarGzFileBytes) throws IOException {
+    public static DirectoryEntry<FileAnalysis> fromTarGz(byte[] tarGzFileBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(tarGzFileBytes);
         GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
         TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(gzipInputStream);
 
-        DirectoryEntry<FileEntry> rootEntry = new DirectoryEntry<>();
+        DirectoryEntry<FileAnalysis> rootEntry = new DirectoryEntry<>();
         TarArchiveEntry archiveEntry;
         while ((archiveEntry = tarArchiveInputStream.getNextTarEntry()) != null) {
             if (archiveEntry.isDirectory()) {
@@ -28,7 +28,7 @@ public class ZipUtils {
                 byte[] content = new byte[archiveEntrySize];
                 tarArchiveInputStream.read(content, 0, archiveEntrySize);
 
-                FileEntry fileEntry = new FileEntry();
+                FileAnalysis fileEntry = new FileAnalysis();
                 fileEntry.setName(archiveEntry.getName());
                 fileEntry.setSrc(new String(content));
                 rootEntry.addFile(archiveEntry.getName(), fileEntry);
@@ -39,15 +39,15 @@ public class ZipUtils {
         return rootEntry;
     }
 
-    public static DirectoryEntry<FileEntry> fromTarXz(byte[] tarXzFileBytes) throws IOException {
+    public static DirectoryEntry<FileAnalysis> fromTarXz(byte[] tarXzFileBytes) throws IOException {
         return null;
     }
 
-    public static DirectoryEntry<FileEntry> fromRar(byte[] rarFileBytes) throws IOException {
+    public static DirectoryEntry<FileAnalysis> fromRar(byte[] rarFileBytes) throws IOException {
         return null;
     }
 
-    public static DirectoryEntry<FileEntry> from7z(byte[] _7zFileBytes) throws IOException {
+    public static DirectoryEntry<FileAnalysis> from7z(byte[] _7zFileBytes) throws IOException {
         return null;
     }
 }

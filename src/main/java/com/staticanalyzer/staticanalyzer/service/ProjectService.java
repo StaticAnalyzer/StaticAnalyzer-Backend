@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 import com.staticanalyzer.algservice.AnalyseResponse;
 import com.staticanalyzer.staticanalyzer.config.UserConfig;
 import com.staticanalyzer.staticanalyzer.entity.analyse.DirectoryEntry;
-import com.staticanalyzer.staticanalyzer.entity.analyse.FileEntry;
 import com.staticanalyzer.staticanalyzer.entity.analyse.FileEntryVO;
+import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
 import com.staticanalyzer.staticanalyzer.entity.project.Project;
 import com.staticanalyzer.staticanalyzer.entity.project.ProjectVO;
 import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
@@ -46,7 +46,7 @@ public class ProjectService {
     private RedisTemplate<String, List<ProjectVO>> projectVORedisTemplate;
 
     @Autowired
-    private RedisTemplate<String, DirectoryEntry<FileEntry>> projectRedisTemplate;
+    private RedisTemplate<String, DirectoryEntry<FileAnalysis>> projectRedisTemplate;
 
     private static Logger LOGGER = LoggerFactory.getLogger(ProjectService.class);
     private static ExecutorService TASK_POOL = Executors.newFixedThreadPool(10);
@@ -82,11 +82,11 @@ public class ProjectService {
         projectRedisTemplate.opsForValue().getAndDelete(keyByUserId);
     }
 
-    private DirectoryEntry<FileEntry> fetch(int userId, int projectId) {
-        ValueOperations<String, DirectoryEntry<FileEntry>> operations = projectRedisTemplate.opsForValue();
+    private DirectoryEntry<FileAnalysis> fetch(int userId, int projectId) {
+        ValueOperations<String, DirectoryEntry<FileAnalysis>> operations = projectRedisTemplate.opsForValue();
         String keyByProjectId = CACHE_KEY_USER + userId + CACHE_KEY_PROJECT + projectId;
 
-        DirectoryEntry<FileEntry> cachedAnalysedProject = operations.get(keyByProjectId);
+        DirectoryEntry<FileAnalysis> cachedAnalysedProject = operations.get(keyByProjectId);
         if (cachedAnalysedProject == null) {
             Project databaseProject = projectMapper.selectById(projectId);
             if (databaseProject == null)
@@ -132,12 +132,12 @@ public class ProjectService {
     }
 
     public DirectoryEntry<FileEntryVO> findByProjectId(int userId, int projectId) {
-        DirectoryEntry<FileEntry> cachedAnalysedProject = fetch(userId, projectId);
+        DirectoryEntry<FileAnalysis> cachedAnalysedProject = fetch(userId, projectId);
         return DirectoryEntry.visualize(cachedAnalysedProject);
     }
 
-    public FileEntry findByPath(int userId, int projectId, String path) {
-        DirectoryEntry<FileEntry> cachedAnalysedProject = fetch(userId, projectId);
+    public FileAnalysis findByPath(int userId, int projectId, String path) {
+        DirectoryEntry<FileAnalysis> cachedAnalysedProject = fetch(userId, projectId);
         if (cachedAnalysedProject == null)
             return null;
         return cachedAnalysedProject.getFileAt(path);

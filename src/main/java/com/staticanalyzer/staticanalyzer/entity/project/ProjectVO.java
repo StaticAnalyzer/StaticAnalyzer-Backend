@@ -11,8 +11,8 @@ import com.staticanalyzer.algservice.AlgAnalyseResult;
 import com.staticanalyzer.algservice.AnalyseResponse;
 import com.staticanalyzer.algservice.AnalyseResultEntry;
 import com.staticanalyzer.algservice.FileAnalyseResults;
-import com.staticanalyzer.staticanalyzer.entity.analyse.AnalyseBrief;
-import com.staticanalyzer.staticanalyzer.entity.analyse.AnalyseStatus;
+import com.staticanalyzer.staticanalyzer.entity.analysis.Analysis;
+import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -40,7 +40,7 @@ public class ProjectVO {
     private String config;
 
     @ApiModelProperty(value = "分析结果简报列表", required = false)
-    private List<AnalyseBrief> analyseBrief;
+    private List<Analysis> analyseBrief;
 
     public static ProjectVO fromProject(Project project) {
         /* todo set timestamp */
@@ -57,11 +57,11 @@ public class ProjectVO {
                 } else {
                     List<AlgAnalyseResult> algAnalyseResultList = analyseResponse.getAlgAnalyseResultsList();
                     for (AlgAnalyseResult algAnalyseResult : algAnalyseResultList) {
-                        AnalyseBrief algAnalyseBrief = new AnalyseBrief();
+                        Analysis algAnalyseBrief = new Analysis();
                         algAnalyseBrief.setAnalyseType(algAnalyseResult.getAnalyseType());
-                        AnalyseStatus severity = AnalyseStatus.Pass;
+                        AnalysisStatus severity = AnalysisStatus.Pass;
                         if (algAnalyseResult.getCode() == 1) {
-                            severity = AnalyseStatus.AnalyseError;
+                            severity = AnalysisStatus.AnalyseError;
                         } else {
                             Map<String, FileAnalyseResults> fileAnalyseResultMap = algAnalyseResult
                                     .getFileAnalyseResultsMap();
@@ -69,7 +69,7 @@ public class ProjectVO {
                                 List<AnalyseResultEntry> analyseResultEntryList = entry.getValue()
                                         .getAnalyseResultsList();
                                 for (AnalyseResultEntry analyseResultEntry : analyseResultEntryList) {
-                                    AnalyseStatus currentSeverity = AnalyseStatus
+                                    AnalysisStatus currentSeverity = AnalysisStatus
                                             .valueOf(analyseResultEntry.getSeverity());
                                     if (currentSeverity.compareTo(severity) > 0)
                                         severity = currentSeverity;

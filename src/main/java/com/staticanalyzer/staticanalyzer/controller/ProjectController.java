@@ -13,8 +13,8 @@ import io.swagger.annotations.ApiOperation;
 
 import com.staticanalyzer.staticanalyzer.entity.Response;
 import com.staticanalyzer.staticanalyzer.entity.analyse.DirectoryEntry;
-import com.staticanalyzer.staticanalyzer.entity.analyse.FileEntry;
 import com.staticanalyzer.staticanalyzer.entity.analyse.FileEntryVO;
+import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
 import com.staticanalyzer.staticanalyzer.entity.project.Project;
 import com.staticanalyzer.staticanalyzer.entity.project.ProjectVO;
 import com.staticanalyzer.staticanalyzer.service.ProjectService;
@@ -58,11 +58,11 @@ public class ProjectController {
 
     @GetMapping("/user/{uid}/project/{pid}/{path:.+}")
     @ApiOperation(value = "获取任务结果")
-    public Response<FileEntry> query(
+    public Response<FileAnalysis> query(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId,
             @PathVariable String path) {
-        FileEntry fileEntry = projectService.findByPath(userId, projectId, path);
+        FileAnalysis fileEntry = projectService.findByPath(userId, projectId, path);
         return new Response<>(Response.OK, "获取任务结果成功", fileEntry);
     }
 }
