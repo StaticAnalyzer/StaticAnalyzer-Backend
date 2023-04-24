@@ -3,8 +3,7 @@ package com.staticanalyzer.staticanalyzer.entity.project;
 import java.util.List;
 import java.util.Date;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,8 +18,7 @@ import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus;
 /**
  * 项目类的前端交互版本
  */
-@Getter
-@Setter
+@Data
 @ApiModel(description = "项目类的前端交互版本")
 public class ProjectVO {
 

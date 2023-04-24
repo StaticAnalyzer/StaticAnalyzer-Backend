@@ -1,8 +1,7 @@
 package com.staticanalyzer.staticanalyzer.entity.user;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,8 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
  * 用户认证信息
  * 登录/注册后被发给前端
  */
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @ApiModel(description = "用户认证信息")
 public class Identity {

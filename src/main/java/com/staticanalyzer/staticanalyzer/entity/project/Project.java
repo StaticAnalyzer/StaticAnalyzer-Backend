@@ -19,6 +19,9 @@ import com.staticanalyzer.algservice.AnalyseResponse;
 
 /**
  * 项目信息
+ * 
+ * @author iu_oi
+ * @version 0.0.1
  */
 @Data
 @ApiModel(description = "项目信息")
@@ -65,7 +68,7 @@ public class Project {
      * 分析结果
      * json字串，由算法任务获取后填入
      * 
-     * @see algservice.AnalyseResponse
+     * @see com.staticanalyzer.algservice.AnalyseResponse
      */
     @ApiModelProperty(value = "分析结果", required = false)
     private String analyseResult;

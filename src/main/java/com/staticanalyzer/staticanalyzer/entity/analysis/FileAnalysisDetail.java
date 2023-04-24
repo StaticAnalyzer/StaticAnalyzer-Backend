@@ -12,6 +12,8 @@ import com.staticanalyzer.staticanalyzer.entity.project.FileEntry;
 
 /**
  * 单个文件分析报告
+ * 
+ * @see com.staticanalyzer.staticanalyzer.entity.project.FileEntry
  */
 @Data
 @ApiModel(description = "单个文件分析报告")

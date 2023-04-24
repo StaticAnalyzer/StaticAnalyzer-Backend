@@ -18,7 +18,7 @@ public class ArchiveTest {
         File file = new File(fileName);
 
         FileInputStream fileInputStream = new FileInputStream(file);
-        DirectoryEntry root = ZipUtils.decompress(fileInputStream.readAllBytes());
+        DirectoryEntry root = TarGzUtils.decompress(fileInputStream.readAllBytes());
 
         System.out.println(root);
     }

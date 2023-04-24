@@ -20,7 +20,7 @@ import com.staticanalyzer.staticanalyzer.entity.project.Project;
 import com.staticanalyzer.staticanalyzer.entity.project.ProjectVO;
 import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
 import com.staticanalyzer.staticanalyzer.service.ProjectService;
-import com.staticanalyzer.staticanalyzer.utils.ZipUtils;
+import com.staticanalyzer.staticanalyzer.utils.TarGzUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +88,7 @@ public class ProjectService {
                 return null;
 
             try {
-                cachedAnalysedProject = ZipUtils.fromTarGz(databaseProject.getSourceCode());
+                cachedAnalysedProject = TarGzUtils.decompress(databaseProject.getSourceCode());
                 DirectoryEntry.analyse(cachedAnalysedProject, databaseProject.resolveAnalyseResponse());
             } catch (IOException ioException) {
                 return null;
