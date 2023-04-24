@@ -13,7 +13,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import com.staticanalyzer.algservice.AnalyseResponse;
-import com.staticanalyzer.staticanalyzer.config.UserConfig;
 import com.staticanalyzer.staticanalyzer.entity.analyse.DirectoryEntry;
 import com.staticanalyzer.staticanalyzer.entity.analyse.FileEntryVO;
 import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
@@ -35,9 +34,6 @@ public class ProjectService {
 
     @Autowired
     private AlgorithmService algorithmService;
-
-    @Autowired
-    private UserConfig userConfig;
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -98,7 +94,7 @@ public class ProjectService {
             } catch (IOException ioException) {
                 return null;
             }
-            operations.set(keyByProjectId, cachedAnalysedProject, userConfig.getExpiration(), TimeUnit.MILLISECONDS);
+            operations.set(keyByProjectId, cachedAnalysedProject, 30, TimeUnit.MINUTES);
         }
         return cachedAnalysedProject;
     }
@@ -125,7 +121,7 @@ public class ProjectService {
                 cachedProjectVOList = new LinkedList<>();
                 for (Project project : databaseProjectList)
                     cachedProjectVOList.add(ProjectVO.fromProject(project));
-                operations.set(keyByUserId, cachedProjectVOList, userConfig.getExpiration(), TimeUnit.MILLISECONDS);
+                operations.set(keyByUserId, cachedProjectVOList, 30, TimeUnit.MINUTES);
             }
         }
         return cachedProjectVOList;

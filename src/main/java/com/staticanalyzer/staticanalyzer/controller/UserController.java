@@ -45,14 +45,14 @@ public class UserController {
         if (!userService.verify(user))
             return new Response<>(Response.ERROR, "用户格式错误");
 
-        User databaseUser = userService.findByUsername(user.getUsername());
+        User databaseUser = userService.find(user.getUsername());
         if (databaseUser == null)
             return new Response<>(Response.ERROR, "找不到用户");
 
         if (!databaseUser.getPassword().equals(user.getPassword()))
             return new Response<>(Response.ERROR, "用户名或密码错误");
 
-        String jws = userService.signById(databaseUser.getId());
+        String jws = userService.sign(databaseUser.getId());
         return new Response<>(Response.OK, "登录成功", new AuthData(databaseUser, jws));
     }
 
@@ -62,19 +62,19 @@ public class UserController {
         if (!userService.verify(user))
             return new Response<>(Response.ERROR, "用户格式错误");
 
-        User databaseUser = userService.findByUsername(user.getUsername());
+        User databaseUser = userService.find(user.getUsername());
         if (databaseUser != null)
             return new Response<>(Response.ERROR, "用户名重复");
 
         userService.create(user);
-        String jws = userService.signById(user.getId());
+        String jws = userService.sign(user.getId());
         return new Response<>(Response.OK, "注册成功", new AuthData(user, jws));
     }
 
     @GetMapping("/user/{uid}")
     @ApiOperation(value = "用户查询")
     public Response<User> query(@PathVariable("uid") int userId) {
-        User databaseUser = userService.findById(userId);
+        User databaseUser = userService.find(userId);
         if (databaseUser == null)
             return new Response<>(Response.ERROR, "找不到用户");
 
@@ -84,7 +84,7 @@ public class UserController {
     @PutMapping("/user/{uid}")
     @ApiOperation(value = "用户修改")
     public Response<?> update(@PathVariable("uid") int userId, @RequestBody String password) {
-        User databaseUser = userService.findById(userId);
+        User databaseUser = userService.find(userId);
         if (databaseUser == null)
             return new Response<>(Response.ERROR, "找不到用户");
 

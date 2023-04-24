@@ -1,4 +1,4 @@
-package com.staticanalyzer.staticanalyzer.config;
+package com.staticanalyzer.staticanalyzer.config.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.staticanalyzer.staticanalyzer.interceptor.UserInterceptor;
 
 @Configuration
-public class WebMvcConfig implements WebMvcConfigurer {
+public class WebConfigurer implements WebMvcConfigurer {
 
     @Autowired
     private UserInterceptor userInterceptor;

@@ -1,4 +1,4 @@
-package com.staticanalyzer.staticanalyzer.config;
+package com.staticanalyzer.staticanalyzer.annotation.swagger;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

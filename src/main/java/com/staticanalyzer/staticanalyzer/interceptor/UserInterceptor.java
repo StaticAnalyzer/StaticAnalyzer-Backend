@@ -6,24 +6,24 @@ import java.nio.file.Path;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.staticanalyzer.staticanalyzer.config.UserConfig;
+import com.staticanalyzer.staticanalyzer.config.jwt.JwtProperties;
 import com.staticanalyzer.staticanalyzer.entity.Response;
 import com.staticanalyzer.staticanalyzer.utils.JwtUtils;
-
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 
 @Component
 public class UserInterceptor implements HandlerInterceptor {
 
     @Autowired
-    UserConfig userConfig;
+    JwtProperties jwtProperties;
 
     private void setResponseMessage(HttpServletResponse response, String message) throws IOException {
         Response<?> result = new Response<>(Response.NO_AUTH, message);
@@ -38,7 +38,7 @@ public class UserInterceptor implements HandlerInterceptor {
         String jws = requestHeader.replaceFirst("Bearer ", "");
         int jwtUserId = -1;
         try {
-            jwtUserId = JwtUtils.parseJws(userConfig.getKey(), jws);
+            jwtUserId = JwtUtils.parseJws(jwtProperties.getKey(), jws);
         } catch (ExpiredJwtException expiredJwtException) {
             setResponseMessage(response, "token过期");
             return false;
