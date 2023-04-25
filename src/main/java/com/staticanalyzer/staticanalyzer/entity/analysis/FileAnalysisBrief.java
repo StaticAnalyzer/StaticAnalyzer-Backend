@@ -12,7 +12,7 @@ import com.staticanalyzer.staticanalyzer.entity.project.FileEntry;
  * 
  * @author iu_oi
  * @since 0.0.2
- * @see com.staticanalyzer.staticanalyzer.entity.project.FileEntry
+ * @see FileEntry
  */
 @Data
 @ApiModel(description = "文件分析简报")
@@ -25,18 +25,19 @@ public class FileAnalysisBrief implements FileEntry {
     /**
      * 文件中权值最高的评估
      * 
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus
+     * @see AnalysisStatus
      */
     @ApiModelProperty(value = "文件中权值最高的评估", example = "Pass", required = true)
     private AnalysisStatus severity;
 
     /**
      * 从文件分析结果生成简报
+     * 如果没有结果，默认通过
      * 
      * @param fileAnalysis
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus
+     * @see FileAnalysis
+     * @see AnalysisResult
+     * @see AnalysisStatus
      */
     public FileAnalysisBrief(FileAnalysis fileAnalysis) {
         name = fileAnalysis.getName();

@@ -16,7 +16,7 @@ import io.swagger.annotations.ApiModelProperty;
  * 
  * @author WLLEGit
  * @since 0.0.2
- * @see com.staticanalyzer.staticanalyzer.entity.project.FileEntry
+ * @see FileEntry
  */
 @Data
 @ApiModel(description = "目录单元")

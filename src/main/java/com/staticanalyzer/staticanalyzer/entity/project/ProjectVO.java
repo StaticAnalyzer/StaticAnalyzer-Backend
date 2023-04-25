@@ -36,7 +36,7 @@ public class ProjectVO {
     /**
      * 项目分析状态
      * 
-     * @see com.staticanalyzer.staticanalyzer.entity.project.ProjectStatus
+     * @see ProjectStatus
      */
     @ApiModelProperty(value = "项目分析状态", example = "Complete", required = true)
     private ProjectStatus status;
@@ -49,7 +49,7 @@ public class ProjectVO {
      * 分析结果简报列表
      * 依据算法分类的简报
      * 
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.Analysis
+     * @see Analysis
      */
     @ApiModelProperty(value = "分析结果简报列表", required = false)
     private List<Analysis> analyseBrief;

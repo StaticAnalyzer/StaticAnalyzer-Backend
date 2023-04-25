@@ -49,6 +49,16 @@ public enum ServiceErrorType {
     PROJECT_NOT_FOUND("找不到项目"),
 
     /**
+     * 项目格式错误
+     */
+    BAD_PROJECT("项目格式错误"),
+
+    /**
+     * 找不到文件
+     */
+    FILE_NOT_FOUND("找不到文件"),
+
+    /**
      * 未知错误
      */
     UNKNOWN("未知错误");

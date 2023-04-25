@@ -18,6 +18,8 @@ import com.staticanalyzer.staticanalyzer.entity.project.DirectoryEntry;
 import com.staticanalyzer.staticanalyzer.entity.project.Project;
 import com.staticanalyzer.staticanalyzer.entity.project.ProjectVO;
 import com.staticanalyzer.staticanalyzer.service.ProjectService;
+import com.staticanalyzer.staticanalyzer.service.error.ServiceError;
+import com.staticanalyzer.staticanalyzer.service.error.ServiceErrorType;
 
 /**
  * 定义所有与项目相关的请求操作
@@ -50,10 +52,11 @@ public class ProjectController {
         try {
             Project project = projectService.create(userId, sourceCode.getBytes(), config);
             projectService.submit(project);
-            String msg = "项目" + project.getId() + "上传成功";
-            return Result.ok(msg);
+            return Result.ok("上传成功");
         } catch (IOException ioException) {
-            return Result.ok("上传失败");
+            return Result.error(ServiceErrorType.BAD_PROJECT.getMsg());
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
         }
     }
 
@@ -63,15 +66,13 @@ public class ProjectController {
      * 
      * @param userId
      * @return 出错时{@code data = null}
-     * @see com.staticanalyzer.staticanalyzer.entity.project.ProjectVO
+     * @see ProjectVO
      */
     @GetMapping("/user/{uid}/project")
     @ApiOperation(value = "项目查询接口")
     public Result<List<ProjectVO>> read(@PathVariable("uid") int userId) {
         List<ProjectVO> projectVOList = projectService.readAll(userId);
-        if (projectVOList == null)
-            return Result.error("项目查询失败");
-        return Result.ok("项目查询成功", projectVOList);
+        return Result.ok("查询成功", projectVOList);
     }
 
     /**
@@ -81,18 +82,20 @@ public class ProjectController {
      * @param userId
      * @param projectId
      * @return 出错时{@code data = null}
-     * @see com.staticanalyzer.staticanalyzer.entity.project.DirectoryEntry
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisBrief
+     * @see DirectoryEntry
+     * @see FileAnalysisBrief
      */
     @GetMapping("/user/{uid}/project/{pid}")
     @ApiOperation(value = "项目目录查询接口")
     public Result<DirectoryEntry<FileAnalysisBrief>> read(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId) {
-        DirectoryEntry<FileAnalysisBrief> directoryEntry = projectService.read(projectId);
-        if (directoryEntry == null)
-            return Result.error("项目目录查询失败");
-        return Result.ok("项目目录查询成功", directoryEntry);
+        try {
+            DirectoryEntry<FileAnalysisBrief> directoryEntry = projectService.read(projectId);
+            return Result.ok("目录查询成功", directoryEntry);
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
     }
 
     /**
@@ -103,7 +106,7 @@ public class ProjectController {
      * @param projectId
      * @param path
      * @return 出错时{@code data = null}
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisVO
+     * @see FileAnalysisVO
      */
     @GetMapping("/user/{uid}/project/{pid}/{path:.+}")
     @ApiOperation(value = "文件查询接口")
@@ -111,9 +114,11 @@ public class ProjectController {
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId,
             @PathVariable String path) {
-        FileAnalysisVO fileEntry = projectService.readFile(projectId, path);
-        if (fileEntry == null)
-            return Result.error("文件查询失败");
-        return Result.ok("文件查询成功", fileEntry);
+        try {
+            FileAnalysisVO fileEntry = projectService.readFile(projectId, path);
+            return Result.ok("文件查询成功", fileEntry);
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
     }
 }

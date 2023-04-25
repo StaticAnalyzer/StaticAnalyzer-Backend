@@ -28,7 +28,7 @@ public class AlgorithmService {
      * @param file
      * @param config
      * @return 分析结果
-     * @see com.staticanalyzer.algservice.AnalyseResponse
+     * @see AnalyseResponse
      */
     public AnalyseResponse Analyse(byte[] file, String config) {
         AnalyseRequest justReturnRequest = AnalyseRequest.newBuilder()

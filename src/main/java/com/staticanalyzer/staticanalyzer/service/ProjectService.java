@@ -1,5 +1,6 @@
 package com.staticanalyzer.staticanalyzer.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -27,6 +28,8 @@ import com.staticanalyzer.staticanalyzer.entity.project.Project;
 import com.staticanalyzer.staticanalyzer.entity.project.ProjectVO;
 import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
 import com.staticanalyzer.staticanalyzer.service.ProjectService;
+import com.staticanalyzer.staticanalyzer.service.error.ServiceError;
+import com.staticanalyzer.staticanalyzer.service.error.ServiceErrorType;
 import com.staticanalyzer.staticanalyzer.utils.TarGzUtils;
 
 /**
@@ -101,8 +104,12 @@ public class ProjectService {
      * @param sourceCode
      * @param config
      * @return 新建的项目
+     * @throws ServiceError
      */
-    public Project create(int userId, byte[] sourceCode, String config) {
+    public Project create(int userId, byte[] sourceCode, String config) throws ServiceError {
+        if (sourceCode == null || config == null)
+            throw new ServiceError(ServiceErrorType.BAD_PROJECT);
+
         Project project = new Project();
         project.setUserId(userId);
         project.setSourceCode(sourceCode);
@@ -116,8 +123,8 @@ public class ProjectService {
      * 通过所有者id查询项目
      * 
      * @param userId
-     * @return 可能为{@code null}
-     * @see com.staticanalyzer.staticanalyzer.entity.project.ProjectVO
+     * @return 不为{@code null}
+     * @see ProjectVO
      */
     public List<ProjectVO> readAll(int userId) {
         List<Project> databaseProjectList = projectMapper.selectByUserId(userId);
@@ -135,20 +142,25 @@ public class ProjectService {
      * 
      * @apiNote 如果分析未完成，则不为FileAnalysis设置分析数据
      * @param project
-     * @return 可能为{@code null}
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis
+     * @return 不为{@code null}
+     * @throws ServiceError
+     * @see FileAnalysis
      */
-    private Map<String, FileAnalysis> fetch(int projectId) {
+    private Map<String, FileAnalysis> fetch(int projectId) throws ServiceError {
         String hashKey = CACHE_KEY_PROJECT + projectId;
         Map<String, FileAnalysis> files = redisTemplate.opsForHash().entries(hashKey);
-        if (files != null)
+        if (files.size() > 0) /* 直接读取缓存 */
             return files;
 
         /* 从数据库中拉取 */
         Project databaseProject = projectMapper.selectById(projectId);
-        files = TarGzUtils.decompress(databaseProject.getSourceCode());
-        if (files == null)
-            return null;
+        if (databaseProject == null)
+            throw new ServiceError(ServiceErrorType.PROJECT_NOT_FOUND);
+        try {
+            files = TarGzUtils.decompress(databaseProject.getSourceCode());
+        } catch (IOException ioException) {
+            throw new ServiceError(ServiceErrorType.BAD_PROJECT);
+        }
 
         /* 设置分析结果(如果有) */
         AnalyseResponse analyseResponse = databaseProject.resolveAnalyseResponse();
@@ -178,17 +190,15 @@ public class ProjectService {
      * 
      * @param userId
      * @param projectId
-     * @return 找不到返回{@code null}
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisVO
+     * @return 不为{@code null}
+     * @throws ServiceError
+     * @see FileAnalysisVO
      */
-    public FileAnalysisVO readFile(int projectId, String filePath) {
+    public FileAnalysisVO readFile(int projectId, String filePath) throws ServiceError {
         Map<String, FileAnalysis> files = fetch(projectId);
-        if (files == null)
-            return null;
-
         FileAnalysis fileAnalysis = files.get(filePath);
         if (fileAnalysis == null)
-            return null;
+            throw new ServiceError(ServiceErrorType.FILE_NOT_FOUND);
         return new FileAnalysisVO(fileAnalysis);
     }
 
@@ -196,15 +206,13 @@ public class ProjectService {
      * 通过项目id查询项目结构
      * 
      * @param projectId
-     * @return 找不到返回{@code null}
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisBrief
-     * @see com.staticanalyzer.staticanalyzer.entity.project.DirectoryEntry
+     * @return 不为{@code null}
+     * @throws ServiceError
+     * @see FileAnalysisBrief
+     * @see DirectoryEntry
      */
-    public DirectoryEntry<FileAnalysisBrief> read(int projectId) {
+    public DirectoryEntry<FileAnalysisBrief> read(int projectId) throws ServiceError {
         Map<String, FileAnalysis> files = fetch(projectId);
-        if (files == null)
-            return null;
-
         DirectoryEntry<FileAnalysisBrief> directoryEntry = new DirectoryEntry<>();
         for (Map.Entry<String, FileAnalysis> entry : files.entrySet())
             directoryEntry.addFileEntry(entry.getKey(), new FileAnalysisBrief(entry.getValue()));

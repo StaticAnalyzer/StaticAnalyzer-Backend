@@ -11,7 +11,7 @@ import io.swagger.annotations.ApiModelProperty;
  * 
  * @author iu_oi
  * @since 0.0.2
- * @see com.staticanalyzer.staticanalyzer.entity.project.ProjectVO
+ * @see ProjectVO
  */
 @Data
 @ApiModel(description = "算法分析结果")
@@ -24,8 +24,8 @@ public class Analysis {
     /**
      * 算法得到的最高权值评估
      * 
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus
+     * @see AnalysisStatus
      */
-    @ApiModelProperty(value = "算法得到的权值最高结果", example = "Warning", required = true)
+    @ApiModelProperty(value = "算法得到的最高权值评估", example = "Warning", required = true)
     private AnalysisStatus status;
 }

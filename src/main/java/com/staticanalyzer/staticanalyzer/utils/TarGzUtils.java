@@ -27,7 +27,7 @@ public class TarGzUtils {
      * @param projectPath 相对路径
      * @return 出现异常返回{@code null}
      */
-    public static byte[] compress(String projectPath) {
+    public static byte[] compress(String projectPath) throws IOException {
         /* todo */
         return null;
     }
@@ -38,22 +38,17 @@ public class TarGzUtils {
      * 
      * @param tarGzFileBytes
      * @return 以相对路径为键值的文件映射 出现异常返回{@code null}
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis
+     * @see FileAnalysis
      */
-    public static Map<String, FileAnalysis> decompress(byte[] tarGzFileBytes) {
+    public static Map<String, FileAnalysis> decompress(byte[] tarGzFileBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(tarGzFileBytes);
-        GZIPInputStream gzipInputStream;
-        try {
-            gzipInputStream = new GZIPInputStream(byteArrayInputStream);
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-            return null;
-        }
-
+        GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
         TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(gzipInputStream);
+
+        Map<String, FileAnalysis> files = new HashMap<>();
+        TarArchiveEntry archiveEntry;
+
         try {
-            Map<String, FileAnalysis> files = new HashMap<>();
-            TarArchiveEntry archiveEntry;
             while ((archiveEntry = tarArchiveInputStream.getNextTarEntry()) != null) {
                 if (archiveEntry.isFile()) {
                     int archiveEntrySize = (int) archiveEntry.getSize();
@@ -68,15 +63,8 @@ public class TarGzUtils {
                 }
             }
             return files;
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-            return null;
         } finally {
-            try {
-                tarArchiveInputStream.close();
-            } catch (IOException ioException2) {
-                ioException2.printStackTrace();
-            }
+            tarArchiveInputStream.close();
         }
     }
 }

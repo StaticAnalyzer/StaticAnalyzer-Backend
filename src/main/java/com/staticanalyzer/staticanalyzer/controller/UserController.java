@@ -58,8 +58,8 @@ public class UserController {
      * @apiNote 无需传递用户id
      * @param user
      * @return 出错时{@code data = null}
-     * @see com.staticanalyzer.staticanalyzer.entity.user.User
-     * @see com.staticanalyzer.staticanalyzer.entity.user.Identity
+     * @see User
+     * @see Identity
      */
     @PostMapping("/user")
     @ApiOperation(value = "用户注册接口")
@@ -78,7 +78,7 @@ public class UserController {
      * 
      * @param userId
      * @return 出错时{@code data = null}
-     * @see com.staticanalyzer.staticanalyzer.entity.user.User
+     * @see User
      */
     @GetMapping("/user/{uid}")
     @ApiOperation(value = "用户查询接口")

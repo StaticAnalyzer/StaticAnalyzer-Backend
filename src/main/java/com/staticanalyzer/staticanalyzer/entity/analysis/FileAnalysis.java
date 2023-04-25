@@ -14,7 +14,7 @@ import com.staticanalyzer.staticanalyzer.entity.project.FileEntry;
  * 
  * @author iu_oi
  * @since 0.0.2
- * @see com.staticanalyzer.staticanalyzer.entity.project.FileEntry
+ * @see FileEntry
  */
 @Data
 @ApiModel(description = "文件分析结果")
@@ -32,7 +32,7 @@ public class FileAnalysis implements FileEntry {
      * 综合所有算法的分析结果列表
      * 用于可视化标注
      * 
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult
+     * @see AnalysisResult
      */
     @ApiModelProperty(value = "分析结果列表", required = false)
     private List<AnalysisResult> analyseResults;

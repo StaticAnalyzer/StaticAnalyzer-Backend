@@ -18,34 +18,34 @@ import com.staticanalyzer.algservice.AnalyseResultEntry;
 public class AnalysisResult {
 
     /* 对应源代码起始行 */
-    @ApiModelProperty(value = "对应源代码起始行")
+    @ApiModelProperty(value = "对应源代码起始行", required = true)
     private int startLine;
 
     /* 对应源代码起始列 */
-    @ApiModelProperty(value = "对应源代码起始列")
+    @ApiModelProperty(value = "对应源代码起始列", required = true)
     private int startColumn;
 
     /* 对应源代码结束行 */
-    @ApiModelProperty(value = "对应源代码结束行")
+    @ApiModelProperty(value = "对应源代码结束行", required = true)
     private int endLine;
 
     /* 对应源代码结束列 */
-    @ApiModelProperty(value = "对应源代码结束列")
+    @ApiModelProperty(value = "对应源代码结束列", required = true)
     private int endColumn;
 
     /* 分析结果评估 */
-    @ApiModelProperty(value = "分析结果评估")
+    @ApiModelProperty(value = "分析结果评估", example = "Pass", required = true)
     private AnalysisStatus severity;
 
     /* 分析建议 */
-    @ApiModelProperty(value = "分析建议")
+    @ApiModelProperty(value = "分析建议", required = true)
     private String message;
 
     /**
      * 通过protobuf类获取信息
      * 
      * @param analyseResultEntry
-     * @see com.staticanalyzer.algservice.AnalyseResultEntry
+     * @see AnalyseResultEntry
      */
     public AnalysisResult(AnalyseResultEntry analyseResultEntry) {
         startLine = analyseResultEntry.getStartLine();

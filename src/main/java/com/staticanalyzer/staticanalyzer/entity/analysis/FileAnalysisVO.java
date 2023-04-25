@@ -1,18 +1,18 @@
 package com.staticanalyzer.staticanalyzer.entity.analysis;
 
+import java.util.List;
+
 import lombok.Data;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import java.util.List;
 
 /**
  * 文件分析报告
  * 
  * @author iu_oi
  * @since 0.0.2
- * @see com.staticanalyzer.staticanalyzer.entity.project.FileEntry
+ * @see FileEntry
  */
 @Data
 @ApiModel(description = "单个文件分析报告")
@@ -26,7 +26,7 @@ public class FileAnalysisVO {
      * 综合所有算法的分析结果列表
      * 用于可视化标注
      * 
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult
+     * @see AnalysisResult
      */
     @ApiModelProperty(value = "分析结果列表", required = false)
     private List<AnalysisResult> analyseResults;
@@ -35,8 +35,8 @@ public class FileAnalysisVO {
      * 从文件分析结果生成报告
      * 
      * @param fileAnalysis
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult
+     * @see FileAnalysis
+     * @see AnalysisResult
      */
     public FileAnalysisVO(FileAnalysis fileAnalysis) {
         src = fileAnalysis.getSrc();
