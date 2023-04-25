@@ -1,13 +1,10 @@
 package com.staticanalyzer.staticanalyzer.entity.analysis;
 
-import java.nio.file.Paths;
-
 import lombok.Data;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import com.staticanalyzer.algservice.AnalyseResultEntry;
 import com.staticanalyzer.staticanalyzer.entity.project.FileEntry;
 
 /**
@@ -39,13 +36,15 @@ public class FileAnalysisBrief implements FileEntry {
      * 
      * @param fileAnalysis
      * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis
+     * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult
+     * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus
      */
     public FileAnalysisBrief(FileAnalysis fileAnalysis) {
-        name = Paths.get(fileAnalysis.getName()).getFileName().toString();
+        name = fileAnalysis.getName();
         severity = AnalysisStatus.Pass;
 
-        for (AnalyseResultEntry analyseResult : fileAnalysis.getAnalyseResults()) {
-            AnalysisStatus currentSeverity = AnalysisStatus.valueOf(analyseResult.getSeverity());
+        for (AnalysisResult analyseResult : fileAnalysis.getAnalyseResults()) {
+            AnalysisStatus currentSeverity = analyseResult.getSeverity();
             if (currentSeverity.compareTo(severity) > 0)
                 severity = currentSeverity;
         }

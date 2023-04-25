@@ -7,7 +7,6 @@ import lombok.Data;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import com.staticanalyzer.algservice.AnalyseResultEntry;
 import com.staticanalyzer.staticanalyzer.entity.project.FileEntry;
 
 /**
@@ -36,8 +35,8 @@ public class FileAnalysis implements FileEntry {
      * 综合所有算法的分析结果列表
      * 用于可视化标注
      * 
-     * @see com.staticanalyzer.algservice.AnalyseResultEntry
+     * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult
      */
     @ApiModelProperty(value = "分析结果列表", required = false)
-    private List<AnalyseResultEntry> analyseResults;
+    private List<AnalysisResult> analyseResults;
 }

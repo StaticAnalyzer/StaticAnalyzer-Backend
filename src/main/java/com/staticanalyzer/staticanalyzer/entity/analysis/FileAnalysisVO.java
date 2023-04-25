@@ -7,8 +7,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
 
-import com.staticanalyzer.algservice.AnalyseResultEntry;
-
 /**
  * 单个文件分析报告
  * 
@@ -28,16 +26,17 @@ public class FileAnalysisVO {
      * 综合所有算法的分析结果列表
      * 用于可视化标注
      * 
-     * @see com.staticanalyzer.algservice.AnalyseResultEntry
+     * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult
      */
     @ApiModelProperty(value = "分析结果列表", required = false)
-    private List<AnalyseResultEntry> analyseResults;
+    private List<AnalysisResult> analyseResults;
 
     /**
      * 从文件分析结果生成报告
      * 
      * @param fileAnalysis
      * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis
+     * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult
      */
     public FileAnalysisVO(FileAnalysis fileAnalysis) {
         src = fileAnalysis.getSrc();

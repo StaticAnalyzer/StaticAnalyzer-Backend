@@ -2,6 +2,7 @@ package com.staticanalyzer.staticanalyzer.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -60,9 +61,10 @@ public class TarGzUtils {
                     tarArchiveInputStream.read(content, 0, archiveEntrySize);
 
                     FileAnalysis newFileEntry = new FileAnalysis();
-                    newFileEntry.setName(archiveEntry.getName());
+                    String newFilePath = archiveEntry.getName();
+                    newFileEntry.setName(Path.of(newFilePath).getFileName().toString());
                     newFileEntry.setSrc(new String(content));
-                    files.put(newFileEntry.getName(), newFileEntry);
+                    files.put(newFilePath, newFileEntry);
                 }
             }
             return files;

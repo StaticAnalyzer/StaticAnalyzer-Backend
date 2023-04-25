@@ -44,7 +44,7 @@ public class SwaggerConfigurer {
                 .apiInfo(getApiInfo())
                 .enable(enabled)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.staticanalyzer.staticanalyzer.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.staticanalyzer.staticanalyzer"))
                 .apis(Predicates.not(RequestHandlerSelectors.withMethodAnnotation(ExcludeSwagger.class)))
                 .apis(Predicates.not(RequestHandlerSelectors.withClassAnnotation(ExcludeSwagger.class)))
                 .paths(PathSelectors.any())

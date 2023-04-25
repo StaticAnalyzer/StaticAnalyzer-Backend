@@ -1,6 +1,7 @@
 package com.staticanalyzer.staticanalyzer.entity.user;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 
 import io.swagger.annotations.ApiModel;
@@ -23,7 +24,7 @@ public class User {
      */
     @TableId(value = "id", type = IdType.AUTO)
     @ApiModelProperty(value = "用户id", required = false)
-    private int id;
+    private Integer id;
 
     /**
      * 用户名

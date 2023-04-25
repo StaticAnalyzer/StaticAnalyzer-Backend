@@ -45,14 +45,17 @@ public class UserInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request,
             HttpServletResponse response, Object handler) throws Exception {
         String requestHeader = request.getHeader("Authorization");
-        Path requestPath = Path.of(request.getRequestURI());
-
+        if (requestHeader == null) {
+            setResponseMessage(response, "认证格式错误，需要登录");
+            return false;
+        }
         String jws = requestHeader.replaceFirst("Bearer ", "");
+        Path requestPath = Path.of(request.getRequestURI());
         int userId = Integer.parseInt(requestPath.getName(1).toString());
-        if (userService.verifySignature(jws, userId))
-            return true;
-
-        setResponseMessage(response, "身份认证失败，请重新登录");
-        return false;
+        if (!userService.verifySignature(jws, userId)) {
+            setResponseMessage(response, "身份认证失败，请重新登录");
+            return false;
+        }
+        return true;
     }
 }

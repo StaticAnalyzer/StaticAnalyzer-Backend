@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.staticanalyzer.algservice.AlgAnalyseResult;
 import com.staticanalyzer.algservice.AnalyseResponse;
 import com.staticanalyzer.algservice.FileAnalyseResults;
+import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult;
 import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
 import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisBrief;
 import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisVO;
@@ -129,7 +130,7 @@ public class ProjectService {
      * 项目模板
      */
     @Autowired
-    private RedisTemplate projectTemplate;
+    private RedisTemplate redisTemplate;
 
     /**
      * 项目缓存键值前缀
@@ -146,7 +147,7 @@ public class ProjectService {
      */
     private Map<String, FileAnalysis> fetch(int projectId) {
         String hashKey = CACHE_KEY_PROJECT + projectId;
-        Map<String, FileAnalysis> files = projectTemplate.opsForHash().entries(hashKey);
+        Map<String, FileAnalysis> files = redisTemplate.opsForHash().entries(hashKey);
         if (files != null)
             return files;
 
@@ -166,14 +167,16 @@ public class ProjectService {
                 for (Map.Entry<String, FileAnalyseResults> entry : algAnalyseResult.getFileAnalyseResultsMap()
                         .entrySet()) {
                     FileAnalysis fileAnalysis = files.get(entry.getKey());
-                    fileAnalysis.setAnalyseResults(entry.getValue().getAnalyseResultsList());
+                    fileAnalysis.setAnalyseResults(
+                            entry.getValue().getAnalyseResultsList().stream().map(r -> new AnalysisResult(r))
+                                    .collect(Collectors.toList()));
                 }
             }
         }
 
         /* 写入缓存 */
-        projectTemplate.opsForHash().putAll(hashKey, files);
-        projectTemplate.expire(hashKey, 30, TimeUnit.MINUTES);
+        redisTemplate.opsForHash().putAll(hashKey, files);
+        redisTemplate.expire(hashKey, 30, TimeUnit.MINUTES);
         return files;
     }
 
