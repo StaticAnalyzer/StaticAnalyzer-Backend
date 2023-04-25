@@ -19,24 +19,25 @@ import com.staticanalyzer.staticanalyzer.service.UserService;
 /**
  * 用户控制器
  * 定义所有与用户相关的请求操作
+ * 
+ * @author iu_oi
+ * @since 0.0.1
  */
 @RestController
 @Api(description = "用户控制器")
 public class UserController {
 
-    /**
-     * 用户服务
-     */
-    @Autowired
+    @Autowired /* 用户服务 */
     private UserService userService;
 
     /**
      * 用户登录接口
      * 
-     * @apiNote 输出错误信息时data将被置空
+     * @apiNote 无需传递用户id
      * @param user
-     * @return user和token的组合
+     * @return 出错时{@code data = null}
      * @see com.staticanalyzer.staticanalyzer.entity.user.User
+     * @see com.staticanalyzer.staticanalyzer.entity.user.Identity
      */
     @PostMapping("/login")
     @ApiOperation(value = "用户登录接口")
@@ -58,9 +59,9 @@ public class UserController {
     /**
      * 用户注册接口
      * 
-     * @apiNote 输出错误信息时data将被置空
+     * @apiNote 无需传递用户id
      * @param user
-     * @return user和token的组合
+     * @return 出错时{@code data = null}
      * @see com.staticanalyzer.staticanalyzer.entity.user.User
      * @see com.staticanalyzer.staticanalyzer.entity.user.Identity
      */
@@ -82,9 +83,8 @@ public class UserController {
     /**
      * 用户查询接口
      * 
-     * @apiNote 输出错误信息时data将被置空
      * @param userId
-     * @return user作为data返回
+     * @return 出错时{@code data = null}
      * @see com.staticanalyzer.staticanalyzer.entity.user.User
      */
     @GetMapping("/user/{uid}")
@@ -101,8 +101,8 @@ public class UserController {
      * 
      * @apiNote 只支持修改密码
      * @param userId
-     * @param password 待修改的密码
-     * @return data始终置空
+     * @param password
+     * @return {@code data = null}
      */
     @PutMapping("/user/{uid}")
     @ApiOperation(value = "用户修改接口")

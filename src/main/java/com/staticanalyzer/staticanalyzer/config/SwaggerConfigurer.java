@@ -10,11 +10,18 @@ import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 import com.staticanalyzer.staticanalyzer.annotation.swagger.ExcludeSwagger;
 
+/**
+ * swagger配置类
+ * 
+ * @author iu_oi
+ * @since 0.0.1
+ */
 @Configuration
 public class SwaggerConfigurer {
 
@@ -30,11 +37,21 @@ public class SwaggerConfigurer {
     @Value("${spring.application.description}")
     private String applicationDescription;
 
+    @Value("${spring.swagger.contact.name}")
+    private String contactName;
+
+    @Value("${spring.swagger.contact.url}")
+    private String contactUrl;
+
+    @Value("${spring.swagger.contact.email}")
+    private String contactEmail;
+
     private ApiInfo getApiInfo() {
         return new ApiInfoBuilder()
                 .title(applicationName)
                 .description(applicationDescription)
                 .version(applicationVersion)
+                .contact(new Contact(contactName, contactUrl, contactEmail))
                 .build();
     }
 

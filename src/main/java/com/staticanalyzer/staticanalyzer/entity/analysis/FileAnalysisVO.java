@@ -8,17 +8,17 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
 
 /**
- * 单个文件分析报告
+ * 文件分析报告
  * 
+ * @author iu_oi
+ * @since 0.0.2
  * @see com.staticanalyzer.staticanalyzer.entity.project.FileEntry
  */
 @Data
 @ApiModel(description = "单个文件分析报告")
 public class FileAnalysisVO {
 
-    /**
-     * 源代码
-     */
+    /* 源代码 */
     @ApiModelProperty(value = "源代码", required = true)
     private String src;
 

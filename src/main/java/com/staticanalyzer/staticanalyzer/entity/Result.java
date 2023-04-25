@@ -7,6 +7,9 @@ import lombok.Data;
 
 /**
  * 统一返回对象
+ * 
+ * @author iu_oi
+ * @since 0.0.1
  */
 @Data
 @ApiModel(description = "封装REST响应数据")
@@ -21,15 +24,11 @@ public class Result<D> {
     @ApiModelProperty(value = "REST响应码", example = "0", required = true)
     private int code;
 
-    /**
-     * REST消息
-     */
+    /* REST消息 */
     @ApiModelProperty(value = "REST消息", required = true)
     private String msg;
 
-    /**
-     * REST数据
-     */
+    /* REST数据 */
     @ApiModelProperty(value = "REST数据", required = false)
     private D data;
 
@@ -44,7 +43,7 @@ public class Result<D> {
      * 
      * @param <D> data类型
      * @param msg
-     * @return code为0的纯消息result
+     * @return {@code code = 0, data = null}
      */
     public static <D> Result<D> ok(String msg) {
         Result<D> result = new Result<>();
@@ -59,7 +58,7 @@ public class Result<D> {
      * @param <D>  data类型
      * @param msg
      * @param data
-     * @return code为0的带数据result
+     * @return {@code code = 0}
      */
     public static <D> Result<D> ok(String msg, D data) {
         Result<D> result = new Result<>();
@@ -80,7 +79,7 @@ public class Result<D> {
      * 
      * @param <D> data类型
      * @param msg
-     * @return code为-1的不带数据result
+     * @return {@code code = -1, data = null}
      */
     public static <D> Result<D> error(String msg) {
         Result<D> result = new Result<>();
@@ -100,7 +99,7 @@ public class Result<D> {
      * 
      * @param <D> data类型
      * @param msg
-     * @return code为-2的不带数据result
+     * @return {@code code = -2, data = null}
      */
     public static <D> Result<D> hint(String msg) {
         Result<D> result = new Result<>();

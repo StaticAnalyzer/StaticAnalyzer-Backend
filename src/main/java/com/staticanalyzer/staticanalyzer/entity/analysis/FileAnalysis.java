@@ -10,24 +10,21 @@ import io.swagger.annotations.ApiModelProperty;
 import com.staticanalyzer.staticanalyzer.entity.project.FileEntry;
 
 /**
- * 单个文件分析结果
+ * 文件分析结果
  * 
+ * @author iu_oi
+ * @since 0.0.2
  * @see com.staticanalyzer.staticanalyzer.entity.project.FileEntry
  */
 @Data
-@ApiModel(description = "单个文件分析结果")
+@ApiModel(description = "文件分析结果")
 public class FileAnalysis implements FileEntry {
 
-    /**
-     * 文件名
-     * 可能作为键值
-     */
+    /* 文件名 */
     @ApiModelProperty(value = "文件名", required = true)
     private String name;
 
-    /**
-     * 源代码
-     */
+    /* 源代码 */
     @ApiModelProperty(value = "源代码", required = true)
     private String src;
 

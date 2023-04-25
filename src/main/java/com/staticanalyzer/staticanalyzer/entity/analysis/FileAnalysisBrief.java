@@ -8,27 +8,26 @@ import io.swagger.annotations.ApiModelProperty;
 import com.staticanalyzer.staticanalyzer.entity.project.FileEntry;
 
 /**
- * 单个文件分析简报
+ * 文件分析简报
  * 
+ * @author iu_oi
+ * @since 0.0.2
  * @see com.staticanalyzer.staticanalyzer.entity.project.FileEntry
  */
 @Data
-@ApiModel(description = "单个文件分析简报")
+@ApiModel(description = "文件分析简报")
 public class FileAnalysisBrief implements FileEntry {
 
-    /**
-     * 文件名
-     * 可能作为键值
-     */
+    /* 文件名 */
     @ApiModelProperty(value = "文件名", required = true)
     private String name;
 
     /**
-     * 文件中权值最高的结果
+     * 文件中权值最高的评估
      * 
      * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus
      */
-    @ApiModelProperty(value = "文件中权值最高的结果", example = "Pass", required = true)
+    @ApiModelProperty(value = "文件中权值最高的评估", example = "Pass", required = true)
     private AnalysisStatus severity;
 
     /**

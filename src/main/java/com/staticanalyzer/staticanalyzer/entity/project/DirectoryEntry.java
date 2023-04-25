@@ -15,29 +15,22 @@ import io.swagger.annotations.ApiModelProperty;
  * 用于结构化显示项目
  * 
  * @author WLLEGit
- * @version 0.0.1
+ * @since 0.0.2
  * @see com.staticanalyzer.staticanalyzer.entity.project.FileEntry
  */
 @Data
 @ApiModel(description = "目录单元")
 public class DirectoryEntry<F extends FileEntry> {
 
-    /**
-     * 目录名
-     * 可能作为键值
-     */
+    /* 目录名 */
     @ApiModelProperty(value = "目录名", required = true)
     private String name;
 
-    /**
-     * 子目录集
-     */
+    /* 子目录集 */
     @ApiModelProperty(value = "子目录集", required = false)
     private Map<String, DirectoryEntry<F>> directories = new HashMap<>();
 
-    /**
-     * 子文件集
-     */
+    /* 子文件集 */
     @ApiModelProperty(value = "文件集", required = false)
     private Map<String, F> files = new HashMap<>();
 

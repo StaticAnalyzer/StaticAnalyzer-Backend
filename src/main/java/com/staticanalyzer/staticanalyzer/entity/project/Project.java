@@ -21,23 +21,18 @@ import com.staticanalyzer.algservice.AnalyseResponse;
  * 项目信息
  * 
  * @author iu_oi
- * @version 0.0.1
+ * @since 0.0.1
  */
 @Data
 @ApiModel(description = "项目信息")
 public class Project {
 
-    /**
-     * 项目id
-     * 由mysql自动生成
-     */
+    /* 项目id由mysql自动生成 */
     @TableId(value = "id", type = IdType.AUTO)
     @ApiModelProperty(value = "项目id", required = false)
-    private int id;
+    private Integer id;
 
-    /**
-     * 所有者id
-     */
+    /* 所有者id */
     @ApiModelProperty(value = "所有者id", required = false)
     private int userId;
 
@@ -52,15 +47,11 @@ public class Project {
     @ApiModelProperty(value = "项目上传时间戳", required = false)
     private Date timestamp;
 
-    /**
-     * 源码包
-     */
+    /* 源码包 */
     @ApiModelProperty(value = "源码包", required = true)
     private byte[] sourceCode;
 
-    /**
-     * 项目配置文件
-     */
+    /* 项目配置文件 */
     @ApiModelProperty(value = "项目配置文件", required = true)
     private String config;
 
@@ -78,7 +69,7 @@ public class Project {
      * 
      * @apiNote 使用protobuf自带的json序列化
      * @param analyseResponse
-     * @return 成功获取时返回{@code 真}，出现IOException返回{@code 假}
+     * @return 异常时返回{@code false}
      * @see com.google.protobuf.util.JsonFormat
      */
     public boolean updateAnalyseResult(AnalyseResponse analyseResponse) {
@@ -98,7 +89,7 @@ public class Project {
      * 提取分析结果
      * 
      * @apiNote 使用protobuf自带的json序列化
-     * @return 解析失败时返回{@code null}
+     * @return 可能为{@code null}
      * @see com.google.protobuf.util.JsonFormat
      */
     public AnalyseResponse resolveAnalyseResponse() {

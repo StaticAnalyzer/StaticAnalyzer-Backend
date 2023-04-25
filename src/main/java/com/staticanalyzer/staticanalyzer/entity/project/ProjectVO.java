@@ -17,20 +17,19 @@ import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus;
 
 /**
  * 项目类的前端交互版本
+ * 
+ * @author iu_oi
+ * @since 0.0.2
  */
 @Data
 @ApiModel(description = "项目类的前端交互版本")
 public class ProjectVO {
 
-    /**
-     * 项目id
-     */
+    /* 项目id */
     @ApiModelProperty(value = "项目id", required = true)
     private int id;
 
-    /**
-     * 项目上传时间戳
-     */
+    /* 项目上传时间戳 */
     @ApiModelProperty(value = "项目上传时间戳", required = true)
     private Date timestamp;
 
@@ -42,9 +41,7 @@ public class ProjectVO {
     @ApiModelProperty(value = "项目分析状态", example = "Complete", required = true)
     private ProjectStatus status;
 
-    /**
-     * 项目配置文件
-     */
+    /* 项目配置文件 */
     @ApiModelProperty(value = "项目配置文件", required = true)
     private String config;
 
@@ -58,10 +55,11 @@ public class ProjectVO {
     private List<Analysis> analyseBrief;
 
     /**
-     * 生成项目的前端版本
+     * 从项目提取数据
      * 
+     * @apiNote 如果项目没有分析结果，则不填入analyseBrief
      * @param project
-     * @return 项目对应的projectVO
+     * @return projectVO
      */
     public ProjectVO(Project project) {
         id = project.getId();

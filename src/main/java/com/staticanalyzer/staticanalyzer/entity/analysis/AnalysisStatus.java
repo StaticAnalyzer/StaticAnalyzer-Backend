@@ -1,8 +1,14 @@
 package com.staticanalyzer.staticanalyzer.entity.analysis;
 
+import io.swagger.annotations.ApiModel;
+
 /**
- * 针对分析算法的分析总结
+ * 分析评估
+ * 
+ * @author iu_oi
+ * @since 0.0.2
  */
+@ApiModel(description = "分析评估")
 public enum AnalysisStatus {
 
     /**

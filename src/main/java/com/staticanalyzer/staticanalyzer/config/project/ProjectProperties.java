@@ -1,16 +1,15 @@
-package com.staticanalyzer.staticanalyzer.config.jwt;
+package com.staticanalyzer.staticanalyzer.config.project;
+
+import java.time.Duration;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import java.security.Key;
-import java.time.Duration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * jwt配置类
+ * project配置类
  * 
  * @author iu_oi
  * @since 0.0.2
@@ -18,12 +17,12 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties(prefix = "jwt")
-public class JwtProperties {
+@ConfigurationProperties(prefix = "project")
+public class ProjectProperties {
 
-    /* 签名使用的H256密钥 */
-    private Key key;
-
-    /* jwt过期时间 */
+    /* project缓存过期时间 */
     private Duration expiration;
+
+    /* project线程池限制 */
+    private int taskLimit;
 }

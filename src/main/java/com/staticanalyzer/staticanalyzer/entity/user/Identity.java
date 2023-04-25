@@ -9,6 +9,9 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * 用户认证信息
  * 登录/注册后被发给前端
+ * 
+ * @author iu_oi
+ * @since 0.0.1
  */
 @Data
 @AllArgsConstructor

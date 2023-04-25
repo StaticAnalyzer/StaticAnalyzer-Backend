@@ -5,7 +5,7 @@ package com.staticanalyzer.staticanalyzer.entity.project;
  * 用于结构化显示项目
  * 
  * @author iu_oi
- * @version 0.0.1
+ * @since 0.0.2
  */
 public interface FileEntry {
 

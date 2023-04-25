@@ -18,15 +18,12 @@ import com.staticanalyzer.staticanalyzer.utils.JwtUtils;
  * 增删改查以及验证等
  * 
  * @author iu_oi
- * @verion 0.0.1
+ * @since 0.0.2
  */
 @Service
 public class UserService {
 
-    /**
-     * jwt配置文件
-     */
-    @Autowired
+    @Autowired /* jwt配置文件 */
     private JwtProperties jwtProperties;
 
     /**
@@ -46,7 +43,7 @@ public class UserService {
      * 
      * @param jws
      * @param userId
-     * @return 如果验证成功返回{@code 真}，否则为{@code 假}
+     * @return 验证是否成功
      */
     public boolean verifySignature(String jws, int userId) {
         try {
@@ -60,17 +57,14 @@ public class UserService {
         }
     }
 
-    /**
-     * user配置文件
-     */
-    @Autowired
+    @Autowired /* user配置文件 */
     private UserProperties userProperties;
 
     /**
      * 验证用户是否符合user.xxx-format的规范
      * 
      * @param user
-     * @return 验证成功返回{@code 真}，否则返回{@code 假}
+     * @return 验证是否成功
      */
     public boolean check(User user) {
         String username = user.getUsername();
@@ -86,19 +80,17 @@ public class UserService {
         return true;
     }
 
-    /**
-     * user数据库映射
-     */
-    @Autowired
+    @Autowired /* user数据库映射 */
     private UserMapper userMapper;
 
     /**
      * 创建用户
      * 
-     * @apiNote user无需填写id字段，它将被自动设置
+     * @apiNote 用户id将被自动设置
      * @param user
      */
     public void create(User user) {
+        /* todo: 检查与异常 */
         userMapper.insert(user);
     }
 
@@ -108,6 +100,7 @@ public class UserService {
      * @param user
      */
     public void update(User user) {
+        /* todo: 检查与异常 */
         userMapper.updateById(user);
     }
 
@@ -115,7 +108,7 @@ public class UserService {
      * 通过用户id查询用户
      * 
      * @param userId
-     * @return 查询到的用户，查询失败返回{@code null}
+     * @return 查询失败返回{@code null}
      */
     public User read(int userId) {
         return userMapper.selectById(userId);
@@ -125,7 +118,7 @@ public class UserService {
      * 通过用户名查询用户
      * 
      * @param username
-     * @return 查询到的用户，查询失败返回{@code null}
+     * @return 查询失败返回{@code null}
      */
     public User read(String username) {
         return userMapper.selectOne(new QueryWrapper<User>().eq("username", username));

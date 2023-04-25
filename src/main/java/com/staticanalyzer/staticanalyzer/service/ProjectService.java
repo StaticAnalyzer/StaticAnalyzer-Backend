@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.staticanalyzer.algservice.AlgAnalyseResult;
 import com.staticanalyzer.algservice.AnalyseResponse;
 import com.staticanalyzer.algservice.FileAnalyseResults;
+import com.staticanalyzer.staticanalyzer.config.project.ProjectProperties;
 import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult;
 import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
 import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisBrief;
@@ -34,18 +34,18 @@ import com.staticanalyzer.staticanalyzer.utils.TarGzUtils;
  * 上传和查询分析结果等
  * 
  * @author iu_oi
- * @verion 0.0.1
+ * @since 0.0.2
  */
 @Service
 public class ProjectService {
 
-    /**
-     * grpc算法服务
-     */
-    @Autowired
+    @Autowired /* project配置属性 */
+    private ProjectProperties projectProperties;
+
+    @Autowired /* grpc算法服务 */
     private AlgorithmService algorithmService;
 
-    /**
+    /*
      * 任务内部类
      * 递交任务的抽象
      */
@@ -54,9 +54,7 @@ public class ProjectService {
     @AllArgsConstructor
     class Task implements Runnable {
 
-        /**
-         * 需要处理的数据
-         */
+        /* 需要处理的数据 */
         private Project project;
 
         @Override
@@ -66,8 +64,10 @@ public class ProjectService {
             AnalyseResponse analyseResponse = algorithmService.Analyse(sourceCode, config);
 
             if (project.updateAnalyseResult(analyseResponse)) {
+                /* 先删缓存再更新 */
+                String hashKey = CACHE_KEY_PROJECT + project.getId();
+                redisTemplate.opsForHash().delete(hashKey);
                 projectMapper.updateById(project);
-                // clean(project);
             }
         }
     }
@@ -77,7 +77,7 @@ public class ProjectService {
      * 最大{@static 10}
      * 超过则等待
      */
-    private static ExecutorService TASK_POOL = Executors.newFixedThreadPool(10);
+    private ExecutorService taskPool;
 
     /**
      * 递交项目给算法后端
@@ -85,18 +85,16 @@ public class ProjectService {
      * @param project
      */
     public void submit(Project project) {
-        TASK_POOL.submit(new Task(project));
+        if (taskPool == null)
+            taskPool = Executors.newFixedThreadPool(projectProperties.getTaskLimit());
+        taskPool.submit(new Task(project));
     }
 
-    /**
-     * project数据库映射
-     */
-    @Autowired
+    @Autowired /* project数据库映射 */
     private ProjectMapper projectMapper;
 
     /**
      * 新建项目
-     * 同时递交任务给grpc后端
      * 
      * @apiNote 项目id和上传时间戳会被mysql自动设置
      * @param userId
@@ -118,7 +116,7 @@ public class ProjectService {
      * 通过所有者id查询项目
      * 
      * @param userId
-     * @return 项目列表，如果没有项目返回空列表
+     * @return 可能为{@code null}
      * @see com.staticanalyzer.staticanalyzer.entity.project.ProjectVO
      */
     public List<ProjectVO> readAll(int userId) {
@@ -126,15 +124,10 @@ public class ProjectService {
         return databaseProjectList.stream().map(p -> new ProjectVO(p)).collect(Collectors.toList());
     }
 
-    /**
-     * 项目模板
-     */
-    @Autowired
+    @Autowired /* project模板 */
     private RedisTemplate redisTemplate;
 
-    /**
-     * 项目缓存键值前缀
-     */
+    /* 项目缓存键值前缀 */
     private static String CACHE_KEY_PROJECT = "project:";
 
     /**
@@ -142,7 +135,7 @@ public class ProjectService {
      * 
      * @apiNote 如果分析未完成，则不为FileAnalysis设置分析数据
      * @param project
-     * @return 文件集，如果解压失败返回{@code null}
+     * @return 可能为{@code null}
      * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis
      */
     private Map<String, FileAnalysis> fetch(int projectId) {
@@ -176,7 +169,7 @@ public class ProjectService {
 
         /* 写入缓存 */
         redisTemplate.opsForHash().putAll(hashKey, files);
-        redisTemplate.expire(hashKey, 30, TimeUnit.MINUTES);
+        redisTemplate.expire(hashKey, projectProperties.getExpiration());
         return files;
     }
 
@@ -185,7 +178,7 @@ public class ProjectService {
      * 
      * @param userId
      * @param projectId
-     * @return 查询到的文件分析信息，如果找不到返回{@code null}
+     * @return 找不到返回{@code null}
      * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisVO
      */
     public FileAnalysisVO readFile(int projectId, String filePath) {
@@ -203,7 +196,7 @@ public class ProjectService {
      * 通过项目id查询项目结构
      * 
      * @param projectId
-     * @return 查询到的项目树状结构，如果找不到返回{@code null}
+     * @return 找不到返回{@code null}
      * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisBrief
      * @see com.staticanalyzer.staticanalyzer.entity.analysis.DirectoryEntry
      */

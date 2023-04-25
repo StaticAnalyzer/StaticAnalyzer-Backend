@@ -16,7 +16,7 @@ import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
  * tar.gz工具类
  * 
  * @author WLLEGit
- * @version 0.0.1
+ * @version 0.0.2
  */
 public class TarGzUtils {
 
@@ -25,7 +25,7 @@ public class TarGzUtils {
      * 用于测试
      * 
      * @param projectPath 相对路径
-     * @return 压缩包字节串，如果出现异常，返回{@code null}
+     * @return 出现异常返回{@code null}
      */
     public static byte[] compress(String projectPath) {
         /* todo */
@@ -37,7 +37,7 @@ public class TarGzUtils {
      * 用于后续分析和结构化显示
      * 
      * @param tarGzFileBytes
-     * @return 以相对路径为键值的文件映射，如果出现异常，返回{@code null}
+     * @return 以相对路径为键值的文件映射 出现异常返回{@code null}
      * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis
      */
     public static Map<String, FileAnalysis> decompress(byte[] tarGzFileBytes) {

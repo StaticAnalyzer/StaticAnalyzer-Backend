@@ -17,15 +17,14 @@ import com.staticanalyzer.staticanalyzer.service.UserService;
 
 /**
  * 用户拦截器
+ * 
+ * @author iu_oi
+ * @since 0.0.1
  */
 @Component
 public class UserInterceptor implements HandlerInterceptor {
 
-    /**
-     * 用户服务
-     * 用来提供签名相关操作
-     */
-    @Autowired
+    @Autowired /* 用户服务 */
     UserService userService;
 
     /**
@@ -49,6 +48,7 @@ public class UserInterceptor implements HandlerInterceptor {
             setResponseMessage(response, "认证格式错误，需要登录");
             return false;
         }
+        /* 比较id */
         String jws = requestHeader.replaceFirst("Bearer ", "");
         Path requestPath = Path.of(request.getRequestURI());
         int userId = Integer.parseInt(requestPath.getName(1).toString());

@@ -2,6 +2,9 @@ package com.staticanalyzer.staticanalyzer.entity.project;
 
 /**
  * 项目状态
+ * 
+ * @author iu_oi
+ * @since 0.0.2
  */
 public enum ProjectStatus {
 

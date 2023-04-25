@@ -11,17 +11,15 @@ import lombok.Data;
 
 /**
  * 用户信息
- * 用户在数据库中的表示型式
- * 可以被前端查询
+ * 
+ * @author iu_oi
+ * @since 0.0.1
  */
 @Data
 @ApiModel(description = "用户信息")
 public class User {
 
-    /**
-     * 用户id
-     * 由mysql自动生成
-     */
+    /* 用户id 由mysql自动生成 */
     @TableId(value = "id", type = IdType.AUTO)
     @ApiModelProperty(value = "用户id", required = false)
     private Integer id;

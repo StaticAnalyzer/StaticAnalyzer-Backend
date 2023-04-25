@@ -10,6 +10,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import com.staticanalyzer.staticanalyzer.entity.project.Project;
 
+/**
+ * 项目映射
+ * 
+ * @author WLLEGit
+ * @since 0.0.1
+ */
 @Mapper
 public interface ProjectMapper extends BaseMapper<Project> {
 

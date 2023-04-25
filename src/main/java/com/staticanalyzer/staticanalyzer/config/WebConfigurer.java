@@ -7,6 +7,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.staticanalyzer.staticanalyzer.interceptor.UserInterceptor;
 
+/**
+ * mvc配置类
+ * 
+ * @author iu_oi
+ * @since 0.0.1
+ */
 @Configuration
 public class WebConfigurer implements WebMvcConfigurer {
 
@@ -17,6 +23,6 @@ public class WebConfigurer implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/user/**")
-                .excludePathPatterns("/user");
+                .excludePathPatterns("/user"); /* 需要忽略注册接口 */
     }
 }
