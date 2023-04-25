@@ -24,7 +24,7 @@ public class DirectoryEntry<F extends FileEntry> {
 
     /* 目录名 */
     @ApiModelProperty(value = "目录名", required = true)
-    private String name;
+    private String name = "root";
 
     /* 子目录集 */
     @ApiModelProperty(value = "子目录集", required = false)
@@ -48,6 +48,7 @@ public class DirectoryEntry<F extends FileEntry> {
             /* 将directoryEntry递进 */
             if ((directoryEntry = directories.get(currentPath.toString())) == null) {
                 directoryEntry = new DirectoryEntry<>();
+                directoryEntry.setName(currentPath.toString());
                 directories.put(currentPath.toString(), directoryEntry);
             }
         }
