@@ -69,7 +69,9 @@ public class ProjectService {
             if (project.updateAnalyseResult(analyseResponse)) {
                 /* 先删缓存再更新 */
                 String hashKey = CACHE_KEY_PROJECT + project.getId();
-                redisTemplate.opsForHash().delete(hashKey);
+                redisTemplate.delete(hashKey);
+                String listKey = CACHE_KEY_PROJECTVO + project.getUserId();
+                redisTemplate.delete(listKey);
                 projectMapper.updateById(project);
             }
         }
@@ -119,6 +121,12 @@ public class ProjectService {
         return project;
     }
 
+    @Autowired /* project模板 */
+    private RedisTemplate redisTemplate;
+
+    /* ProjectVO缓存键值前缀 */
+    private static String CACHE_KEY_PROJECTVO = "project_of_user:";
+
     /**
      * 通过所有者id查询项目
      * 
@@ -127,14 +135,23 @@ public class ProjectService {
      * @see ProjectVO
      */
     public List<ProjectVO> readAll(int userId) {
+        String listKey = CACHE_KEY_PROJECTVO + userId;
+        List<ProjectVO> projectVOList = redisTemplate.opsForList().range(listKey, 0, -1);
+        if (projectVOList.size() > 0) /* 直接读取缓存 */
+            return projectVOList;
+
+        /* 从数据库拉取 */
         List<Project> databaseProjectList = projectMapper.selectByUserId(userId);
-        return databaseProjectList.stream().map(p -> new ProjectVO(p)).collect(Collectors.toList());
+        projectVOList = databaseProjectList.stream().map(p -> new ProjectVO(p))
+                .collect(Collectors.toList());
+
+        /* 写入缓存 */
+        redisTemplate.opsForList().leftPushAll(listKey, projectVOList);
+        redisTemplate.expire(listKey, projectProperties.getExpiration());
+        return projectVOList;
     }
 
-    @Autowired /* project模板 */
-    private RedisTemplate redisTemplate;
-
-    /* 项目缓存键值前缀 */
+    /* Project缓存键值前缀 */
     private static String CACHE_KEY_PROJECT = "project:";
 
     /**
