@@ -1,15 +1,12 @@
 package com.staticanalyzer.staticanalyzer.service;
 
-import java.util.concurrent.TimeUnit;
-
 import io.jsonwebtoken.JwtException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 import com.staticanalyzer.staticanalyzer.config.jwt.JwtProperties;
 import com.staticanalyzer.staticanalyzer.config.user.UserProperties;
 import com.staticanalyzer.staticanalyzer.entity.user.User;
@@ -19,6 +16,9 @@ import com.staticanalyzer.staticanalyzer.utils.JwtUtils;
 /**
  * 用户服务
  * 增删改查以及验证等
+ * 
+ * @author iu_oi
+ * @verion 0.0.1
  */
 @Service
 public class UserService {
@@ -103,72 +103,31 @@ public class UserService {
     }
 
     /**
-     * user缓存模板
-     */
-    @Autowired
-    private RedisTemplate<String, User> userTemplate;
-
-    /**
-     * 缓存用户数据使用的key前缀
-     * 键值: {@code username}
-     */
-    private static String CACHE_KEY_USERNAME = "user:";
-    /**
-     * 缓存用户数据使用的key前缀
-     * 键值: {@code id}
-     */
-    private static String CACHE_KEY_USERID = "user@";
-
-    /**
      * 更新用户
      * 
-     * @apiNote 更新数据库中的用户将导致缓存先被删除
      * @param user
      */
     public void update(User user) {
-        ValueOperations<String, User> operations = userTemplate.opsForValue();
-        operations.getAndDelete(CACHE_KEY_USERID + user.getId());
-        operations.getAndDelete(CACHE_KEY_USERNAME + user.getUsername());
         userMapper.updateById(user);
     }
 
     /**
      * 通过用户id查询用户
      * 
-     * @apiNote 优先访问缓存
      * @param userId
      * @return 查询到的用户，查询失败返回{@code null}
      */
     public User read(int userId) {
-        ValueOperations<String, User> operations = userTemplate.opsForValue();
-        String keyById = CACHE_KEY_USERID + userId;
-        User cachedUser = operations.get(keyById);
-        if (cachedUser == null) {
-            User databaseUser = userMapper.selectById(userId);
-            if (databaseUser != null)
-                operations.set(keyById, databaseUser, 30, TimeUnit.MINUTES);
-            return databaseUser;
-        }
-        return cachedUser;
+        return userMapper.selectById(userId);
     }
 
     /**
      * 通过用户名查询用户
      * 
-     * @apiNote 优先访问缓存
      * @param username
      * @return 查询到的用户，查询失败返回{@code null}
      */
     public User read(String username) {
-        ValueOperations<String, User> operations = userTemplate.opsForValue();
-        String keyByUsername = CACHE_KEY_USERID + username;
-        User cachedUser = operations.get(keyByUsername);
-        if (cachedUser == null) {
-            User databaseUser = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
-            if (databaseUser != null)
-                operations.set(keyByUsername, databaseUser, 30, TimeUnit.MINUTES);
-            return databaseUser;
-        }
-        return cachedUser;
+        return userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
     }
 }

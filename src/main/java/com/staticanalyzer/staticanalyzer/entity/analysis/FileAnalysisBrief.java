@@ -1,5 +1,7 @@
 package com.staticanalyzer.staticanalyzer.entity.analysis;
 
+import java.nio.file.Paths;
+
 import lombok.Data;
 
 import io.swagger.annotations.ApiModel;
@@ -29,7 +31,7 @@ public class FileAnalysisBrief implements FileEntry {
      * 
      * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus
      */
-    @ApiModelProperty(value = "文件中权值最高的结果", required = true)
+    @ApiModelProperty(value = "文件中权值最高的结果", example = "Pass", required = true)
     private AnalysisStatus severity;
 
     /**
@@ -39,7 +41,7 @@ public class FileAnalysisBrief implements FileEntry {
      * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis
      */
     public FileAnalysisBrief(FileAnalysis fileAnalysis) {
-        name = fileAnalysis.getName();
+        name = Paths.get(fileAnalysis.getName()).getFileName().toString();
         severity = AnalysisStatus.Pass;
 
         for (AnalyseResultEntry analyseResult : fileAnalysis.getAnalyseResults()) {

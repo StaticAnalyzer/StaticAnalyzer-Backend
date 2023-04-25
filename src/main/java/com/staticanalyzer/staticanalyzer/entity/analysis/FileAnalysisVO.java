@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
 
 import com.staticanalyzer.algservice.AnalyseResultEntry;
-import com.staticanalyzer.staticanalyzer.entity.project.FileEntry;
 
 /**
  * 单个文件分析报告
@@ -17,14 +16,7 @@ import com.staticanalyzer.staticanalyzer.entity.project.FileEntry;
  */
 @Data
 @ApiModel(description = "单个文件分析报告")
-public class FileAnalysisDetail implements FileEntry {
-
-    /**
-     * 文件名
-     * 可能作为键值
-     */
-    @ApiModelProperty(value = "文件名", required = true)
-    private String name;
+public class FileAnalysisVO {
 
     /**
      * 源代码
@@ -47,8 +39,7 @@ public class FileAnalysisDetail implements FileEntry {
      * @param fileAnalysis
      * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis
      */
-    public FileAnalysisDetail(FileAnalysis fileAnalysis) {
-        name = fileAnalysis.getName();
+    public FileAnalysisVO(FileAnalysis fileAnalysis) {
         src = fileAnalysis.getSrc();
         analyseResults = fileAnalysis.getAnalyseResults();
     }

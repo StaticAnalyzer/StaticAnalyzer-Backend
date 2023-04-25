@@ -12,9 +12,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import com.staticanalyzer.staticanalyzer.entity.Result;
-import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisDe
-import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisDetail;tailFileAnalysisDetail;
 import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisBrief;
+import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisVO;
 import com.staticanalyzer.staticanalyzer.entity.project.DirectoryEntry;
 import com.staticanalyzer.staticanalyzer.entity.project.Project;
 import com.staticanalyzer.staticanalyzer.entity.project.ProjectVO;
@@ -23,6 +22,9 @@ import com.staticanalyzer.staticanalyzer.service.ProjectService;
 /**
  * 项目控制器
  * 定义所有与项目相关的请求操作
+ * 
+ * @author iu_oi
+ * @version 0.0.1
  */
 @RestController
 @Api(description = "项目控制器")
@@ -41,7 +43,7 @@ public class ProjectController {
      * @param userId
      * @param sourceCode
      * @param config
-     * @return data始终置空
+     * @return data始终为{@code null}
      */
     @PostMapping("/user/{uid}/project")
     @ApiOperation(value = "项目上传接口")
@@ -69,7 +71,9 @@ public class ProjectController {
     @GetMapping("/user/{uid}/project")
     @ApiOperation(value = "项目查询接口")
     public Result<List<ProjectVO>> read(@PathVariable("uid") int userId) {
-        List<ProjectVO> projectVOList = projectService.findByUserId(userId);
+        List<ProjectVO> projectVOList = projectService.readAll(userId);
+        if (projectVOList == null)
+            return Result.error("项目查询失败");
         return Result.ok("项目查询成功", projectVOList);
     }
 
@@ -88,8 +92,10 @@ public class ProjectController {
     public Result<DirectoryEntry<FileAnalysisBrief>> read(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId) {
-        DirectoryEntry<FileAnalysisBrief> directoryEntryVO = projectService.findByProjectId(userId, projectId);
-        return Result.ok("项目目录查询成功", directoryEntryVO);
+        DirectoryEntry<FileAnalysisBrief> directoryEntry = projectService.read(projectId);
+        if (directoryEntry == null)
+            return Result.error("项目目录查询失败");
+        return Result.ok("项目目录查询成功", directoryEntry);
     }
 
     /**
@@ -104,11 +110,13 @@ public class ProjectController {
      */
     @GetMapping("/user/{uid}/project/{pid}/{path:.+}")
     @ApiOperation(value = "文件查询接口")
-    public Result<FileAnalysisDetail> read(
+    public Result<FileAnalysisVO> read(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId,
             @PathVariable String path) {
-        FileAnalysisDetail fileEntry = projectService.findByPath(userId, projectId, path);
+        FileAnalysisVO fileEntry = projectService.readFile(projectId, path);
+        if (fileEntry == null)
+            return Result.error("文件查询失败");
         return Result.ok("文件查询成功", fileEntry);
     }
 }

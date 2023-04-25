@@ -88,8 +88,8 @@ public class ProjectVO {
             if (algAnalyseResult.getCode() == 1) {
                 severity = AnalysisStatus.AnalyseError;
             } else {
-                for (FileAnalyseResults entrys : algAnalyseResult.getFileAnalyseResultsMap().values()) {
-                    for (AnalyseResultEntry analyseResultEntry : entrys.getAnalyseResultsList()) {
+                for (FileAnalyseResults entry : algAnalyseResult.getFileAnalyseResultsMap().values()) {
+                    for (AnalyseResultEntry analyseResultEntry : entry.getAnalyseResultsList()) {
                         AnalysisStatus currentSeverity = AnalysisStatus.valueOf(analyseResultEntry.getSeverity());
                         if (currentSeverity.compareTo(severity) > 0)
                             severity = currentSeverity;

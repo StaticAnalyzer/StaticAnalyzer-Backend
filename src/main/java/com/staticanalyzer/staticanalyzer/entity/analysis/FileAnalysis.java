@@ -27,14 +27,6 @@ public class FileAnalysis implements FileEntry {
     private String name;
 
     /**
-     * 文件中权值最高的结果
-     * 
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus
-     */
-    @ApiModelProperty(value = "文件中权值最高的结果", example = "Pass", required = false)
-    private AnalysisStatus severity;
-
-    /**
      * 源代码
      */
     @ApiModelProperty(value = "源代码", required = true)
