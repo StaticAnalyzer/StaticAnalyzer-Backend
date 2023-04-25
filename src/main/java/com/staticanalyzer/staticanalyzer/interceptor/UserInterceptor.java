@@ -14,6 +14,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.staticanalyzer.staticanalyzer.entity.Result;
 import com.staticanalyzer.staticanalyzer.service.UserService;
+import com.staticanalyzer.staticanalyzer.service.error.ServiceError;
+import com.staticanalyzer.staticanalyzer.service.error.ServiceErrorType;
 
 /**
  * 用户拦截器
@@ -43,19 +45,19 @@ public class UserInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request,
             HttpServletResponse response, Object handler) throws Exception {
-        String requestHeader = request.getHeader("Authorization");
-        if (requestHeader == null) {
-            setResponseMessage(response, "认证格式错误，需要登录");
+        try {
+            String requestHeader = request.getHeader("Authorization");
+            String jws = requestHeader.replaceFirst("Bearer ", "");
+            Path requestPath = Path.of(request.getRequestURI());
+            int userId = Integer.parseInt(requestPath.getName(1).toString());
+            userService.checkSignature(jws, userId); /* 比较id */
+            return true;
+        } catch (ServiceError serviceError) {
+            setResponseMessage(response, serviceError.getMessage());
+            return false;
+        } catch (Exception exception) {
+            setResponseMessage(response, ServiceErrorType.UNKNOWN.getMsg());
             return false;
         }
-        /* 比较id */
-        String jws = requestHeader.replaceFirst("Bearer ", "");
-        Path requestPath = Path.of(request.getRequestURI());
-        int userId = Integer.parseInt(requestPath.getName(1).toString());
-        if (!userService.verifySignature(jws, userId)) {
-            setResponseMessage(response, "身份认证失败，请重新登录");
-            return false;
-        }
-        return true;
     }
 }

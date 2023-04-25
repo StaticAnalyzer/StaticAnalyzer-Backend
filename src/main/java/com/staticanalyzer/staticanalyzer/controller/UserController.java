@@ -15,6 +15,7 @@ import com.staticanalyzer.staticanalyzer.entity.Result;
 import com.staticanalyzer.staticanalyzer.entity.user.User;
 import com.staticanalyzer.staticanalyzer.entity.user.Identity;
 import com.staticanalyzer.staticanalyzer.service.UserService;
+import com.staticanalyzer.staticanalyzer.service.error.ServiceError;
 
 /**
  * 用户控制器
@@ -36,24 +37,19 @@ public class UserController {
      * @apiNote 无需传递用户id
      * @param user
      * @return 出错时{@code data = null}
-     * @see com.staticanalyzer.staticanalyzer.entity.user.User
-     * @see com.staticanalyzer.staticanalyzer.entity.user.Identity
+     * @see User
+     * @see Identity
      */
     @PostMapping("/login")
     @ApiOperation(value = "用户登录接口")
     public Result<Identity> login(@RequestBody User user) {
-        if (!userService.check(user))
-            return Result.error("用户名或密码格式错误");
-
-        User databaseUser = userService.read(user.getUsername());
-        if (databaseUser == null)
-            return Result.error("找不到用户");
-
-        if (!databaseUser.getPassword().equals(user.getPassword()))
-            return Result.error("用户名或密码错误");
-
-        String jws = userService.getSignature(databaseUser.getId());
-        return Result.ok("登录成功", new Identity(databaseUser, jws));
+        try {
+            User databaseUser = userService.login(user);
+            String jws = userService.getSignature(databaseUser.getId());
+            return Result.ok("登录成功", new Identity(databaseUser, jws));
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
     }
 
     /**
@@ -68,16 +64,13 @@ public class UserController {
     @PostMapping("/user")
     @ApiOperation(value = "用户注册接口")
     public Result<Identity> create(@RequestBody User user) {
-        if (!userService.check(user))
-            return Result.error("用户名或密码格式错误");
-
-        User databaseUser = userService.read(user.getUsername());
-        if (databaseUser != null)
-            return Result.error("用户已存在");
-
-        userService.create(user);
-        String jws = userService.getSignature(user.getId());
-        return Result.ok("注册成功", new Identity(user, jws));
+        try {
+            userService.create(user);
+            String jws = userService.getSignature(user.getId());
+            return Result.ok("注册成功", new Identity(user, jws));
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
     }
 
     /**
@@ -90,10 +83,12 @@ public class UserController {
     @GetMapping("/user/{uid}")
     @ApiOperation(value = "用户查询接口")
     public Result<User> read(@PathVariable("uid") int userId) {
-        User databaseUser = userService.read(userId);
-        if (databaseUser == null)
-            return Result.error("找不到用户");
-        return Result.ok("查询成功", databaseUser);
+        try {
+            User databaseUser = userService.read(userId);
+            return Result.ok("查询成功", databaseUser);
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
     }
 
     /**
@@ -107,15 +102,13 @@ public class UserController {
     @PutMapping("/user/{uid}")
     @ApiOperation(value = "用户修改接口")
     public Result<?> update(@PathVariable("uid") int userId, @RequestBody String password) {
-        User databaseUser = userService.read(userId);
-        if (databaseUser == null)
-            return Result.error("找不到用户");
-
-        databaseUser.setPassword(password);
-        if (!userService.check(databaseUser))
-            return Result.error("用户名或密码格式错误");
-
-        userService.update(databaseUser);
-        return Result.ok("修改成功");
+        try {
+            User databaseUser = userService.read(userId);
+            databaseUser.setPassword(password);
+            userService.update(databaseUser);
+            return Result.ok("修改成功");
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
     }
 }

@@ -198,7 +198,7 @@ public class ProjectService {
      * @param projectId
      * @return 找不到返回{@code null}
      * @see com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisBrief
-     * @see com.staticanalyzer.staticanalyzer.entity.analysis.DirectoryEntry
+     * @see com.staticanalyzer.staticanalyzer.entity.project.DirectoryEntry
      */
     public DirectoryEntry<FileAnalysisBrief> read(int projectId) {
         Map<String, FileAnalysis> files = fetch(projectId);

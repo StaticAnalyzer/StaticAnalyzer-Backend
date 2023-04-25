@@ -1,8 +1,7 @@
 package com.staticanalyzer.staticanalyzer.entity;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,13 +30,13 @@ public class UserTest {
         badUser.setId(8);
         badUser.setUsername("test");
         badUser.setPassword("8888");
-        assertFalse(userService.check(badUser));
+        assertDoesNotThrow(() -> userService.check(badUser));
 
         User newUser = new User();
         newUser.setId(1000);
         newUser.setUsername("nju");
         newUser.setPassword("88888888");
-        assertTrue(userService.check(newUser));
+        assertDoesNotThrow(() -> userService.check(newUser));
 
         userService.create(newUser);
         User byId = userService.read(newUser.getId());
@@ -46,7 +45,7 @@ public class UserTest {
         assertEquals(byUsername, newUser);
 
         newUser.setPassword("66666666");
-        assertTrue(userService.check(newUser));
+        assertDoesNotThrow(() -> userService.check(newUser));
         userService.update(newUser);
         byId = userService.read(newUser.getId());
         byUsername = userService.read(newUser.getUsername());

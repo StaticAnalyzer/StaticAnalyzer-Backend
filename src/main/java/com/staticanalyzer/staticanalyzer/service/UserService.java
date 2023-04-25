@@ -1,5 +1,6 @@
 package com.staticanalyzer.staticanalyzer.service;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import com.staticanalyzer.staticanalyzer.config.jwt.JwtProperties;
 import com.staticanalyzer.staticanalyzer.config.user.UserProperties;
 import com.staticanalyzer.staticanalyzer.entity.user.User;
 import com.staticanalyzer.staticanalyzer.mapper.UserMapper;
+import com.staticanalyzer.staticanalyzer.service.error.ServiceError;
+import com.staticanalyzer.staticanalyzer.service.error.ServiceErrorType;
 import com.staticanalyzer.staticanalyzer.utils.JwtUtils;
 
 /**
@@ -43,17 +46,17 @@ public class UserService {
      * 
      * @param jws
      * @param userId
-     * @return 验证是否成功
+     * @throws ServiceError
      */
-    public boolean verifySignature(String jws, int userId) {
+    public void checkSignature(String jws, int userId) throws ServiceError {
         try {
             int jwtId = JwtUtils.parseJws(jwtProperties.getKey(), jws);
-            if (jwtId == userId)
-                return true;
-            return false;
+            if (jwtId != userId)
+                throw new ServiceError(ServiceErrorType.USER_AUTH_FAILED);
+        } catch (ExpiredJwtException expiredJwtException) {
+            throw new ServiceError(ServiceErrorType.USER_TOKEN_EXPIRED);
         } catch (JwtException jwtException) {
-            /* todo: 处理不同类型的异常并转化成用户异常 */
-            return false;
+            throw new ServiceError(ServiceErrorType.USER_AUTH_FAILED);
         }
     }
 
@@ -64,33 +67,54 @@ public class UserService {
      * 验证用户是否符合user.xxx-format的规范
      * 
      * @param user
-     * @return 验证是否成功
+     * @throws ServiceError
      */
-    public boolean check(User user) {
+    public void check(User user) throws ServiceError {
+        /* 验证用户名 */
         String username = user.getUsername();
+        if (!username.matches(userProperties.getUsernameFormat()))
+            throw new ServiceError(ServiceErrorType.BAD_USERNAME);
+        /* 验证密码 */
         String password = user.getPassword();
-        if (!username.matches(userProperties.getUsernameFormat())) {
-            /* todo: 扔出用户异常 */
-            return false;
-        }
-        if (!password.matches(userProperties.getPasswordFormat())) {
-            /* todo: 扔出用户异常 */
-            return false;
-        }
-        return true;
+        if (!password.matches(userProperties.getPasswordFormat()))
+            throw new ServiceError(ServiceErrorType.BAD_PASSWORD);
     }
 
     @Autowired /* user数据库映射 */
     private UserMapper userMapper;
 
     /**
+     * 用户登录
+     * 
+     * @param user
+     * @return 有效用户
+     * @throws ServiceError
+     */
+    public User login(User user) throws ServiceError {
+        check(user);
+        User databaseUser = userMapper.selectOne(
+                new QueryWrapper<User>().eq("username", user.getUsername()));
+        if (databaseUser == null)
+            throw new ServiceError(ServiceErrorType.USER_NOT_FOUND);
+        if (!databaseUser.getPassword().equals(user.getPassword()))
+            throw new ServiceError(ServiceErrorType.USER_AUTH_FAILED);
+        return databaseUser;
+
+    }
+
+    /**
      * 创建用户
      * 
      * @apiNote 用户id将被自动设置
      * @param user
+     * @throws ServiceError
      */
-    public void create(User user) {
-        /* todo: 检查与异常 */
+    public void create(User user) throws ServiceError {
+        check(user);
+        User databaseUser = userMapper.selectOne(
+                new QueryWrapper<User>().eq("username", user.getUsername()));
+        if (databaseUser != null)
+            throw new ServiceError(ServiceErrorType.USER_ALREADY_EXISTS);
         userMapper.insert(user);
     }
 
@@ -98,9 +122,10 @@ public class UserService {
      * 更新用户
      * 
      * @param user
+     * @throws ServiceError
      */
-    public void update(User user) {
-        /* todo: 检查与异常 */
+    public void update(User user) throws ServiceError {
+        check(user);
         userMapper.updateById(user);
     }
 
@@ -108,19 +133,28 @@ public class UserService {
      * 通过用户id查询用户
      * 
      * @param userId
-     * @return 查询失败返回{@code null}
+     * @return 用户
+     * @throws ServiceError
      */
-    public User read(int userId) {
-        return userMapper.selectById(userId);
+    public User read(int userId) throws ServiceError {
+        User databaseUser = userMapper.selectById(userId);
+        if (databaseUser == null)
+            throw new ServiceError(ServiceErrorType.USER_NOT_FOUND);
+        return databaseUser;
     }
 
     /**
      * 通过用户名查询用户
      * 
      * @param username
-     * @return 查询失败返回{@code null}
+     * @return 用户
+     * @throws ServiceError
      */
     public User read(String username) {
-        return userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+        User databaseUser = userMapper.selectOne(
+                new QueryWrapper<User>().eq("username", username));
+        if (databaseUser == null)
+            throw new ServiceError(ServiceErrorType.USER_NOT_FOUND);
+        return databaseUser;
     }
 }
