@@ -47,8 +47,8 @@ public class DirectoryEntry<F extends FileEntry> {
      * @apiNote 文件名为相对目录
      * @param fileEntry
      */
-    public void addFileEntry(F fileEntry) {
-        Path filePath = Paths.get(fileEntry.getName());
+    public void addFileEntry(String path, F fileEntry) {
+        Path filePath = Paths.get(path);
         DirectoryEntry<F> directoryEntry = this;
         for (Path currentPath : filePath.getParent()) {
             Map<String, DirectoryEntry<F>> directories = directoryEntry.getDirectories();

@@ -53,6 +53,7 @@ public class ProjectController {
             @RequestParam(value = "config") String config) {
         try {
             Project project = projectService.create(userId, sourceCode.getBytes(), config);
+            projectService.submit(project);
             String msg = "项目" + project.getId() + "上传成功";
             return Result.ok(msg);
         } catch (IOException ioException) {

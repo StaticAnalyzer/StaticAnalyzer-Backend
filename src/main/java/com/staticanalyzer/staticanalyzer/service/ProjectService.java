@@ -1,6 +1,5 @@
 package com.staticanalyzer.staticanalyzer.service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -153,11 +152,9 @@ public class ProjectService {
 
         /* 从数据库中拉取 */
         Project databaseProject = projectMapper.selectById(projectId);
-        try {
-            files = TarGzUtils.decompress(databaseProject.getSourceCode());
-        } catch (IOException ioException) {
+        files = TarGzUtils.decompress(databaseProject.getSourceCode());
+        if (files == null)
             return null;
-        }
 
         /* 设置分析结果(如果有) */
         AnalyseResponse analyseResponse = databaseProject.resolveAnalyseResponse();
@@ -213,8 +210,8 @@ public class ProjectService {
             return null;
 
         DirectoryEntry<FileAnalysisBrief> directoryEntry = new DirectoryEntry<>();
-        for (FileAnalysis fileAnalysis : files.values())
-            directoryEntry.addFileEntry(new FileAnalysisBrief(fileAnalysis));
+        for (Map.Entry<String, FileAnalysis> entry : files.entrySet())
+            directoryEntry.addFileEntry(entry.getKey(), new FileAnalysisBrief(entry.getValue()));
         return directoryEntry;
     }
 }

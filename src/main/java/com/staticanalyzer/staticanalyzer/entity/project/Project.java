@@ -87,10 +87,11 @@ public class Project {
                     .includingDefaultValueFields()
                     .omittingInsignificantWhitespace()
                     .print(analyseResponse);
+            return true;
         } catch (InvalidProtocolBufferException invalidProtocolBufferException) {
+            invalidProtocolBufferException.printStackTrace();
             return false;
         }
-        return true;
     }
 
     /**
@@ -104,9 +105,10 @@ public class Project {
         AnalyseResponse.Builder builder = AnalyseResponse.newBuilder();
         try {
             JsonFormat.parser().merge(analyseResult, builder);
+            return builder.build();
         } catch (InvalidProtocolBufferException invalidProtocolBufferException) {
+            invalidProtocolBufferException.printStackTrace();
             return null;
         }
-        return builder.build();
     }
 }
