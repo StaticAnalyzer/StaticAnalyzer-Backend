@@ -54,6 +54,9 @@ public class ProjectVO {
     @ApiModelProperty(value = "分析结果简报列表", required = false)
     private List<Analysis> analyseBrief;
 
+    public ProjectVO() {
+    }
+
     /**
      * 从项目提取数据
      * 
