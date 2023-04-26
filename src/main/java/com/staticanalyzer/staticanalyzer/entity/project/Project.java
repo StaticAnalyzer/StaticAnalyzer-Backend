@@ -10,7 +10,6 @@ import io.swagger.annotations.ApiModelProperty;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -42,8 +41,7 @@ public class Project {
      * 时间格式{@code yyyy-MM-dd HH:mm:ss}
      * 运行mysql的时区为标准时，此处设置时区为东8区
      */
-    @TableField(value = "timestamp", fill = FieldFill.INSERT)
-    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @TableField(value = "timestamp")
     @ApiModelProperty(value = "项目上传时间戳", required = false)
     private Date timestamp;
 

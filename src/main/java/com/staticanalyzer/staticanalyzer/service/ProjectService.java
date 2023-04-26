@@ -184,7 +184,7 @@ public class ProjectService {
         if (analyseResponse != null && analyseResponse.getCode() == 0) {
             List<AlgAnalyseResult> algAnalyseResultList = analyseResponse.getAlgAnalyseResultsList();
             for (AlgAnalyseResult algAnalyseResult : algAnalyseResultList) {
-                if (algAnalyseResult.getCode() == 1)
+                if (algAnalyseResult.getCode() != 0)
                     continue;
                 for (Map.Entry<String, FileAnalyseResults> entry : algAnalyseResult.getFileAnalyseResultsMap()
                         .entrySet()) {

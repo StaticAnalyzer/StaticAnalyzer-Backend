@@ -1,12 +1,15 @@
 package com.staticanalyzer.staticanalyzer.entity.project;
 
-import java.util.List;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import lombok.Data;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import com.staticanalyzer.algservice.AlgAnalyseResult;
 import com.staticanalyzer.algservice.AnalyseResponse;
@@ -30,6 +33,7 @@ public class ProjectVO {
     private int id;
 
     /* 项目上传时间戳 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "项目上传时间戳", required = true)
     private Date timestamp;
 
@@ -65,6 +69,7 @@ public class ProjectVO {
         id = project.getId();
         timestamp = project.getTimestamp();
         config = project.getConfig();
+        analyseBrief = new LinkedList<>();
 
         if (project.getAnalyseResult() == null) {
             status = ProjectStatus.Queueing;
@@ -83,7 +88,7 @@ public class ProjectVO {
             algAnalyseBrief.setAnalyseType(algAnalyseResult.getAnalyseType());
 
             AnalysisStatus severity = AnalysisStatus.Pass;
-            if (algAnalyseResult.getCode() == 1) {
+            if (algAnalyseResult.getCode() != 0) {
                 severity = AnalysisStatus.AnalyseError;
             } else {
                 for (FileAnalyseResults entry : algAnalyseResult.getFileAnalyseResultsMap().values()) {
@@ -95,6 +100,7 @@ public class ProjectVO {
                 }
             }
             algAnalyseBrief.setStatus(severity);
+            analyseBrief.add(algAnalyseBrief);
         }
         status = ProjectStatus.Complete;
     }
