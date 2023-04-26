@@ -77,7 +77,7 @@ public class ProjectVO {
         }
 
         AnalyseResponse analyseResponse = project.resolveAnalyseResponse();
-        if (analyseResponse == null || analyseResponse.getCode() == 1) {
+        if (analyseResponse == null || analyseResponse.getCode() != 0) {
             status = ProjectStatus.Error;
             return;
         }
