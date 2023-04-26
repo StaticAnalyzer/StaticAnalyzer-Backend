@@ -42,7 +42,7 @@ public class Project {
      * 时间格式{@code yyyy-MM-dd HH:mm:ss}
      * 运行mysql的时区为标准时，此处设置时区为东8区
      */
-    @TableField(value = "timestamp", fill = FieldFill.INSERT)
+    @TableField(value = "timestamp")
     @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "项目上传时间戳", required = false)
     private Date timestamp;
