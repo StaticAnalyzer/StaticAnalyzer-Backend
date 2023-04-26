@@ -1,9 +1,9 @@
 package com.staticanalyzer.staticanalyzer.entity;
 
+import lombok.Data;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import lombok.Data;
 
 /**
  * 统一返回对象
