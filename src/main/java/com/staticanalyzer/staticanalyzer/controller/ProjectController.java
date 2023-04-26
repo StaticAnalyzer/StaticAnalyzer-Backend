@@ -108,12 +108,12 @@ public class ProjectController {
      * @return 出错时{@code data = null}
      * @see FileAnalysisVO
      */
-    @GetMapping("/user/{uid}/project/{pid}/{path:.+}")
+    @GetMapping("/user/{uid}/project/{pid}/file")
     @ApiOperation(value = "文件查询接口")
     public Result<FileAnalysisVO> read(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId,
-            @PathVariable String path) {
+            @RequestParam(value = "path") String path) {
         try {
             FileAnalysisVO fileEntry = projectService.readFile(projectId, path);
             return Result.ok("文件查询成功", fileEntry);
