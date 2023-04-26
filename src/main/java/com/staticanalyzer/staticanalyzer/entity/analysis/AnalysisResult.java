@@ -41,6 +41,9 @@ public class AnalysisResult {
     @ApiModelProperty(value = "分析建议", required = true)
     private String message;
 
+    public AnalysisResult() {
+    }
+
     /**
      * 通过protobuf类获取信息
      * 

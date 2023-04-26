@@ -1,6 +1,7 @@
 package com.staticanalyzer.staticanalyzer.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -194,6 +195,12 @@ public class ProjectService {
                                     .collect(Collectors.toList()));
                 }
             }
+        }
+
+        for (Map.Entry<String, FileAnalysis> entry : files.entrySet()) {
+            FileAnalysis fileAnalysis = entry.getValue();
+            if (fileAnalysis.getAnalyseResults() == null)
+                fileAnalysis.setAnalyseResults(new ArrayList<>());
         }
 
         /* 写入缓存 */

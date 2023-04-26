@@ -43,13 +43,17 @@ public class DirectoryEntry<F extends FileEntry> {
     public void addFileEntry(String path, F fileEntry) {
         Path filePath = Paths.get(path);
         DirectoryEntry<F> directoryEntry = this;
-        for (Path currentPath : filePath.getParent()) {
-            Map<String, DirectoryEntry<F>> directories = directoryEntry.getDirectories();
-            /* 将directoryEntry递进 */
-            if ((directoryEntry = directories.get(currentPath.toString())) == null) {
-                directoryEntry = new DirectoryEntry<>();
-                directoryEntry.setName(currentPath.toString());
-                directories.put(currentPath.toString(), directoryEntry);
+        if (filePath.getParent() == null)
+            directoryEntry.getFiles().put(filePath.getFileName().toString(), fileEntry);
+        else {
+            for (Path currentPath : filePath.getParent()) {
+                Map<String, DirectoryEntry<F>> directories = directoryEntry.getDirectories();
+                /* 将directoryEntry递进 */
+                if ((directoryEntry = directories.get(currentPath.toString())) == null) {
+                    directoryEntry = new DirectoryEntry<>();
+                    directoryEntry.setName(currentPath.toString());
+                    directories.put(currentPath.toString(), directoryEntry);
+                }
             }
         }
         directoryEntry.getFiles().put(filePath.getFileName().toString(), fileEntry);
