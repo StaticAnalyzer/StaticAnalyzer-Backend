@@ -20,10 +20,7 @@ import com.staticanalyzer.staticanalyzer.config.jwt.JwtProperties;
  */
 public class JwtTest {
 
-    /**
-     * jwt配置文件
-     */
-    @Autowired
+    @Autowired /* jwt配置文件 */
     private JwtProperties jwtProperties;
 
     /**

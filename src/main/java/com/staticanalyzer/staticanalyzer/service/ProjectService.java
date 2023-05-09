@@ -147,8 +147,10 @@ public class ProjectService {
                 .collect(Collectors.toList());
 
         /* 写入缓存 */
-        redisTemplate.opsForList().leftPushAll(listKey, projectVOList);
-        redisTemplate.expire(listKey, projectProperties.getExpiration());
+        if (projectVOList.size() > 0) {
+            redisTemplate.opsForList().leftPushAll(listKey, projectVOList);
+            redisTemplate.expire(listKey, projectProperties.getExpiration());
+        }
         return projectVOList;
     }
 
@@ -190,22 +192,24 @@ public class ProjectService {
                 for (Map.Entry<String, FileAnalyseResults> entry : algAnalyseResult.getFileAnalyseResultsMap()
                         .entrySet()) {
                     FileAnalysis fileAnalysis = files.get(entry.getKey());
-                    fileAnalysis.setAnalyseResults(
-                            entry.getValue().getAnalyseResultsList().stream().map(r -> new AnalysisResult(r))
-                                    .collect(Collectors.toList()));
+                    /* 添加该算法的结果 */
+                    List<AnalysisResult> newAnalysisResultList = entry.getValue().getAnalyseResultsList().stream()
+                            .map(r -> new AnalysisResult(r)).collect(Collectors.toList());
+                    if (newAnalysisResultList.size() > 0) {
+                        /* 如果暂时还没有结果，则先初始化一个 */
+                        if (fileAnalysis.getAnalyseResults() == null)
+                            fileAnalysis.setAnalyseResults(new ArrayList<>());
+                        fileAnalysis.getAnalyseResults().addAll(newAnalysisResultList);
+                    }
                 }
             }
         }
 
-        for (Map.Entry<String, FileAnalysis> entry : files.entrySet()) {
-            FileAnalysis fileAnalysis = entry.getValue();
-            if (fileAnalysis.getAnalyseResults() == null)
-                fileAnalysis.setAnalyseResults(new ArrayList<>());
-        }
-
         /* 写入缓存 */
-        redisTemplate.opsForHash().putAll(hashKey, files);
-        redisTemplate.expire(hashKey, projectProperties.getExpiration());
+        if (files.size() > 0) {
+            redisTemplate.opsForHash().putAll(hashKey, files);
+            redisTemplate.expire(hashKey, projectProperties.getExpiration());
+        }
         return files;
     }
 
