@@ -38,6 +38,7 @@ public class PlaygroundService {
         FileAnalysis newFileEntry = new FileAnalysis();
         newFileEntry.setName("main.cpp");
         newFileEntry.setSrc(code);
+        newFileEntry.setAnalyseResults(new ArrayList<>());
 
         /* 设置结果 */
         if (analyseResponse != null && analyseResponse.getCode() == 0) {
@@ -46,13 +47,12 @@ public class PlaygroundService {
                 if (algAnalyseResult.getCode() != 0)
                     continue;
                 Map<String, FileAnalyseResults> fileAnalyseResults = algAnalyseResult.getFileAnalyseResultsMap();
+                if (!fileAnalyseResults.containsKey("main.cpp"))
+                    continue;
                 List<AnalysisResult> newAnalysisResultList = fileAnalyseResults.get("main.cpp").getAnalyseResultsList()
                         .stream().map(r -> new AnalysisResult(r))
                         .collect(Collectors.toList());
                 if (newAnalysisResultList.size() > 0) {
-                    /* 如果暂时还没有结果，则先初始化一个 */
-                    if (newFileEntry.getAnalyseResults() == null)
-                        newFileEntry.setAnalyseResults(new ArrayList<>());
                     newFileEntry.getAnalyseResults().addAll(newAnalysisResultList);
                 }
 
