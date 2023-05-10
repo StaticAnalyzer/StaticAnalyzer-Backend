@@ -45,61 +45,59 @@ public class GRPCJsonTest {
 
     @Test
     void TestGrpcJsonDeserialize() throws InvalidProtocolBufferException {
-        String json = """
-                {
-                    "code": 0,
-                    "msg": "分析完成",
-                    "algAnalyseResults": [
-                        {
-                            "analyseType": "UninitializedVariable",
-                            "code": 0,
-                            "msg": "",
-                            "fileAnalyseResults": {
-                                "main.cpp": {
-                                    "analyseResults": [
-                                        {
-                                            "startLine": 1,
-                                            "startColumn": 1,
-                                            "endLine": 1,
-                                            "endColumn": 2,
-                                            "severity": "Error",
-                                            "message": "error message"
-                                        },
-                                        {
-                                            "startLine": 4,
-                                            "startColumn": 2,
-                                            "endLine": 4,
-                                            "endColumn": 8,
-                                            "severity": "Warning",
-                                            "message": "error message"
-                                        }
-                                    ]
-                                },
-                                "src/a.c": {
-                                    "analyseResults": [
-                                        {
-                                            "startLine": 1,
-                                            "startColumn": 3,
-                                            "endLine": 1,
-                                            "endColumn": 5,
-                                            "severity": "Error",
-                                            "message": "error message"
-                                        },
-                                        {
-                                            "startLine": 4,
-                                            "startColumn": 2,
-                                            "endLine": 4,
-                                            "endColumn": 8,
-                                            "severity": "Info",
-                                            "message": "error message"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    ]
-                }
-        """;
+        String json = "{\n" +
+                      "    \"code\": 0,\n" +
+                      "    \"msg\": \"分析完成\",\n" +
+                      "    \"algAnalyseResults\": [\n" +
+                      "        {\n" +
+                      "            \"analyseType\": \"UninitializedVariable\",\n" +
+                      "            \"code\": 0,\n" +
+                      "            \"msg\": \"\",\n" +
+                      "            \"fileAnalyseResults\": {\n" +
+                      "                \"main.cpp\": {\n" +
+                      "                    \"analyseResults\": [\n" +
+                      "                        {\n" +
+                      "                            \"startLine\": 1,\n" +
+                      "                            \"startColumn\": 1,\n" +
+                      "                            \"endLine\": 1,\n" +
+                      "                            \"endColumn\": 2,\n" +
+                      "                            \"severity\": \"Error\",\n" +
+                      "                            \"message\": \"error message\"\n" +
+                      "                        },\n" +
+                      "                        {\n" +
+                      "                            \"startLine\": 4,\n" +
+                      "                            \"startColumn\": 2,\n" +
+                      "                            \"endLine\": 4,\n" +
+                      "                            \"endColumn\": 8,\n" +
+                      "                            \"severity\": \"Warning\",\n" +
+                      "                            \"message\": \"error message\"\n" +
+                      "                        }\n" +
+                      "                    ]\n" +
+                      "                },\n" +
+                      "                \"src/a.c\": {\n" +
+                      "                    \"analyseResults\": [\n" +
+                      "                        {\n" +
+                      "                            \"startLine\": 1,\n" +
+                      "                            \"startColumn\": 3,\n" +
+                      "                            \"endLine\": 1,\n" +
+                      "                            \"endColumn\": 5,\n" +
+                      "                            \"severity\": \"Error\",\n" +
+                      "                            \"message\": \"error message\"\n" +
+                      "                        },\n" +
+                      "                        {\n" +
+                      "                            \"startLine\": 4,\n" +
+                      "                            \"startColumn\": 2,\n" +
+                      "                            \"endLine\": 4,\n" +
+                      "                            \"endColumn\": 8,\n" +
+                      "                            \"severity\": \"Info\",\n" +
+                      "                            \"message\": \"error message\"\n" +
+                      "                        }\n" +
+                      "                    ]\n" +
+                      "                }\n" +
+                      "            }\n" +
+                      "        }\n" +
+                      "    ]\n" +
+                      "}";
 
         AnalyseResponse.Builder builder = AnalyseResponse.newBuilder();
         JsonFormat.parser().merge(json, builder);
