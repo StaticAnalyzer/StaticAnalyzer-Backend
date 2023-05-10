@@ -1,7 +1,6 @@
 package com.staticanalyzer.staticanalyzer.utils;
 
 import java.util.Date;
-
 import java.security.Key;
 import java.time.Duration;
 

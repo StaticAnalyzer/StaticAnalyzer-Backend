@@ -65,7 +65,8 @@ public class ProjectService {
         public void run() {
             byte[] sourceCode = project.getSourceCode();
             String config = project.getConfig();
-            AnalyseResponse analyseResponse = algorithmService.Analyse(sourceCode, config);
+            com.staticanalyzer.algservice.AnalyseResponse analyseResponse = algorithmService.Analyse(sourceCode,
+                    config);
 
             if (project.updateAnalyseResult(analyseResponse)) {
                 /* 先删缓存再更新 */
@@ -168,49 +169,62 @@ public class ProjectService {
      */
     private Map<String, FileAnalysis> fetch(int projectId) throws ServiceError {
         String hashKey = CACHE_KEY_PROJECT + projectId;
-        Map<String, FileAnalysis> files = redisTemplate.opsForHash().entries(hashKey);
-        if (files.size() > 0) /* 直接读取缓存 */
-            return files;
+        Map<String, FileAnalysis> fileMap = redisTemplate.opsForHash().entries(hashKey);
+        if (fileMap.size() > 0) /* 直接读取缓存 */
+            return fileMap;
 
         /* 从数据库中拉取 */
         Project databaseProject = projectMapper.selectById(projectId);
         if (databaseProject == null)
             throw new ServiceError(ServiceErrorType.PROJECT_NOT_FOUND);
         try {
-            files = TarGzUtils.decompress(databaseProject.getSourceCode());
+            fileMap = TarGzUtils.decompress(databaseProject.getSourceCode());
         } catch (IOException ioException) {
             throw new ServiceError(ServiceErrorType.BAD_PROJECT);
         }
 
-        /* 设置分析结果(如果有) */
+        /*
+         * 默认分析结果为空列表
+         * 这可能有两种情况，grpc返回错误或不存在对该文件的解析结果
+         */
+        for (FileAnalysis fileAnalysis : fileMap.values())
+            fileAnalysis.setAnalyseResults(new ArrayList<>());
+
+        /*
+         * 拉取分析结果
+         * 解析并对fileMap中的条目赋值
+         */
         AnalyseResponse analyseResponse = databaseProject.resolveAnalyseResponse();
+
         if (analyseResponse != null && analyseResponse.getCode() == 0) {
-            List<AlgAnalyseResult> algAnalyseResultList = analyseResponse.getAlgAnalyseResultsList();
+            List<AlgAnalyseResult> algAnalyseResultList = analyseResponse
+                    .getAlgAnalyseResultsList();
+            /* 遍历每种算法的结果 */
             for (AlgAnalyseResult algAnalyseResult : algAnalyseResultList) {
                 if (algAnalyseResult.getCode() != 0)
                     continue;
-                for (Map.Entry<String, FileAnalyseResults> entry : algAnalyseResult.getFileAnalyseResultsMap()
-                        .entrySet()) {
-                    FileAnalysis fileAnalysis = files.get(entry.getKey());
-                    /* 添加该算法的结果 */
+                /*
+                 * 每种算法中都有一个针对单文件的列表
+                 * 文件以Map的形式组织
+                 */
+                for (Map.Entry<String, FileAnalyseResults> entry : algAnalyseResult
+                        .getFileAnalyseResultsMap().entrySet()) {
+                    /* 附加该算法针对该文件的结果 */
+                    FileAnalysis fileAnalysis = fileMap.get(entry.getKey());
                     List<AnalysisResult> newAnalysisResultList = entry.getValue().getAnalyseResultsList().stream()
                             .map(r -> new AnalysisResult(r)).collect(Collectors.toList());
-                    if (newAnalysisResultList.size() > 0) {
-                        /* 如果暂时还没有结果，则先初始化一个 */
-                        if (fileAnalysis.getAnalyseResults() == null)
-                            fileAnalysis.setAnalyseResults(new ArrayList<>());
+                    if (newAnalysisResultList.size() > 0)
                         fileAnalysis.getAnalyseResults().addAll(newAnalysisResultList);
-                    }
                 }
             }
         }
 
         /* 写入缓存 */
-        if (files.size() > 0) {
-            redisTemplate.opsForHash().putAll(hashKey, files);
+        if (fileMap.size() > 0) {
+            redisTemplate.opsForHash().putAll(hashKey, fileMap);
             redisTemplate.expire(hashKey, projectProperties.getExpiration());
         }
-        return files;
+        return fileMap;
     }
 
     /**

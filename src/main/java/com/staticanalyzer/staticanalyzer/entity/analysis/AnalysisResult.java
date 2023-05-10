@@ -1,6 +1,7 @@
 package com.staticanalyzer.staticanalyzer.entity.analysis;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -14,6 +15,7 @@ import com.staticanalyzer.algservice.AnalyseResultEntry;
  * @since 0.0.2
  */
 @Data
+@NoArgsConstructor
 @ApiModel(description = "分析结果单元")
 public class AnalysisResult {
 
@@ -40,9 +42,6 @@ public class AnalysisResult {
     /* 分析建议 */
     @ApiModelProperty(value = "分析建议", required = true)
     private String message;
-
-    public AnalysisResult() {
-    }
 
     /**
      * 通过protobuf类获取信息

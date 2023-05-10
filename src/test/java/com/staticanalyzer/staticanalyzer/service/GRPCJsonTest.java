@@ -1,17 +1,19 @@
 package com.staticanalyzer.staticanalyzer.service;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import org.junit.jupiter.api.Test;
+
+import org.springframework.boot.test.context.SpringBootTest;
+
 import com.google.protobuf.util.JsonFormat;
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import com.staticanalyzer.algservice.AlgAnalyseResult;
 import com.staticanalyzer.algservice.AnalyseResponse;
 import com.staticanalyzer.algservice.AnalyseResultEntry;
 import com.staticanalyzer.algservice.FileAnalyseResults;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 public class GRPCJsonTest {
-
 
     @Test
     void TestGrpcJsonSerialization() throws InvalidProtocolBufferException {
@@ -44,60 +46,60 @@ public class GRPCJsonTest {
     @Test
     void TestGrpcJsonDeserialize() throws InvalidProtocolBufferException {
         String json = """
-{
-    "code": 0,
-    "msg": "分析完成",
-    "algAnalyseResults": [
-        {
-            "analyseType": "UninitializedVariable",
-            "code": 0,
-            "msg": "",
-            "fileAnalyseResults": {
-                "main.cpp": {
-                    "analyseResults": [
+                {
+                    "code": 0,
+                    "msg": "分析完成",
+                    "algAnalyseResults": [
                         {
-                            "startLine": 1,
-                            "startColumn": 1,
-                            "endLine": 1,
-                            "endColumn": 2,
-                            "severity": "Error",
-                            "message": "error message"
-                        },
-                        {
-                            "startLine": 4,
-                            "startColumn": 2,
-                            "endLine": 4,
-                            "endColumn": 8,
-                            "severity": "Warning",
-                            "message": "error message"
-                        }
-                    ]
-                },
-                "src/a.c": {
-                    "analyseResults": [
-                        {
-                            "startLine": 1,
-                            "startColumn": 3,
-                            "endLine": 1,
-                            "endColumn": 5,
-                            "severity": "Error",
-                            "message": "error message"
-                        },
-                        {
-                            "startLine": 4,
-                            "startColumn": 2,
-                            "endLine": 4,
-                            "endColumn": 8,
-                            "severity": "Info",
-                            "message": "error message"
+                            "analyseType": "UninitializedVariable",
+                            "code": 0,
+                            "msg": "",
+                            "fileAnalyseResults": {
+                                "main.cpp": {
+                                    "analyseResults": [
+                                        {
+                                            "startLine": 1,
+                                            "startColumn": 1,
+                                            "endLine": 1,
+                                            "endColumn": 2,
+                                            "severity": "Error",
+                                            "message": "error message"
+                                        },
+                                        {
+                                            "startLine": 4,
+                                            "startColumn": 2,
+                                            "endLine": 4,
+                                            "endColumn": 8,
+                                            "severity": "Warning",
+                                            "message": "error message"
+                                        }
+                                    ]
+                                },
+                                "src/a.c": {
+                                    "analyseResults": [
+                                        {
+                                            "startLine": 1,
+                                            "startColumn": 3,
+                                            "endLine": 1,
+                                            "endColumn": 5,
+                                            "severity": "Error",
+                                            "message": "error message"
+                                        },
+                                        {
+                                            "startLine": 4,
+                                            "startColumn": 2,
+                                            "endLine": 4,
+                                            "endColumn": 8,
+                                            "severity": "Info",
+                                            "message": "error message"
+                                        }
+                                    ]
+                                }
+                            }
                         }
                     ]
                 }
-            }
-        }
-    ]
-}
-                """;
+        """;
 
         AnalyseResponse.Builder builder = AnalyseResponse.newBuilder();
         JsonFormat.parser().merge(json, builder);

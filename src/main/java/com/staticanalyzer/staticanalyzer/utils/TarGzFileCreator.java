@@ -1,14 +1,16 @@
 package com.staticanalyzer.staticanalyzer.utils;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+
 public class TarGzFileCreator {
+
     private final ByteArrayOutputStream byteArrayOutputStream;
+
     private final TarArchiveOutputStream tarArchiveOutputStream;
 
     public TarGzFileCreator() throws IOException {
