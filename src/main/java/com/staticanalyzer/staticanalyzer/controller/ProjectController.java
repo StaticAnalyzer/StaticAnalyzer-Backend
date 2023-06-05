@@ -12,9 +12,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import com.staticanalyzer.staticanalyzer.entity.Result;
-import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisBrief;
-import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisVO;
-import com.staticanalyzer.staticanalyzer.entity.project.DirectoryEntry;
+import com.staticanalyzer.staticanalyzer.entity.file.SrcFileDigest;
+import com.staticanalyzer.staticanalyzer.entity.file.SrcDirectory;
+import com.staticanalyzer.staticanalyzer.entity.file.SrcFileAnalysis;
 import com.staticanalyzer.staticanalyzer.entity.project.Project;
 import com.staticanalyzer.staticanalyzer.entity.project.ProjectVO;
 import com.staticanalyzer.staticanalyzer.service.ProjectService;
@@ -82,16 +82,16 @@ public class ProjectController {
      * @param userId
      * @param projectId
      * @return 出错时{@code data = null}
-     * @see DirectoryEntry
-     * @see FileAnalysisBrief
+     * @see SrcDirectory
+     * @see SrcFileDigest
      */
     @GetMapping("/user/{uid}/project/{pid}")
     @ApiOperation(value = "项目目录查询接口")
-    public Result<DirectoryEntry<FileAnalysisBrief>> read(
+    public Result<SrcDirectory> read(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId) {
         try {
-            DirectoryEntry<FileAnalysisBrief> directoryEntry = projectService.read(projectId);
+            SrcDirectory directoryEntry = projectService.read(projectId);
             return Result.ok("目录查询成功", directoryEntry);
         } catch (ServiceError serviceError) {
             return Result.error(serviceError.getMessage());
@@ -110,12 +110,12 @@ public class ProjectController {
      */
     @GetMapping("/user/{uid}/project/{pid}/file")
     @ApiOperation(value = "文件查询接口")
-    public Result<FileAnalysisVO> read(
+    public Result<SrcFileAnalysis> read(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId,
             @RequestParam(value = "path") String path) {
         try {
-            FileAnalysisVO fileEntry = projectService.readFile(projectId, path);
+            SrcFileAnalysis fileEntry = projectService.readFile(projectId, path);
             return Result.ok("文件查询成功", fileEntry);
         } catch (ServiceError serviceError) {
             return Result.error(serviceError.getMessage());

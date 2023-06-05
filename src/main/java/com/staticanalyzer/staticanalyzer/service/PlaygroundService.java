@@ -1,6 +1,5 @@
 package com.staticanalyzer.staticanalyzer.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +12,11 @@ import com.staticanalyzer.algservice.AlgAnalyseResult;
 import com.staticanalyzer.algservice.AnalyseResponse;
 import com.staticanalyzer.algservice.FileAnalyseResults;
 import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult;
-import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
-import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisVO;
+import com.staticanalyzer.staticanalyzer.entity.file.SrcFileAnalysis;
+import com.staticanalyzer.staticanalyzer.entity.file.SrcFile;
 import com.staticanalyzer.staticanalyzer.service.error.ServiceError;
 import com.staticanalyzer.staticanalyzer.service.error.ServiceErrorType;
-import com.staticanalyzer.staticanalyzer.utils.TarGzFileCreator;
+import com.staticanalyzer.staticanalyzer.utils.TarGzUtils;
 
 @Service
 public class PlaygroundService {
@@ -25,19 +24,19 @@ public class PlaygroundService {
     @Autowired
     private AlgorithmService algorithmService;
 
-    public FileAnalysisVO testSingle(String code, String config) throws ServiceError {
+    public SrcFileAnalysis testSingle(String code, String config) throws ServiceError {
         AnalyseResponse analyseResponse;
+        SrcFile srcFile;
         try {
-            TarGzFileCreator tarGzFileCreator = new TarGzFileCreator();
-            tarGzFileCreator.addFileToTarGz("main.cpp", code);
-            analyseResponse = algorithmService.Analyse(tarGzFileCreator.getTarGzBytes(), config);
-        } catch (IOException ioException) {
+            srcFile = new SrcFile();
+            srcFile.setName("main.cpp");
+            srcFile.setSrc(code);
+            analyseResponse = algorithmService.Analyse(TarGzUtils.compressSingle(srcFile), config);
+        } catch (java.io.IOException ioException) {
             throw new ServiceError(ServiceErrorType.BAD_PROJECT);
         }
 
-        FileAnalysis newFileEntry = new FileAnalysis();
-        newFileEntry.setName("main.cpp");
-        newFileEntry.setSrc(code);
+        SrcFileAnalysis newFileEntry = new SrcFileAnalysis(srcFile);
         newFileEntry.setAnalyseResults(new ArrayList<>());
 
         /* 设置结果 */
@@ -58,6 +57,6 @@ public class PlaygroundService {
 
             }
         }
-        return new FileAnalysisVO(newFileEntry);
+        return newFileEntry;
     }
 }

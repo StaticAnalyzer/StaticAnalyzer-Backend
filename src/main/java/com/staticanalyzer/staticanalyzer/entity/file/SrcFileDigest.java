@@ -1,26 +1,21 @@
-package com.staticanalyzer.staticanalyzer.entity.analysis;
+package com.staticanalyzer.staticanalyzer.entity.file;
 
-import lombok.Data;
+import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult;
+import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import com.staticanalyzer.staticanalyzer.entity.project.FileEntry;
 
 /**
  * 文件分析简报
  * 
  * @author iu_oi
  * @since 0.0.2
- * @see FileEntry
  */
-@Data
+@lombok.Setter
+@lombok.Getter
 @ApiModel(description = "文件分析简报")
-public class FileAnalysisBrief implements FileEntry {
-
-    /* 文件名 */
-    @ApiModelProperty(value = "文件名", required = true)
-    private String name;
+public class SrcFileDigest extends SrcFile {
 
     /**
      * 文件中权值最高的评估
@@ -30,16 +25,22 @@ public class FileAnalysisBrief implements FileEntry {
     @ApiModelProperty(value = "文件中权值最高的评估", example = "Pass", required = true)
     private AnalysisStatus severity;
 
+    public SrcFileDigest(SrcFile srcFile) {
+        name = srcFile.name;
+        severity = AnalysisStatus.Pass;
+        // no need to copy src
+    }
+
     /**
      * 从文件分析结果生成简报
      * 如果没有结果，默认通过
      * 
      * @param fileAnalysis
-     * @see FileAnalysis
+     * @see SrcFileAnalysis
      * @see AnalysisResult
      * @see AnalysisStatus
      */
-    public FileAnalysisBrief(FileAnalysis fileAnalysis) {
+    public SrcFileDigest(SrcFileAnalysis fileAnalysis) {
         name = fileAnalysis.getName();
         severity = AnalysisStatus.Pass;
 
@@ -49,4 +50,5 @@ public class FileAnalysisBrief implements FileEntry {
                 severity = currentSeverity;
         }
     }
+
 }

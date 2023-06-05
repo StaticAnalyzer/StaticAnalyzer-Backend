@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.staticanalyzer.staticanalyzer.entity.Result;
-import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisVO;
-import com.staticanalyzer.staticanalyzer.entity.playground.PlaygroundRequestParam;
+import com.staticanalyzer.staticanalyzer.entity.file.SrcFileAnalysis;
+import com.staticanalyzer.staticanalyzer.entity.project.SimpleProject;
 import com.staticanalyzer.staticanalyzer.service.PlaygroundService;
 import com.staticanalyzer.staticanalyzer.service.error.ServiceError;
 
@@ -21,9 +21,9 @@ public class PlaygroundController {
     private PlaygroundService playgroundService;
 
     @PostMapping("/playground/test")
-    public Result<FileAnalysisVO> playgroundSubmit(@RequestBody PlaygroundRequestParam requestBody) {
+    public Result<SrcFileAnalysis> playgroundSubmit(@RequestBody SimpleProject requestBody) {
         try {
-            FileAnalysisVO newFileEntryVO = playgroundService.testSingle(requestBody.getCode(),
+            SrcFileAnalysis newFileEntryVO = playgroundService.testSingle(requestBody.getCode(),
                     requestBody.getConfig());
             return Result.ok("测试成功", newFileEntryVO);
         } catch (ServiceError serviceError) {

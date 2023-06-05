@@ -1,70 +1,116 @@
 package com.staticanalyzer.staticanalyzer.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.zip.GZIPInputStream;
-
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
-import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
+import com.staticanalyzer.staticanalyzer.entity.file.SrcFile;
 
 /**
  * tar.gz工具类
+ * <p> 该工具类操纵字节流与文件集之间的转换
+ * <p> 字节流为tar.gz格式，文件集为相对路径与文件的键值对
  * 
- * @author WLLEGit
- * @version 0.0.2
+ * @author iu_oi
+ * @since 0.2
  */
 public class TarGzUtils {
 
     /**
-     * 将项目压缩成项目包
-     * 用于测试
+     * 将文件集压缩成tar.gz项目包
+     * <p> {@code key}为文件相对根目录路径，{@code value.name}为单独文件名
      * 
-     * @param projectPath 相对路径
-     * @return 出现异常返回{@code null}
+     * @param files 文件集
+     * @return {@code tarGzProjBytes} tar.gz格式的项目包
+     * @throws java.io.IOException
      */
-    public static byte[] compress(String projectPath) throws IOException {
-        /* todo */
-        return null;
+    public static byte[] compress(java.util.Map<String, SrcFile> files) throws java.io.IOException {
+        java.io.ByteArrayOutputStream byteArrayOutputStream = new java.io.ByteArrayOutputStream();
+        java.util.zip.GZIPOutputStream gzipOutputStream = new java.util.zip.GZIPOutputStream(byteArrayOutputStream);
+
+        TarArchiveOutputStream tarArchiveOutputStream = new TarArchiveOutputStream(gzipOutputStream);
+        TarArchiveEntry tarArchiveEntry;
+        byte[] tarGzProjBytes;
+
+        try (tarArchiveOutputStream) {
+            for (java.util.Map.Entry<String, SrcFile> entry : files.entrySet()) {
+                tarArchiveEntry = new TarArchiveEntry(entry.getKey());
+                tarArchiveEntry.setSize(entry.getValue().getSrc().length());
+                tarArchiveOutputStream.putArchiveEntry(tarArchiveEntry);
+                tarArchiveOutputStream.write(entry.getValue().getSrc().getBytes());
+                tarArchiveOutputStream.closeArchiveEntry();
+            }
+            tarArchiveOutputStream.finish();
+        }
+
+        tarGzProjBytes = byteArrayOutputStream.toByteArray();
+        return tarGzProjBytes;
+
     }
 
     /**
-     * 将项目包解压成文件集
-     * 用于后续分析和结构化显示
+     * 将单个源文件压缩成tar.gz项目包
+     * <p> {@code key}为文件相对根目录路径，{@code value.name}为单独文件名
      * 
-     * @param tarGzFileBytes
-     * @return 以相对路径为键值的文件映射 出现异常返回{@code null}
-     * @see FileAnalysis
+     * @param srcFile 源文件
+     * @return {@code tarGzProjBytes} tar.gz项目包
+     * @throws java.io.IOException
      */
-    public static Map<String, FileAnalysis> decompress(byte[] tarGzFileBytes) throws IOException {
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(tarGzFileBytes);
-        GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
+    public static byte[] compressSingle(SrcFile srcFile) throws java.io.IOException {
+        java.io.ByteArrayOutputStream byteArrayOutputStream = new java.io.ByteArrayOutputStream();
+        java.util.zip.GZIPOutputStream gzipOutputStream = new java.util.zip.GZIPOutputStream(byteArrayOutputStream);
+
+        TarArchiveOutputStream tarArchiveOutputStream = new TarArchiveOutputStream(gzipOutputStream);
+        TarArchiveEntry tarArchiveEntry = new TarArchiveEntry(srcFile.getName());
+        tarArchiveEntry.setSize(srcFile.getSrc().length());
+        byte[] tarGzProjBytes;
+
+        try (tarArchiveOutputStream) {
+            tarArchiveOutputStream.putArchiveEntry(tarArchiveEntry);
+            tarArchiveOutputStream.write(srcFile.getSrc().getBytes());
+            tarArchiveOutputStream.closeArchiveEntry();
+            tarArchiveOutputStream.finish();
+        }
+
+        tarGzProjBytes = byteArrayOutputStream.toByteArray();
+        return tarGzProjBytes;
+    }
+
+    /**
+     * 将tar.gz项目包解压成源文件集
+     * <p> {@code key}为文件相对根目录路径，{@code value.name}为单独文件名
+     * 
+     * @param tarGzProjBytes tar.gz项目包
+     * @return {@code files} 源文件集
+     * @throws java.io.IOException
+     * @see SrcFile
+     */
+    public static java.util.Map<String, SrcFile> decompress(byte[] tarGzProjBytes) throws java.io.IOException {
+        java.util.Map<String, SrcFile> files = new java.util.HashMap<>();
+        java.io.ByteArrayInputStream byteArrayInputStream = new java.io.ByteArrayInputStream(tarGzProjBytes);
+        java.util.zip.GZIPInputStream gzipInputStream = new java.util.zip.GZIPInputStream(byteArrayInputStream);
+
         TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(gzipInputStream);
+        TarArchiveEntry tarArchiveEntry;
+        SrcFile srcFile;
 
-        Map<String, FileAnalysis> files = new HashMap<>();
-        TarArchiveEntry archiveEntry;
+        try (tarArchiveInputStream) {
+            while ((tarArchiveEntry = tarArchiveInputStream.getNextTarEntry()) != null) {
+                if (tarArchiveEntry.isFile()) {
+                    int tarArchiveSize = (int) tarArchiveEntry.getSize();
+                    String tarArchiveName = tarArchiveEntry.getName();
+                    byte[] tarArchiveContent = new byte[tarArchiveSize];
+                    tarArchiveInputStream.read(tarArchiveContent, 0, tarArchiveSize);
 
-        try {
-            while ((archiveEntry = tarArchiveInputStream.getNextTarEntry()) != null) {
-                if (archiveEntry.isFile()) {
-                    int archiveEntrySize = (int) archiveEntry.getSize();
-                    byte[] content = new byte[archiveEntrySize];
-                    tarArchiveInputStream.read(content, 0, archiveEntrySize);
-
-                    FileAnalysis newFileEntry = new FileAnalysis();
-                    String newFilePath = archiveEntry.getName();
-                    newFileEntry.setName(Path.of(newFilePath).getFileName().toString());
-                    newFileEntry.setSrc(new String(content));
-                    files.put(newFilePath, newFileEntry);
+                    srcFile = new SrcFile();
+                    srcFile.setName(java.nio.file.Path.of(tarArchiveName).getFileName().toString());
+                    srcFile.setSrc(new String(tarArchiveContent));
+                    files.put(tarArchiveName, srcFile);
                 }
             }
-            return files;
-        } finally {
-            tarArchiveInputStream.close();
         }
+
+        return files;
     }
+
 }

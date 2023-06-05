@@ -1,7 +1,6 @@
 package com.staticanalyzer.staticanalyzer.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -9,8 +8,6 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,10 +18,10 @@ import com.staticanalyzer.algservice.AnalyseResponse;
 import com.staticanalyzer.algservice.FileAnalyseResults;
 import com.staticanalyzer.staticanalyzer.config.project.ProjectProperties;
 import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult;
-import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysis;
-import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisBrief;
-import com.staticanalyzer.staticanalyzer.entity.analysis.FileAnalysisVO;
-import com.staticanalyzer.staticanalyzer.entity.project.DirectoryEntry;
+import com.staticanalyzer.staticanalyzer.entity.file.SrcFileAnalysis;
+import com.staticanalyzer.staticanalyzer.entity.file.SrcFileDigest;
+import com.staticanalyzer.staticanalyzer.entity.file.SrcDirectory;
+import com.staticanalyzer.staticanalyzer.entity.file.SrcFile;
 import com.staticanalyzer.staticanalyzer.entity.project.Project;
 import com.staticanalyzer.staticanalyzer.entity.project.ProjectVO;
 import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
@@ -53,8 +50,8 @@ public class ProjectService {
      * 任务内部类
      * 递交任务的抽象
      */
-    @Getter
-    @Setter
+    @lombok.Setter
+    @lombok.Getter
     @AllArgsConstructor
     class Task implements Runnable {
 
@@ -165,20 +162,22 @@ public class ProjectService {
      * @param project
      * @return 不为{@code null}
      * @throws ServiceError
-     * @see FileAnalysis
+     * @see SrcFileAnalysis
      */
-    private Map<String, FileAnalysis> fetch(int projectId) throws ServiceError {
+    private Map<String, SrcFileAnalysis> fetch(int projectId) throws ServiceError {
         String hashKey = CACHE_KEY_PROJECT + projectId;
-        Map<String, FileAnalysis> fileMap = redisTemplate.opsForHash().entries(hashKey);
-        if (fileMap.size() > 0) /* 直接读取缓存 */
-            return fileMap;
+        Map<String, SrcFileAnalysis> fileAnalyses = redisTemplate.opsForHash().entries(hashKey);
+        if (fileAnalyses.size() > 0) /* 直接读取缓存 */
+            return fileAnalyses;
 
         /* 从数据库中拉取 */
         Project databaseProject = projectMapper.selectById(projectId);
         if (databaseProject == null)
             throw new ServiceError(ServiceErrorType.PROJECT_NOT_FOUND);
+
+        Map<String, SrcFile> files;
         try {
-            fileMap = TarGzUtils.decompress(databaseProject.getSourceCode());
+            files = TarGzUtils.decompress(databaseProject.getSourceCode());
         } catch (IOException ioException) {
             throw new ServiceError(ServiceErrorType.BAD_PROJECT);
         }
@@ -187,8 +186,8 @@ public class ProjectService {
          * 默认分析结果为空列表
          * 这可能有两种情况，grpc返回错误或不存在对该文件的解析结果
          */
-        for (FileAnalysis fileAnalysis : fileMap.values())
-            fileAnalysis.setAnalyseResults(new ArrayList<>());
+        for (java.util.Map.Entry<String, SrcFile> entry : files.entrySet())
+            fileAnalyses.put(entry.getKey(), new SrcFileAnalysis(entry.getValue()));
 
         /*
          * 拉取分析结果
@@ -210,7 +209,7 @@ public class ProjectService {
                 for (Map.Entry<String, FileAnalyseResults> entry : algAnalyseResult
                         .getFileAnalyseResultsMap().entrySet()) {
                     /* 附加该算法针对该文件的结果 */
-                    FileAnalysis fileAnalysis = fileMap.get(entry.getKey());
+                    SrcFileAnalysis fileAnalysis = fileAnalyses.get(entry.getKey());
                     List<AnalysisResult> newAnalysisResultList = entry.getValue().getAnalyseResultsList().stream()
                             .map(r -> new AnalysisResult(r)).collect(Collectors.toList());
                     if (newAnalysisResultList.size() > 0)
@@ -220,11 +219,11 @@ public class ProjectService {
         }
 
         /* 写入缓存 */
-        if (fileMap.size() > 0) {
-            redisTemplate.opsForHash().putAll(hashKey, fileMap);
+        if (fileAnalyses.size() > 0) {
+            redisTemplate.opsForHash().putAll(hashKey, fileAnalyses);
             redisTemplate.expire(hashKey, projectProperties.getExpiration());
         }
-        return fileMap;
+        return fileAnalyses;
     }
 
     /**
@@ -236,12 +235,12 @@ public class ProjectService {
      * @throws ServiceError
      * @see FileAnalysisVO
      */
-    public FileAnalysisVO readFile(int projectId, String filePath) throws ServiceError {
-        Map<String, FileAnalysis> files = fetch(projectId);
-        FileAnalysis fileAnalysis = files.get(filePath);
+    public SrcFileAnalysis readFile(int projectId, String filePath) throws ServiceError {
+        Map<String, SrcFileAnalysis> files = fetch(projectId);
+        SrcFileAnalysis fileAnalysis = files.get(filePath);
         if (fileAnalysis == null)
             throw new ServiceError(ServiceErrorType.FILE_NOT_FOUND);
-        return new FileAnalysisVO(fileAnalysis);
+        return fileAnalysis;
     }
 
     /**
@@ -250,14 +249,16 @@ public class ProjectService {
      * @param projectId
      * @return 不为{@code null}
      * @throws ServiceError
-     * @see FileAnalysisBrief
-     * @see DirectoryEntry
+     * @see SrcFileDigest
+     * @see SrcDirectory
      */
-    public DirectoryEntry<FileAnalysisBrief> read(int projectId) throws ServiceError {
-        Map<String, FileAnalysis> files = fetch(projectId);
-        DirectoryEntry<FileAnalysisBrief> directoryEntry = new DirectoryEntry<>();
-        for (Map.Entry<String, FileAnalysis> entry : files.entrySet())
-            directoryEntry.addFileEntry(entry.getKey(), new FileAnalysisBrief(entry.getValue()));
+    public SrcDirectory read(int projectId) throws ServiceError {
+        Map<String, SrcFileAnalysis> files = fetch(projectId);
+        SrcDirectory directoryEntry = new SrcDirectory();
+        for (Map.Entry<String, SrcFileAnalysis> entry : files.entrySet()) {
+            SrcFileDigest fileAnalysisBrief = new SrcFileDigest(entry.getValue());
+            directoryEntry.addSrcFile(entry.getKey(), fileAnalysisBrief);
+        }
         return directoryEntry;
     }
 }
