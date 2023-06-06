@@ -4,7 +4,7 @@ package com.staticanalyzer.staticanalyzer.entity.analysis;
 @lombok.Setter
 public class AnalysisProblem {
 
-    private String path;
+    private String file;
 
     private AnalysisStatus severity;
 

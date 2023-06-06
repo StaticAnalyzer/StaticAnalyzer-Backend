@@ -249,7 +249,7 @@ public class ProjectService {
             SrcFileAnalysis analysis = entry.getValue();
             for (AnalysisResult result : analysis.getAnalyseResults()) {
                 AnalysisProblem problem = new AnalysisProblem();
-                problem.setPath(entry.getKey());
+                problem.setFile(entry.getKey());
                 problem.setLine(result.getStartLine());
                 problem.setMessage(result.getMessage());
                 problem.setSeverity(result.getSeverity());
