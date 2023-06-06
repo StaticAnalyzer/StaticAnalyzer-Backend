@@ -17,6 +17,7 @@ import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult;
  */
 @lombok.Setter
 @lombok.Getter
+@lombok.NoArgsConstructor
 @ApiModel(description = "文件分析结果")
 public class SrcFileAnalysis extends SrcFile {
 
