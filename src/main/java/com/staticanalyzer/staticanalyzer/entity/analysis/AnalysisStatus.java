@@ -5,39 +5,22 @@ import io.swagger.annotations.ApiModel;
 /**
  * 分析评估
  * 
- * @author iu_oi
- * @since 0.0.2
+ * @author YangYu
+ * @since 0.2
  */
 @ApiModel(description = "分析评估")
 public enum AnalysisStatus {
 
-    /**
-     * 结果中存在一个或多个分析失败的文件
-     */
-    AnalyseError,
+    AnalyseError, // 结果中存在一个或多个分析失败的文件
 
-    /**
-     * 分析通过
-     */
-    Pass,
+    Pass, // 分析通过
 
-    /**
-     * 建议
-     */
-    Hint,
+    Hint, // 建议
 
-    /**
-     * 分析信息
-     */
-    Info,
+    Info, // 分析信息
 
-    /**
-     * 警告
-     */
-    Warning,
+    Warning, // 警告
 
-    /**
-     * 严重错误
-     */
-    Error
+    Error // 错误
+
 }

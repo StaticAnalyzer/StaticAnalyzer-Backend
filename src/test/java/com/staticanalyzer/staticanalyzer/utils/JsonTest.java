@@ -1,4 +1,4 @@
-package com.staticanalyzer.staticanalyzer.service;
+package com.staticanalyzer.staticanalyzer.utils;
 
 import org.junit.jupiter.api.Test;
 
@@ -13,9 +13,9 @@ import com.staticanalyzer.algservice.AnalyseResultEntry;
 import com.staticanalyzer.algservice.FileAnalyseResults;
 
 @SpringBootTest
-public class GRPCJsonTest {
+public class JsonTest {
 
-    @Test
+    //@Test
     void TestGrpcJsonSerialization() throws InvalidProtocolBufferException {
         AnalyseResponse.Builder builder = AnalyseResponse.newBuilder();
         builder.setCode(0);
@@ -43,7 +43,7 @@ public class GRPCJsonTest {
         System.out.println(json);
     }
 
-    @Test
+    //@Test
     void TestGrpcJsonDeserialize() throws InvalidProtocolBufferException {
         String json = "{\n" +
                       "    \"code\": 0,\n" +

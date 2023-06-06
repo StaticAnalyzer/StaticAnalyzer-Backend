@@ -1,8 +1,5 @@
 package com.staticanalyzer.staticanalyzer.interceptor;
 
-import java.io.IOException;
-import java.nio.file.Path;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,26 +14,13 @@ import com.staticanalyzer.staticanalyzer.service.UserService;
 import com.staticanalyzer.staticanalyzer.service.error.ServiceError;
 import com.staticanalyzer.staticanalyzer.service.error.ServiceErrorType;
 
-/**
- * 用户拦截器
- * 
- * @author iu_oi
- * @since 0.0.1
- */
 @Component
 public class UserInterceptor implements HandlerInterceptor {
 
-    @Autowired /* 用户服务 */
+    @Autowired
     UserService userService;
 
-    /**
-     * 强行设置返回消息
-     * 
-     * @param response
-     * @param message
-     * @throws IOException
-     */
-    private void setResponseMessage(HttpServletResponse response, String message) throws IOException {
+    private void setResponseMessage(HttpServletResponse response, String message) throws java.io.IOException {
         Result<?> result = Result.hint(message);
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().println(new ObjectMapper().writeValueAsString(result));
@@ -48,9 +32,9 @@ public class UserInterceptor implements HandlerInterceptor {
         try {
             String requestHeader = request.getHeader("Authorization");
             String jws = requestHeader.replaceFirst("Bearer ", "");
-            Path requestPath = Path.of(request.getRequestURI());
+            java.nio.file.Path requestPath = java.nio.file.Path.of(request.getRequestURI());
             int userId = Integer.parseInt(requestPath.getName(1).toString());
-            userService.checkSignature(jws, userId); /* 比较id */
+            userService.checkSignature(jws, userId); // 比较id
             return true;
         } catch (ServiceError serviceError) {
             setResponseMessage(response, serviceError.getMessage());
@@ -60,4 +44,5 @@ public class UserInterceptor implements HandlerInterceptor {
             return false;
         }
     }
+
 }

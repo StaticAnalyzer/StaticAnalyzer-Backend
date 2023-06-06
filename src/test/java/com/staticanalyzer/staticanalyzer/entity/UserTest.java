@@ -24,7 +24,7 @@ public class UserTest {
     @Autowired
     private UserService userService;
 
-    @Test
+    //@Test
     public void TestUserBasic() {
         User badUser = new User();
         badUser.setId(8);

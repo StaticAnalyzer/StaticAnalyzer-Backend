@@ -1,6 +1,7 @@
 package com.staticanalyzer.staticanalyzer.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,13 +22,15 @@ public class PlaygroundController {
     private PlaygroundService playgroundService;
 
     @PostMapping("/playground/test")
-    public Result<SrcFileAnalysis> playgroundSubmit(@RequestBody SimpleProject requestBody) {
+    @ApiOperation(value = "上传单个文件")
+    public Result<SrcFileAnalysis> submit(@RequestBody SimpleProject simpleProj) {
         try {
-            SrcFileAnalysis newFileEntryVO = playgroundService.testSingle(requestBody.getCode(),
-                    requestBody.getConfig());
-            return Result.ok("测试成功", newFileEntryVO);
+            SrcFileAnalysis analysis = playgroundService.testSingle(simpleProj.getCode(),
+                    simpleProj.getConfig());
+            return Result.ok("测试成功", analysis);
         } catch (ServiceError serviceError) {
             return Result.error(serviceError.getMessage());
         }
     }
+
 }

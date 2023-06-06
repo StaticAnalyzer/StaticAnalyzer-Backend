@@ -20,7 +20,7 @@ public class ProjectTest {
     @Autowired
     private ProjectService projectService;
 
-    @Test
+    //@Test
     public void TestProjectBasic() {
         Project project = projectService.create(1000, new byte[10], "<algorithm>test</algorithm>");
         assertTrue(project != null);

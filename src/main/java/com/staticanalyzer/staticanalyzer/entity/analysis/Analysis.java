@@ -6,11 +6,11 @@ import io.swagger.annotations.ApiModelProperty;
 import com.staticanalyzer.staticanalyzer.entity.project.ProjectVO;
 
 /**
- * 算法分析结果，用于ProjectVO
+ * 算法分析结果
  * 
- * @author iu_oi
- * @since 0.2
  * @see ProjectVO
+ * @author YangYu
+ * @since 0.2
  */
 @lombok.Getter
 @lombok.Setter

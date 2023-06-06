@@ -4,10 +4,14 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * 源文件目录类，用于结构化显示项目
+ * 源文件目录类
+ * <p>
+ * 提供{@code SrcFile}及其子类的结构化展示
+ * </p>
  * 
- * @author iu_oi
- * @since 0.0.2
+ * @see SrcFile
+ * @author YangYu
+ * @since 0.2
  */
 @lombok.Getter
 @lombok.Setter

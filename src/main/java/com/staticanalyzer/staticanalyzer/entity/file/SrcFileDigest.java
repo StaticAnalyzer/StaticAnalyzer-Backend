@@ -8,38 +8,27 @@ import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 文件分析简报
+ * <p>
+ * 简报的{@code src}属性永远为{@code null}
+ * </p>
  * 
+ * @see AnalysisStatus
  * @author iu_oi
- * @since 0.0.2
+ * @since 0.2
  */
 @lombok.Setter
 @lombok.Getter
 @ApiModel(description = "文件分析简报")
 public class SrcFileDigest extends SrcFile {
 
-    /**
-     * 文件中权值最高的评估
-     * 
-     * @see AnalysisStatus
-     */
     @ApiModelProperty(value = "文件中权值最高的评估", example = "Pass", required = true)
     private AnalysisStatus severity;
 
     public SrcFileDigest(SrcFile srcFile) {
         name = srcFile.name;
         severity = AnalysisStatus.Pass;
-        // no need to copy src
     }
 
-    /**
-     * 从文件分析结果生成简报
-     * 如果没有结果，默认通过
-     * 
-     * @param fileAnalysis
-     * @see SrcFileAnalysis
-     * @see AnalysisResult
-     * @see AnalysisStatus
-     */
     public SrcFileDigest(SrcFileAnalysis fileAnalysis) {
         name = fileAnalysis.getName();
         severity = AnalysisStatus.Pass;

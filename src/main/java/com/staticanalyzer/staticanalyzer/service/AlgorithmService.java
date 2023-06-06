@@ -11,10 +11,10 @@ import com.staticanalyzer.algservice.AnalyseRequest;
 import com.staticanalyzer.algservice.AnalyseResponse;
 
 /**
- * 算法服务
+ * 请求远程算法服务
  * 
  * @author WLLEGit
- * @since 0.0.1
+ * @since 0.1
  */
 @Service
 public class AlgorithmService {
@@ -25,10 +25,9 @@ public class AlgorithmService {
     /**
      * 递交分析请求
      * 
-     * @param file
-     * @param config
-     * @return 分析结果
-     * @see AnalyseResponse
+     * @param file tar.gz包
+     * @param config 配置文件
+     * @return {@code analyseResponse} 分析结果
      */
     public AnalyseResponse Analyse(byte[] file, String config) {
         AnalyseRequest justReturnRequest = AnalyseRequest.newBuilder()
@@ -37,4 +36,5 @@ public class AlgorithmService {
                 .build();
         return algServiceBlockingStub.analyse(justReturnRequest);
     }
+
 }

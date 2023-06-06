@@ -16,12 +16,6 @@ import springfox.documentation.spring.web.plugins.Docket;
 
 import com.staticanalyzer.staticanalyzer.annotation.swagger.ExcludeSwagger;
 
-/**
- * swagger配置类
- * 
- * @author iu_oi
- * @since 0.0.1
- */
 @Configuration
 public class SwaggerConfigurer {
 
@@ -67,4 +61,5 @@ public class SwaggerConfigurer {
                 .paths(PathSelectors.any())
                 .build();
     }
+
 }

@@ -3,6 +3,12 @@ package com.staticanalyzer.staticanalyzer.entity.file;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+/**
+ * 源文件实体类
+ * 
+ * @author YangYu
+ * @since 0.2
+ */
 @lombok.Setter
 @lombok.Getter
 @lombok.NoArgsConstructor

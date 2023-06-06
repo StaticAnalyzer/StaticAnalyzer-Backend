@@ -13,73 +13,41 @@ import io.swagger.annotations.ApiOperation;
 
 import com.staticanalyzer.staticanalyzer.entity.Result;
 import com.staticanalyzer.staticanalyzer.entity.user.User;
-import com.staticanalyzer.staticanalyzer.entity.user.Identity;
+import com.staticanalyzer.staticanalyzer.entity.user.UserWithJwt;
 import com.staticanalyzer.staticanalyzer.service.UserService;
 import com.staticanalyzer.staticanalyzer.service.error.ServiceError;
 
-/**
- * 用户控制器
- * 定义所有与用户相关的请求操作
- * 
- * @author iu_oi
- * @since 0.0.1
- */
 @RestController
 @Api(description = "用户控制器")
 public class UserController {
 
-    @Autowired /* 用户服务 */
+    @Autowired
     private UserService userService;
 
-    /**
-     * 用户登录接口
-     * 
-     * @apiNote 无需传递用户id
-     * @param user
-     * @return 出错时{@code data = null}
-     * @see User
-     * @see Identity
-     */
     @PostMapping("/login")
     @ApiOperation(value = "用户登录接口")
-    public Result<Identity> login(@RequestBody User user) {
+    public Result<UserWithJwt> login(@RequestBody User user) {
         try {
             User databaseUser = userService.login(user);
             String jws = userService.getSignature(databaseUser.getId());
-            return Result.ok("登录成功", new Identity(databaseUser, jws));
+            return Result.ok("登录成功", new UserWithJwt(databaseUser, jws));
         } catch (ServiceError serviceError) {
             return Result.error(serviceError.getMessage());
         }
     }
 
-    /**
-     * 用户注册接口
-     * 
-     * @apiNote 无需传递用户id
-     * @param user
-     * @return 出错时{@code data = null}
-     * @see User
-     * @see Identity
-     */
     @PostMapping("/user")
     @ApiOperation(value = "用户注册接口")
-    public Result<Identity> create(@RequestBody User user) {
+    public Result<UserWithJwt> create(@RequestBody User user) {
         try {
             userService.create(user);
             String jws = userService.getSignature(user.getId());
-            return Result.ok("注册成功", new Identity(user, jws));
+            return Result.ok("注册成功", new UserWithJwt(user, jws));
         } catch (ServiceError serviceError) {
             return Result.error(serviceError.getMessage());
         }
     }
 
-    /**
-     * 用户查询接口
-     * 
-     * @param userId
-     * @return 出错时{@code data = null}
-     * @see User
-     */
     @GetMapping("/user/{uid}")
     @ApiOperation(value = "用户查询接口")
     public Result<User> read(@PathVariable("uid") int userId) {
@@ -91,14 +59,6 @@ public class UserController {
         }
     }
 
-    /**
-     * 用户修改接口
-     * 
-     * @apiNote 只支持修改密码
-     * @param userId
-     * @param password
-     * @return {@code data = null}
-     */
     @PutMapping("/user/{uid}")
     @ApiOperation(value = "用户修改接口")
     public Result<?> update(@PathVariable("uid") int userId, @RequestBody String password) {
@@ -111,4 +71,5 @@ public class UserController {
             return Result.error(serviceError.getMessage());
         }
     }
+
 }

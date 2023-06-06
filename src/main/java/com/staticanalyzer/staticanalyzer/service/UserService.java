@@ -18,21 +18,24 @@ import com.staticanalyzer.staticanalyzer.utils.JwtUtils;
 
 /**
  * 用户服务
- * 增删改查以及验证等
+ * <p>
+ * 提供用户的注册和登录等功能
+ * </p>
  * 
- * @author iu_oi
- * @since 0.0.2
+ * @author YangYu
+ * @since 0.2
  */
 @Service
 public class UserService {
 
-    @Autowired /* jwt配置文件 */
+    @Autowired
     private JwtProperties jwtProperties;
 
     /**
      * 创建用户签名
      * 
-     * @return 用户的签名
+     * @param userId 用户id
+     * @return 用户签名
      */
     public String getSignature(int userId) {
         return JwtUtils.generateJws(
@@ -44,8 +47,8 @@ public class UserService {
     /**
      * 验证用户签名
      * 
-     * @param jws
-     * @param userId
+     * @param jws    用户签名
+     * @param userId 用户id
      * @throws ServiceError
      */
     public void checkSignature(String jws, int userId) throws ServiceError {
@@ -60,34 +63,32 @@ public class UserService {
         }
     }
 
-    @Autowired /* user配置文件 */
+    @Autowired
     private UserProperties userProperties;
 
     /**
-     * 验证用户是否符合user.xxx-format的规范
+     * 验证用户是否符合{@code user.xxx-format}的规范
      * 
-     * @param user
+     * @param user 用户对象
      * @throws ServiceError
      */
     public void check(User user) throws ServiceError {
-        /* 验证用户名 */
-        String username = user.getUsername();
+        String username = user.getUsername(); // 验证用户名
         if (!username.matches(userProperties.getUsernameFormat()))
             throw new ServiceError(ServiceErrorType.BAD_USERNAME);
-        /* 验证密码 */
-        String password = user.getPassword();
+        String password = user.getPassword(); // 验证密码
         if (!password.matches(userProperties.getPasswordFormat()))
             throw new ServiceError(ServiceErrorType.BAD_PASSWORD);
     }
 
-    @Autowired /* user数据库映射 */
+    @Autowired
     private UserMapper userMapper;
 
     /**
      * 用户登录
      * 
-     * @param user
-     * @return 有效用户
+     * @param user 请求的用户对象
+     * @return {@code databaseUser}有效用户
      * @throws ServiceError
      */
     public User login(User user) throws ServiceError {
@@ -104,9 +105,11 @@ public class UserService {
 
     /**
      * 创建用户
+     * <p>
+     * 自动设置{@code id}
+     * </p>
      * 
-     * @apiNote 用户id将被自动设置
-     * @param user
+     * @param user 请求的用户对象
      * @throws ServiceError
      */
     public void create(User user) throws ServiceError {
@@ -121,7 +124,7 @@ public class UserService {
     /**
      * 更新用户
      * 
-     * @param user
+     * @param user 请求的用户对象
      * @throws ServiceError
      */
     public void update(User user) throws ServiceError {
@@ -130,10 +133,10 @@ public class UserService {
     }
 
     /**
-     * 通过用户id查询用户
+     * 通过id查询用户
      * 
-     * @param userId
-     * @return 用户
+     * @param userId 用户id
+     * @return {@code databaseUser}有效用户
      * @throws ServiceError
      */
     public User read(int userId) throws ServiceError {
@@ -146,8 +149,8 @@ public class UserService {
     /**
      * 通过用户名查询用户
      * 
-     * @param username
-     * @return 用户
+     * @param username 用户名
+     * @return {@code databaseUser}用户
      * @throws ServiceError
      */
     public User read(String username) {
@@ -157,4 +160,5 @@ public class UserService {
             throw new ServiceError(ServiceErrorType.USER_NOT_FOUND);
         return databaseUser;
     }
+
 }

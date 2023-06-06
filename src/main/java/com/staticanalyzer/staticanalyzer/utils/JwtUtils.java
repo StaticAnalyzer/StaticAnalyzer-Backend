@@ -1,31 +1,30 @@
 package com.staticanalyzer.staticanalyzer.utils;
 
-import java.util.Date;
-import java.security.Key;
-import java.time.Duration;
-
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.JwtException;
 
 /**
- * jwt工具类
+ * Jwt工具类
+ * <p>
+ * 该类提供Jwt签名与解析
+ * </p>
  * 
- * @author iu_oi
- * @since 0.0.1
+ * @author YangYu
+ * @since 0.1
  */
 public class JwtUtils {
 
     /**
-     * 生成jws
+     * 生成Jws
      * 
-     * @param key
-     * @param expiration
-     * @param userId
+     * @param key        签名密钥
+     * @param expiration 签名过期时间
+     * @param userId     用户id
      * @return 用户签名
      */
-    public static String generateJws(Key key, Duration expiration, int userId) {
-        Date now = new Date();
-        Date expireDate = new Date(now.getTime() + expiration.toMillis());
+    public static String generateJws(java.security.Key key, java.time.Duration expiration, int userId) {
+        java.util.Date now = new java.util.Date();
+        java.util.Date expireDate = new java.util.Date(now.getTime() + expiration.toMillis());
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .setIssuedAt(now)
@@ -35,14 +34,14 @@ public class JwtUtils {
     }
 
     /**
-     * 从jws解析用户id
+     * 从Jws解析用户id
      * 
-     * @param key
-     * @param jws
+     * @param key 解密密钥
+     * @param jws 签名
      * @return 用户id
      * @throws JwtException
      */
-    public static int parseJws(Key key, String jws) throws JwtException {
+    public static int parseJws(java.security.Key key, String jws) throws JwtException {
         String subject = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
@@ -51,4 +50,5 @@ public class JwtUtils {
                 .getSubject();
         return Integer.parseInt(subject);
     }
+
 }

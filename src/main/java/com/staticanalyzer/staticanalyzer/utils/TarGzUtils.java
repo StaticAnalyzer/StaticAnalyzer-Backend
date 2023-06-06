@@ -8,17 +8,23 @@ import com.staticanalyzer.staticanalyzer.entity.file.SrcFile;
 
 /**
  * tar.gz工具类
- * <p> 该工具类操纵字节流与文件集之间的转换
- * <p> 字节流为tar.gz格式，文件集为相对路径与文件的键值对
+ * <p>
+ * 该工具类操纵字节流与文件集之间的转换
+ * </p>
+ * <p>
+ * 字节流为tar.gz格式，文件集为相对路径与文件的键值对
+ * </p>
  * 
- * @author iu_oi
+ * @author YangYu
  * @since 0.2
  */
 public class TarGzUtils {
 
     /**
      * 将文件集压缩成tar.gz项目包
-     * <p> {@code key}为文件相对根目录路径，{@code value.name}为单独文件名
+     * <p>
+     * {@code key}为文件相对根目录路径，{@code value.name}为单独文件名
+     * </p>
      * 
      * @param files 文件集
      * @return {@code tarGzProjBytes} tar.gz格式的项目包
@@ -50,7 +56,9 @@ public class TarGzUtils {
 
     /**
      * 将单个源文件压缩成tar.gz项目包
-     * <p> {@code key}为文件相对根目录路径，{@code value.name}为单独文件名
+     * <p>
+     * {@code key}为文件相对根目录路径，{@code value.name}为单独文件名
+     * </p>
      * 
      * @param srcFile 源文件
      * @return {@code tarGzProjBytes} tar.gz项目包
@@ -78,7 +86,9 @@ public class TarGzUtils {
 
     /**
      * 将tar.gz项目包解压成源文件集
-     * <p> {@code key}为文件相对根目录路径，{@code value.name}为单独文件名
+     * <p>
+     * {@code key}为文件相对根目录路径，{@code value.name}为单独文件名
+     * </p>
      * 
      * @param tarGzProjBytes tar.gz项目包
      * @return {@code files} 源文件集

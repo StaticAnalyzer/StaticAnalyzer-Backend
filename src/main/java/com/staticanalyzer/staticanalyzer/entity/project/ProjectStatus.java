@@ -1,28 +1,11 @@
 package com.staticanalyzer.staticanalyzer.entity.project;
 
-/**
- * 项目状态
- * 
- * @author iu_oi
- * @since 0.0.2
- */
 public enum ProjectStatus {
 
-    /**
-     * 分析完成
-     * {@code analyseResult}为analyseResponse对象的json表示
-     */
-    Complete,
+    Complete, // 完成
 
-    /**
-     * 分析未完成
-     * {@code analyseResult}为空
-     */
-    Queueing,
+    Queueing, // 未完成
 
-    /**
-     * 分析完成，但出现错误
-     * {@code analyseResult}为空
-     */
-    Error
+    Error // 完成，但出现错误
+
 }

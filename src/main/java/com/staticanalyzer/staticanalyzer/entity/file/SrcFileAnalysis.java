@@ -7,20 +7,19 @@ import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult;
 
 /**
  * 文件分析结果
+ * <p>
+ * {@code analyseResults}默认为{@code null}
+ * </p>
  * 
- * @author iu_oi
- * @since 0.0.2
+ * @see AnalysisResult
+ * @author YangYu
+ * @since 0.2
  */
 @lombok.Setter
 @lombok.Getter
 @ApiModel(description = "文件分析结果")
 public class SrcFileAnalysis extends SrcFile {
 
-    /**
-     * 综合所有算法的分析结果列表
-     * 
-     * @see AnalysisResult
-     */
     @ApiModelProperty(value = "分析结果列表", required = false)
     private java.util.List<AnalysisResult> analyseResults;
 

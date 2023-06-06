@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import lombok.Data;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -19,55 +17,41 @@ import com.staticanalyzer.staticanalyzer.entity.analysis.Analysis;
 import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus;
 
 /**
- * 项目类的前端交互版本
+ * 项目可视类
+ * <p>
+ * 项目上传时间格式为{@code yyyy-MM-dd HH:mm:ss}
+ * 时区为东八区
+ * </p>
+ * <p>
+ * 如果对应项目没有分析结果，则{@code analyseBrief}为{@code null}
+ * </p>
  * 
- * @author iu_oi
- * @since 0.0.2
+ * @see ProjectStatus
+ * @author YangYu
+ * @since 0.2
  */
-@Data
+@lombok.Getter
+@lombok.Setter
+@lombok.NoArgsConstructor
 @ApiModel(description = "项目类的前端交互版本")
 public class ProjectVO {
 
-    /* 项目id */
     @ApiModelProperty(value = "项目id", required = true)
     private int id;
 
-    /* 项目上传时间戳 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "项目上传时间戳", required = true)
     private Date timestamp;
 
-    /**
-     * 项目分析状态
-     * 
-     * @see ProjectStatus
-     */
     @ApiModelProperty(value = "项目分析状态", example = "Complete", required = true)
     private ProjectStatus status;
 
-    /* 项目配置文件 */
     @ApiModelProperty(value = "项目配置文件", required = true)
     private String config;
 
-    /**
-     * 分析结果简报列表
-     * 依据算法分类的简报
-     * 
-     * @see Analysis
-     */
     @ApiModelProperty(value = "分析结果简报列表", required = false)
     private List<Analysis> analyseBrief;
 
-    public ProjectVO() {
-    }
-
-    /**
-     * 从项目提取数据
-     * 
-     * @apiNote 如果项目没有分析结果，则不填入analyseBrief
-     * @param project
-     * @return projectVO
-     */
     public ProjectVO(Project project) {
         id = project.getId();
         timestamp = project.getTimestamp();
@@ -107,4 +91,5 @@ public class ProjectVO {
         }
         status = ProjectStatus.Complete;
     }
+
 }
