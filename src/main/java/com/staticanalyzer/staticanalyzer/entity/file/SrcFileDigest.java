@@ -13,7 +13,7 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  * 
  * @see AnalysisStatus
- * @author iu_oi
+ * @author YangYu
  * @since 0.2
  */
 @lombok.Setter

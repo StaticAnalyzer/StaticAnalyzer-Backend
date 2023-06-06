@@ -1,5 +1,6 @@
 package com.staticanalyzer.staticanalyzer.controller;
 
+import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisProblem;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -43,8 +44,8 @@ public class ProjectController {
     @GetMapping("/user/{uid}/project")
     @ApiOperation(value = "项目查询接口")
     public Result<java.util.List<ProjectVO>> read(@PathVariable("uid") int userId) {
-        java.util.List<ProjectVO> projectVOList = projectService.query(userId);
-        return Result.ok("查询成功", projectVOList);
+        java.util.List<ProjectVO> projectList = projectService.queryProj(userId);
+        return Result.ok("查询成功", projectList);
     }
 
     @GetMapping("/user/{uid}/project/{pid}")
@@ -69,6 +70,19 @@ public class ProjectController {
         try {
             SrcFileAnalysis analysis = projectService.readFile(projectId, path);
             return Result.ok("文件查询成功", analysis);
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
+    }
+
+    @GetMapping("/user/{uid}/project/{pid}/problem")
+    @ApiOperation(value = "问题查询接口")
+    public Result<java.util.List<AnalysisProblem>> query(
+            @PathVariable("uid") int userId,
+            @PathVariable("pid") int projectId){
+        try {
+            java.util.List<AnalysisProblem> analysisProblems = projectService.queryProblem(projectId);
+            return Result.ok("问题查询成功", analysisProblems);
         } catch (ServiceError serviceError) {
             return Result.error(serviceError.getMessage());
         }

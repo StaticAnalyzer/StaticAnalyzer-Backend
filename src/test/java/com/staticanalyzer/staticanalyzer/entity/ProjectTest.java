@@ -2,6 +2,9 @@ package com.staticanalyzer.staticanalyzer.entity;
 
 import static org.junit.Assert.assertTrue;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisProblem;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +15,23 @@ import org.springframework.transaction.annotation.Transactional;
 import com.staticanalyzer.staticanalyzer.entity.project.Project;
 import com.staticanalyzer.staticanalyzer.service.ProjectService;
 
+import java.util.List;
+
 @SpringBootTest
 @Transactional
 @Rollback
 public class ProjectTest {
 
     @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
     private ProjectService projectService;
 
-    //@Test
-    public void TestProjectBasic() {
-        Project project = projectService.create(1000, new byte[10], "<algorithm>test</algorithm>");
-        assertTrue(project != null);
+    @Test
+    public void TestProjectBasic() throws JsonProcessingException {
+        List<AnalysisProblem> analysisProblems = projectService.queryProblem(1);
+        String analysisProblemsJson = objectMapper.writeValueAsString(analysisProblems);
+        System.out.println(analysisProblemsJson);
     }
 }

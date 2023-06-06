@@ -1,5 +1,7 @@
 package com.staticanalyzer.staticanalyzer.service;
 
+import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisProblem;
+import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -118,7 +120,7 @@ public class ProjectService {
      * @return {@code projectList}项目列表，如果未查到，该列表长度为0
      * @see ProjectVO
      */
-    public java.util.List<ProjectVO> query(int userId) {
+    public java.util.List<ProjectVO> queryProj(int userId) {
         String listKey = CACHE_KEY_PROJECTVO + userId;
         java.util.List<ProjectVO> projectList = redisTemplate.opsForList().range(listKey, 0, -1);
         if (projectList.size() > 0) /* 直接读取缓存 */
@@ -238,6 +240,23 @@ public class ProjectService {
             directory.addSrcFile(entry.getKey(), digest);
         }
         return directory;
+    }
+
+    public java.util.List<AnalysisProblem> queryProblem(int projectId) throws ServiceError {
+        java.util.Map<String, SrcFileAnalysis> files = fetch(projectId);
+        java.util.List<AnalysisProblem> problems = new java.util.LinkedList<>();
+        for (java.util.Map.Entry<String, SrcFileAnalysis> entry : files.entrySet()) {
+            SrcFileAnalysis analysis = entry.getValue();
+            for (AnalysisResult result : analysis.getAnalyseResults()) {
+                AnalysisProblem problem = new AnalysisProblem();
+                problem.setName(analysis.getName());
+                problem.setLine(result.getStartLine());
+                problem.setMessage(result.getMessage());
+                problem.setSeverity(result.getSeverity());
+                problems.add(problem);
+            }
+        }
+        return problems;
     }
 
 }
