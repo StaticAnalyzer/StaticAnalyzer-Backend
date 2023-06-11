@@ -8,21 +8,26 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.staticanalyzer.staticanalyzer.entity.file.SrcFile;
 
+// 本测试与Spring Boot无关
 public class TarGzTest {
+
+    public static byte[] readAllBytesFromResource(String resourcePath) throws java.io.IOException {
+        java.io.File targetFile = new java.io.File(TarGzTest.class.getResource(resourcePath).getFile());
+        byte[] targetBytes = new byte[(int) targetFile.length()];
+
+        java.io.FileInputStream fileInputStream = new java.io.FileInputStream(targetFile);
+        fileInputStream.read(targetBytes);
+        fileInputStream.close();
+        return targetBytes;
+    }
 
     private static String TARGET_TARGZ_PATH = "/cpython.tar.gz";
     private static String TARGET_PATH = "/cpython";
 
     @org.junit.Test
     public void testDecompress() throws java.io.IOException {
-        java.io.File targetTarGZ = new java.io.File(this.getClass().getResource(TARGET_TARGZ_PATH).getFile());
-
-        byte[] tarGzBytes = new byte[(int) targetTarGZ.length()];
-        java.io.FileInputStream fileInputStream = new java.io.FileInputStream(targetTarGZ);
-        fileInputStream.read(tarGzBytes);
-        fileInputStream.close();
-
         // 解压缩文件
+        byte[] tarGzBytes = readAllBytesFromResource(TARGET_TARGZ_PATH);
         java.util.Map<String, SrcFile> extractedFiles = TarGzUtils.decompress(tarGzBytes);
 
         // 比较直接读取的目录和解压缩后的目录中所有的文件

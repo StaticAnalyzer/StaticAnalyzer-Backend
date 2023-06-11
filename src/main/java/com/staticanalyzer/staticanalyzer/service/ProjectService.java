@@ -59,8 +59,6 @@ public class ProjectService {
                 // 先删缓存再更新
                 String hashKey = CACHE_KEY_PROJECT + project.getId();
                 redisTemplate.delete(hashKey);
-                String listKey = CACHE_KEY_PROJECTVO + project.getUserId();
-                redisTemplate.delete(listKey);
                 projectMapper.updateById(project);
             }
         }
@@ -104,6 +102,9 @@ public class ProjectService {
         project.setSourceCode(sourceCode);
         project.setConfig(config);
 
+        // 先删缓存再更新
+        String listKey = CACHE_KEY_PROJECTVO + project.getUserId();
+        redisTemplate.delete(listKey);
         projectMapper.insert(project);
         return project;
     }
@@ -142,6 +143,46 @@ public class ProjectService {
     private static String CACHE_KEY_PROJECT = "project:";
 
     /**
+     * 按文件集的格式解析以算法名称组织的analyseResponse
+     * <p>
+     * 如果analyseResponse中存在未知文件路径，抛出异常
+     * </p>
+     * 
+     * @see SrcFileAnalysis
+     * @param analyses        文件集
+     * @param analyseResponse 分析回应
+     * @throws ServiceError
+     */
+    public void parseAnalyseResponse(java.util.Map<String, SrcFileAnalysis> analyses, AnalyseResponse analyseResponse)
+            throws ServiceError {
+        // 解析并对analyses中的条目赋值
+        if (analyseResponse != null && analyseResponse.getCode() == 0) {
+            java.util.List<AlgAnalyseResult> algAnalyseResultList = analyseResponse
+                    .getAlgAnalyseResultsList();
+            // 遍历每种算法的结果
+            for (AlgAnalyseResult algAnalyseResult : algAnalyseResultList) {
+                if (algAnalyseResult.getCode() != 0)
+                    continue;
+
+                // 每种算法中都有一个针对单文件的列表，文件以Map的形式组织
+                for (java.util.Map.Entry<String, FileAnalyseResults> entry : algAnalyseResult
+                        .getFileAnalyseResultsMap().entrySet()) {
+                    // 附加该算法针对该文件的结果
+                    SrcFileAnalysis analysis = analyses.get(entry.getKey());
+                    if (analysis == null) {
+                        throw new ServiceError(ServiceErrorType.FILE_NOT_FOUND);
+                    }
+                    java.util.List<AnalysisResult> analysisResults = entry.getValue().getAnalyseResultsList()
+                            .stream().map(r -> new AnalysisResult(r))
+                            .collect(java.util.stream.Collectors.toList());
+                    if (analysisResults.size() > 0)
+                        analysis.getAnalyseResults().addAll(analysisResults);
+                }
+            }
+        }
+    }
+
+    /**
      * 获取源文件集
      * <p>
      * 如果分析未完成，则不为{@code SrcFileAnalysis}设置分析数据
@@ -174,29 +215,7 @@ public class ProjectService {
             analyses.put(entry.getKey(), new SrcFileAnalysis(entry.getValue()));
 
         AnalyseResponse analyseResponse = databaseProject.resolveAnalyseResponse();
-
-        // 解析并对analyses中的条目赋值
-        if (analyseResponse != null && analyseResponse.getCode() == 0) {
-            java.util.List<AlgAnalyseResult> algAnalyseResultList = analyseResponse
-                    .getAlgAnalyseResultsList();
-            // 遍历每种算法的结果
-            for (AlgAnalyseResult algAnalyseResult : algAnalyseResultList) {
-                if (algAnalyseResult.getCode() != 0)
-                    continue;
-
-                // 每种算法中都有一个针对单文件的列表，文件以Map的形式组织
-                for (java.util.Map.Entry<String, FileAnalyseResults> entry : algAnalyseResult
-                        .getFileAnalyseResultsMap().entrySet()) {
-                    // 附加该算法针对该文件的结果
-                    SrcFileAnalysis analysis = analyses.get(entry.getKey());
-                    java.util.List<AnalysisResult> analysisResults = entry.getValue().getAnalyseResultsList()
-                            .stream().map(r -> new AnalysisResult(r))
-                            .collect(java.util.stream.Collectors.toList());
-                    if (analysisResults.size() > 0)
-                        analysis.getAnalyseResults().addAll(analysisResults);
-                }
-            }
-        }
+        parseAnalyseResponse(analyses, analyseResponse);
 
         // 写入缓存
         if (analyses.size() > 0) {
