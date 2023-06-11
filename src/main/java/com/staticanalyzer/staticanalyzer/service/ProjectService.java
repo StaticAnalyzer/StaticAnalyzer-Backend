@@ -57,6 +57,8 @@ public class ProjectService {
 
             if (project.updateAnalyseResult(analyseResponse)) {
                 // 先删缓存再更新
+                String listKey = CACHE_KEY_PROJECTVO + project.getUserId();
+                redisTemplate.delete(listKey);
                 String hashKey = CACHE_KEY_PROJECT + project.getId();
                 redisTemplate.delete(hashKey);
                 projectMapper.updateById(project);
