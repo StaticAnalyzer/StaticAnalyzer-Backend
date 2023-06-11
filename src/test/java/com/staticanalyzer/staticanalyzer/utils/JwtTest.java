@@ -16,6 +16,8 @@ public class JwtTest {
         java.util.Random random = new java.util.Random(0xdeadbeef);
         java.security.Key key = jwtProperties.getKey();
         java.time.Duration expiration = jwtProperties.getExpiration();
+
+        // 随机化测试
         for (int i = 0; i < 100; i++) {
             int id = random.nextInt();
             String jws = JwtUtils.generateJws(key, expiration, id);

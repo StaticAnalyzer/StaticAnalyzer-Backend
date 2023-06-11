@@ -58,17 +58,20 @@ public class ProjectVO {
         config = project.getConfig();
         analyseBrief = new LinkedList<>();
 
+        // 正在等待中
         if (project.getAnalyseResult() == null) {
             status = ProjectStatus.Queueing;
             return;
         }
 
+        // 出现分析错误
         AnalyseResponse analyseResponse = project.resolveAnalyseResponse();
         if (analyseResponse == null || analyseResponse.getCode() != 0) {
             status = ProjectStatus.Error;
             return;
         }
 
+        // 分析完成，需要生成简报
         List<AlgAnalyseResult> algAnalyseResultList = analyseResponse.getAlgAnalyseResultsList();
         for (AlgAnalyseResult algAnalyseResult : algAnalyseResultList) {
             Analysis algAnalyseBrief = new Analysis();
@@ -81,6 +84,7 @@ public class ProjectVO {
                 for (FileAnalyseResults entry : algAnalyseResult.getFileAnalyseResultsMap().values()) {
                     for (AnalyseResultEntry analyseResultEntry : entry.getAnalyseResultsList()) {
                         AnalysisStatus currentSeverity = AnalysisStatus.valueOf(analyseResultEntry.getSeverity());
+                        // 取最严重的简报
                         if (currentSeverity.compareTo(severity) > 0)
                             severity = currentSeverity;
                     }

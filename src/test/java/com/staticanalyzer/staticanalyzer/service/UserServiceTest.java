@@ -3,19 +3,13 @@ package com.staticanalyzer.staticanalyzer.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.staticanalyzer.staticanalyzer.entity.user.User;
-import com.staticanalyzer.staticanalyzer.service.UserService;
 
-/**
- * 用户功能测试
- */
 @SpringBootTest
 @Transactional
 @Rollback
@@ -24,7 +18,7 @@ public class UserServiceTest {
     @Autowired
     private UserService userService;
 
-    //@Test
+    @org.junit.Test
     public void TestUserBasic() {
         User badUser = new User();
         badUser.setId(8);
@@ -52,4 +46,5 @@ public class UserServiceTest {
         assertEquals(byId, newUser);
         assertEquals(byUsername, newUser);
     }
+
 }

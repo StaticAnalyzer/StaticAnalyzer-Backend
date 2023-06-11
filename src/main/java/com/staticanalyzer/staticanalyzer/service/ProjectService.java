@@ -123,7 +123,7 @@ public class ProjectService {
     public java.util.List<ProjectVO> getProjectInfo(int userId) {
         String listKey = CACHE_KEY_PROJECTVO + userId;
         java.util.List<ProjectVO> projectList = redisTemplate.opsForList().range(listKey, 0, -1);
-        if (projectList.size() > 0) /* 直接读取缓存 */
+        if (projectList != null && projectList.size() > 0) /* 直接读取缓存 */
             return projectList;
 
         // 从数据库拉取
@@ -155,7 +155,7 @@ public class ProjectService {
     private java.util.Map<String, SrcFileAnalysis> fetchFromCache(int projectId) throws ServiceError {
         String hashKey = CACHE_KEY_PROJECT + projectId;
         java.util.Map<String, SrcFileAnalysis> analyses = redisTemplate.opsForHash().entries(hashKey);
-        if (analyses.size() > 0) // 直接读取缓存
+        if (analyses != null && analyses.size() > 0) // 直接读取缓存
             return analyses;
 
         // 从数据库中拉取

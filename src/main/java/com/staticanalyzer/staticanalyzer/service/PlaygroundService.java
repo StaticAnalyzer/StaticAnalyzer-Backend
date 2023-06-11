@@ -51,16 +51,18 @@ public class PlaygroundService {
 
         SrcFileAnalysis analysis = new SrcFileAnalysis(srcFile);
 
-        // 设置结果
+        // 设置特殊结果：main.cpp
         if (analyseResponse != null && analyseResponse.getCode() == 0) {
             java.util.List<AlgAnalyseResult> algAnalyseResultList = analyseResponse.getAlgAnalyseResultsList();
             for (AlgAnalyseResult algAnalyseResult : algAnalyseResultList) {
                 if (algAnalyseResult.getCode() != 0)
                     continue;
+
                 java.util.Map<String, FileAnalyseResults> fileAnalyseResults = algAnalyseResult
                         .getFileAnalyseResultsMap();
                 if (!fileAnalyseResults.containsKey("main.cpp"))
                     continue;
+
                 java.util.List<AnalysisResult> newAnalysisResultList = fileAnalyseResults.get("main.cpp")
                         .getAnalyseResultsList()
                         .stream().map(r -> new AnalysisResult(r))
