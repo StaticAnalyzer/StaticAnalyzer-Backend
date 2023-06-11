@@ -35,13 +35,27 @@ public class AnalysisResult {
     @ApiModelProperty(value = "分析建议", required = true)
     private String message;
 
-    public AnalysisResult(AnalyseResultEntry analyseResultEntry) {
-        startLine = analyseResultEntry.getStartLine();
-        startColumn = analyseResultEntry.getStartColumn();
-        endLine = analyseResultEntry.getEndLine();
-        endColumn = analyseResultEntry.getEndColumn();
-        severity = AnalysisStatus.valueOf(analyseResultEntry.getSeverity());
-        message = analyseResultEntry.getMessage();
+    @ApiModelProperty(value = "算法类型", required = true)
+    private String type;
+
+    public AnalysisResult(AnalysisResult analysisResult) {
+        this.startLine = analysisResult.startLine;
+        this.startColumn = analysisResult.startColumn;
+        this.endLine = analysisResult.endLine;
+        this.endColumn = analysisResult.endColumn;
+        this.severity = analysisResult.severity;
+        this.message = analysisResult.message;
+        this.type = analysisResult.type;
+    }
+
+    public AnalysisResult(String analysisType, AnalyseResultEntry analyseResultEntry) {
+        this.startLine = analyseResultEntry.getStartLine();
+        this.startColumn = analyseResultEntry.getStartColumn();
+        this.endLine = analyseResultEntry.getEndLine();
+        this.endColumn = analyseResultEntry.getEndColumn();
+        this.severity = AnalysisStatus.valueOf(analyseResultEntry.getSeverity());
+        this.message = analyseResultEntry.getMessage();
+        this.type = analysisType;
     }
 
 }

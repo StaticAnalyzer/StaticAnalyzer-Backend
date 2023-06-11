@@ -173,7 +173,7 @@ public class ProjectService {
                         throw new ServiceError(ServiceErrorType.FILE_NOT_FOUND);
                     }
                     java.util.List<AnalysisResult> analysisResults = entry.getValue().getAnalyseResultsList()
-                            .stream().map(r -> new AnalysisResult(r))
+                            .stream().map(res -> new AnalysisResult(algAnalyseResult.getAnalyseType(), res))
                             .collect(java.util.stream.Collectors.toList());
                     if (analysisResults.size() > 0)
                         analysis.getAnalyseResults().addAll(analysisResults);
@@ -271,17 +271,15 @@ public class ProjectService {
     public java.util.List<AnalysisProblem> getProblems(int projectId) throws ServiceError {
         java.util.Map<String, SrcFileAnalysis> files = fetchFromCache(projectId);
         java.util.List<AnalysisProblem> problems = new java.util.LinkedList<>();
+
         for (java.util.Map.Entry<String, SrcFileAnalysis> entry : files.entrySet()) {
             SrcFileAnalysis analysis = entry.getValue();
             for (AnalysisResult result : analysis.getAnalyseResults()) {
-                AnalysisProblem problem = new AnalysisProblem();
-                problem.setFile(entry.getKey());
-                problem.setLine(result.getStartLine());
-                problem.setMessage(result.getMessage());
-                problem.setSeverity(result.getSeverity());
+                AnalysisProblem problem = new AnalysisProblem(entry.getKey(), result);
                 problems.add(problem);
             }
         }
+
         return problems;
     }
 
