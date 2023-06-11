@@ -72,7 +72,7 @@ public class UserService {
      * @param user 用户对象
      * @throws ServiceError
      */
-    public void check(User user) throws ServiceError {
+    public void checkUserInfoFormat(User user) throws ServiceError {
         String username = user.getUsername(); // 验证用户名
         if (!username.matches(userProperties.getUsernameFormat()))
             throw new ServiceError(ServiceErrorType.BAD_USERNAME);
@@ -92,7 +92,7 @@ public class UserService {
      * @throws ServiceError
      */
     public User login(User user) throws ServiceError {
-        check(user);
+        checkUserInfoFormat(user);
         User databaseUser = userMapper.selectOne(
                 new QueryWrapper<User>().eq("username", user.getUsername()));
         if (databaseUser == null)
@@ -112,8 +112,8 @@ public class UserService {
      * @param user 请求的用户对象
      * @throws ServiceError
      */
-    public void create(User user) throws ServiceError {
-        check(user);
+    public void createUser(User user) throws ServiceError {
+        checkUserInfoFormat(user);
         User databaseUser = userMapper.selectOne(
                 new QueryWrapper<User>().eq("username", user.getUsername()));
         if (databaseUser != null)
@@ -127,8 +127,8 @@ public class UserService {
      * @param user 请求的用户对象
      * @throws ServiceError
      */
-    public void update(User user) throws ServiceError {
-        check(user);
+    public void updateUser(User user) throws ServiceError {
+        checkUserInfoFormat(user);
         userMapper.updateById(user);
     }
 
@@ -139,7 +139,7 @@ public class UserService {
      * @return {@code databaseUser}有效用户
      * @throws ServiceError
      */
-    public User read(int userId) throws ServiceError {
+    public User getUserById(int userId) throws ServiceError {
         User databaseUser = userMapper.selectById(userId);
         if (databaseUser == null)
             throw new ServiceError(ServiceErrorType.USER_NOT_FOUND);
@@ -153,7 +153,7 @@ public class UserService {
      * @return {@code databaseUser}用户
      * @throws ServiceError
      */
-    public User read(String username) {
+    public User getUserByName(String username) {
         User databaseUser = userMapper.selectOne(
                 new QueryWrapper<User>().eq("username", username));
         if (databaseUser == null)

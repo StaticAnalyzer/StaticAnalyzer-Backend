@@ -30,7 +30,7 @@ public class ProjectTest {
 
     @Test
     public void TestProjectBasic() throws JsonProcessingException {
-        List<AnalysisProblem> analysisProblems = projectService.queryProblem(1);
+        List<AnalysisProblem> analysisProblems = projectService.getProblems(1);
         String analysisProblemsJson = objectMapper.writeValueAsString(analysisProblems);
         System.out.println(analysisProblemsJson);
     }

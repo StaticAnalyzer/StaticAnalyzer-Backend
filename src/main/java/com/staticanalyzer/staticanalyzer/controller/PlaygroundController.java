@@ -23,10 +23,10 @@ public class PlaygroundController {
 
     @PostMapping("/playground/test")
     @ApiOperation(value = "上传单个文件")
-    public Result<SrcFileAnalysis> submit(@RequestBody SimpleProject simpleProj) {
+    public Result<SrcFileAnalysis> upload(@RequestBody SimpleProject simpleProject) {
         try {
-            SrcFileAnalysis analysis = playgroundService.testSingle(simpleProj.getCode(),
-                    simpleProj.getConfig());
+            SrcFileAnalysis analysis = playgroundService.testSingle(simpleProject.getCode(),
+                    simpleProject.getConfig());
             return Result.ok("测试成功", analysis);
         } catch (ServiceError serviceError) {
             return Result.error(serviceError.getMessage());

@@ -1,5 +1,7 @@
 package com.staticanalyzer.staticanalyzer.utils;
 
+import java.io.ByteArrayOutputStream;
+
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
@@ -102,19 +104,25 @@ public class TarGzUtils {
 
         TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(gzipInputStream);
         TarArchiveEntry tarArchiveEntry;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         SrcFile srcFile;
 
         try (tarArchiveInputStream) {
+            int byteCount;
+            byte[] byteBuffer = new byte[8192];
             while ((tarArchiveEntry = tarArchiveInputStream.getNextTarEntry()) != null) {
                 if (tarArchiveEntry.isFile()) {
-                    int tarArchiveSize = (int) tarArchiveEntry.getSize();
-                    String tarArchiveName = tarArchiveEntry.getName();
-                    byte[] tarArchiveContent = new byte[tarArchiveSize];
-                    tarArchiveInputStream.read(tarArchiveContent, 0, tarArchiveSize);
+                    byteArrayOutputStream.reset();
+                    byteCount = tarArchiveInputStream.read(byteBuffer, 0, byteBuffer.length);
+                    while (byteCount != -1) {
+                        byteArrayOutputStream.write(byteBuffer, 0, byteCount);
+                        byteCount = tarArchiveInputStream.read(byteBuffer, 0, byteBuffer.length);
+                    }
 
+                    String tarArchiveName = tarArchiveEntry.getName();
                     srcFile = new SrcFile();
                     srcFile.setName(java.nio.file.Path.of(tarArchiveName).getFileName().toString());
-                    srcFile.setSrc(new String(tarArchiveContent));
+                    srcFile.setSrc(new String(byteArrayOutputStream.toByteArray()));
                     files.put(tarArchiveName, srcFile);
                 }
             }

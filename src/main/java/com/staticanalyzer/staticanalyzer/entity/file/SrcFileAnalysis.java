@@ -17,12 +17,15 @@ import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult;
  */
 @lombok.Setter
 @lombok.Getter
-@lombok.NoArgsConstructor
 @ApiModel(description = "文件分析结果")
 public class SrcFileAnalysis extends SrcFile {
 
     @ApiModelProperty(value = "分析结果列表", required = false)
     private java.util.List<AnalysisResult> analyseResults;
+
+    public SrcFileAnalysis() {
+        this.analyseResults = new java.util.LinkedList<>();
+    }
 
     public SrcFileAnalysis(SrcFile srcFile) {
         this.name = srcFile.name;

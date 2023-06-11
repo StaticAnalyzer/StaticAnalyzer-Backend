@@ -74,7 +74,7 @@ public class ProjectService {
      * 
      * @param project
      */
-    public void submit(Project project) {
+    public void testComplex(Project project) {
         if (taskPool == null)
             taskPool = java.util.concurrent.Executors.newFixedThreadPool(projectProperties.getTaskLimit());
         taskPool.submit(new Task(project));
@@ -95,7 +95,7 @@ public class ProjectService {
      * @return {@code project} 新建的项目
      * @throws ServiceError
      */
-    public Project create(int userId, byte[] sourceCode, String config) throws ServiceError {
+    public Project createProject(int userId, byte[] sourceCode, String config) throws ServiceError {
         if (sourceCode == null || config == null)
             throw new ServiceError(ServiceErrorType.BAD_PROJECT);
 
@@ -120,7 +120,7 @@ public class ProjectService {
      * @return {@code projectList}项目列表，如果未查到，该列表长度为0
      * @see ProjectVO
      */
-    public java.util.List<ProjectVO> queryProj(int userId) {
+    public java.util.List<ProjectVO> getProjectInfo(int userId) {
         String listKey = CACHE_KEY_PROJECTVO + userId;
         java.util.List<ProjectVO> projectList = redisTemplate.opsForList().range(listKey, 0, -1);
         if (projectList.size() > 0) /* 直接读取缓存 */
@@ -152,7 +152,7 @@ public class ProjectService {
      * @return {@code fileAnalyses}源文件集，如果未查到，该映射大小为0
      * @throws ServiceError
      */
-    private java.util.Map<String, SrcFileAnalysis> fetch(int projectId) throws ServiceError {
+    private java.util.Map<String, SrcFileAnalysis> fetchFromCache(int projectId) throws ServiceError {
         String hashKey = CACHE_KEY_PROJECT + projectId;
         java.util.Map<String, SrcFileAnalysis> analyses = redisTemplate.opsForHash().entries(hashKey);
         if (analyses.size() > 0) // 直接读取缓存
@@ -175,7 +175,7 @@ public class ProjectService {
 
         AnalyseResponse analyseResponse = databaseProject.resolveAnalyseResponse();
 
-        // 解析并对fileMap中的条目赋值
+        // 解析并对analyses中的条目赋值
         if (analyseResponse != null && analyseResponse.getCode() == 0) {
             java.util.List<AlgAnalyseResult> algAnalyseResultList = analyseResponse
                     .getAlgAnalyseResultsList();
@@ -215,8 +215,8 @@ public class ProjectService {
      * @return {@code files}源文件分析信息
      * @throws ServiceError
      */
-    public SrcFileAnalysis readFile(int projectId, String filePath) throws ServiceError {
-        java.util.Map<String, SrcFileAnalysis> files = fetch(projectId);
+    public SrcFileAnalysis getFileInfo(int projectId, String filePath) throws ServiceError {
+        java.util.Map<String, SrcFileAnalysis> files = fetchFromCache(projectId);
         SrcFileAnalysis analysis = files.get(filePath);
         if (analysis == null)
             throw new ServiceError(ServiceErrorType.FILE_NOT_FOUND);
@@ -228,12 +228,12 @@ public class ProjectService {
      * 
      * @see SrcFileDigest
      * @see SrcDirectory
-     * @param projectId
+     * @param projectId 项目id
      * @return {@code directory}源文件结构化分析信息
      * @throws ServiceError
      */
-    public SrcDirectory read(int projectId) throws ServiceError {
-        java.util.Map<String, SrcFileAnalysis> files = fetch(projectId);
+    public SrcDirectory getAllInfo(int projectId) throws ServiceError {
+        java.util.Map<String, SrcFileAnalysis> files = fetchFromCache(projectId);
         SrcDirectory directory = new SrcDirectory();
         for (java.util.Map.Entry<String, SrcFileAnalysis> entry : files.entrySet()) {
             SrcFileDigest digest = new SrcFileDigest(entry.getValue());
@@ -242,8 +242,15 @@ public class ProjectService {
         return directory;
     }
 
-    public java.util.List<AnalysisProblem> queryProblem(int projectId) throws ServiceError {
-        java.util.Map<String, SrcFileAnalysis> files = fetch(projectId);
+    /**
+     * 通过项目id查询项目问题列表
+     * 
+     * @param projectId 项目id
+     * @return {@code problems} 项目问题列表
+     * @throws ServiceError
+     */
+    public java.util.List<AnalysisProblem> getProblems(int projectId) throws ServiceError {
+        java.util.Map<String, SrcFileAnalysis> files = fetchFromCache(projectId);
         java.util.List<AnalysisProblem> problems = new java.util.LinkedList<>();
         for (java.util.Map.Entry<String, SrcFileAnalysis> entry : files.entrySet()) {
             SrcFileAnalysis analysis = entry.getValue();

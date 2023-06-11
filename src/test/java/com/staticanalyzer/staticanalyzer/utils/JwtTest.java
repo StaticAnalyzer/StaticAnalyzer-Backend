@@ -1,7 +1,6 @@
 package com.staticanalyzer.staticanalyzer.utils;
 
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,7 +11,7 @@ public class JwtTest {
     @Autowired
     private JwtProperties jwtProperties;
 
-    //@Test
+    @org.junit.Test
     public void testJwt() {
         java.util.Random random = new java.util.Random(0xdeadbeef);
         java.security.Key key = jwtProperties.getKey();
@@ -22,7 +21,6 @@ public class JwtTest {
             String jws = JwtUtils.generateJws(key, expiration, id);
             assertEquals(JwtUtils.parseJws(key, jws), id);
         }
-        System.out.println("吱");
     }
 
 }

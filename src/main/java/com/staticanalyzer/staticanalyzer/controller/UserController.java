@@ -38,9 +38,9 @@ public class UserController {
 
     @PostMapping("/user")
     @ApiOperation(value = "用户注册接口")
-    public Result<UserWithJwt> create(@RequestBody User user) {
+    public Result<UserWithJwt> createUser(@RequestBody User user) {
         try {
-            userService.create(user);
+            userService.createUser(user);
             String jws = userService.getSignature(user.getId());
             return Result.ok("注册成功", new UserWithJwt(user, jws));
         } catch (ServiceError serviceError) {
@@ -50,9 +50,9 @@ public class UserController {
 
     @GetMapping("/user/{uid}")
     @ApiOperation(value = "用户查询接口")
-    public Result<User> read(@PathVariable("uid") int userId) {
+    public Result<User> getUserInfo(@PathVariable("uid") int userId) {
         try {
-            User databaseUser = userService.read(userId);
+            User databaseUser = userService.getUserById(userId);
             return Result.ok("查询成功", databaseUser);
         } catch (ServiceError serviceError) {
             return Result.error(serviceError.getMessage());
@@ -61,11 +61,11 @@ public class UserController {
 
     @PutMapping("/user/{uid}")
     @ApiOperation(value = "用户修改接口")
-    public Result<?> update(@PathVariable("uid") int userId, @RequestBody String password) {
+    public Result<?> updateUserInfo(@PathVariable("uid") int userId, @RequestBody String password) {
         try {
-            User databaseUser = userService.read(userId);
+            User databaseUser = userService.getUserById(userId);
             databaseUser.setPassword(password);
-            userService.update(databaseUser);
+            userService.updateUser(databaseUser);
             return Result.ok("修改成功");
         } catch (ServiceError serviceError) {
             return Result.error(serviceError.getMessage());

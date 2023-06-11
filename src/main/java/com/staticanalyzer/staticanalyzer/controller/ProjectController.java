@@ -26,13 +26,13 @@ public class ProjectController {
 
     @PostMapping("/user/{uid}/project")
     @ApiOperation(value = "项目上传接口")
-    public Result<?> upload(
+    public Result<?> uploadProject(
             @PathVariable("uid") int userId,
             @RequestParam(value = "sourceCode") MultipartFile sourceCode,
             @RequestParam(value = "config") String config) {
         try {
-            Project project = projectService.create(userId, sourceCode.getBytes(), config);
-            projectService.submit(project);
+            Project project = projectService.createProject(userId, sourceCode.getBytes(), config);
+            projectService.testComplex(project);
             return Result.ok("上传成功");
         } catch (java.io.IOException ioException) {
             return Result.error(ServiceErrorType.BAD_PROJECT.getMsg());
@@ -43,18 +43,18 @@ public class ProjectController {
 
     @GetMapping("/user/{uid}/project")
     @ApiOperation(value = "项目查询接口")
-    public Result<java.util.List<ProjectVO>> read(@PathVariable("uid") int userId) {
-        java.util.List<ProjectVO> projectList = projectService.queryProj(userId);
+    public Result<java.util.List<ProjectVO>> getAllProjects(@PathVariable("uid") int userId) {
+        java.util.List<ProjectVO> projectList = projectService.getProjectInfo(userId);
         return Result.ok("查询成功", projectList);
     }
 
     @GetMapping("/user/{uid}/project/{pid}")
     @ApiOperation(value = "项目目录查询接口")
-    public Result<SrcDirectory> read(
+    public Result<SrcDirectory> getAllAnalysis(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId) {
         try {
-            SrcDirectory projDirectory = projectService.read(projectId);
+            SrcDirectory projDirectory = projectService.getAllInfo(projectId);
             return Result.ok("目录查询成功", projDirectory);
         } catch (ServiceError serviceError) {
             return Result.error(serviceError.getMessage());
@@ -63,12 +63,12 @@ public class ProjectController {
 
     @GetMapping("/user/{uid}/project/{pid}/file")
     @ApiOperation(value = "文件查询接口")
-    public Result<SrcFileAnalysis> read(
+    public Result<SrcFileAnalysis> getFileAnalysis(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId,
             @RequestParam(value = "path") String path) {
         try {
-            SrcFileAnalysis analysis = projectService.readFile(projectId, path);
+            SrcFileAnalysis analysis = projectService.getFileInfo(projectId, path);
             return Result.ok("文件查询成功", analysis);
         } catch (ServiceError serviceError) {
             return Result.error(serviceError.getMessage());
@@ -77,11 +77,11 @@ public class ProjectController {
 
     @GetMapping("/user/{uid}/project/{pid}/problem")
     @ApiOperation(value = "问题查询接口")
-    public Result<java.util.List<AnalysisProblem>> query(
+    public Result<java.util.List<AnalysisProblem>> getProblems(
             @PathVariable("uid") int userId,
             @PathVariable("pid") int projectId){
         try {
-            java.util.List<AnalysisProblem> analysisProblems = projectService.queryProblem(projectId);
+            java.util.List<AnalysisProblem> analysisProblems = projectService.getProblems(projectId);
             return Result.ok("问题查询成功", analysisProblems);
         } catch (ServiceError serviceError) {
             return Result.error(serviceError.getMessage());
