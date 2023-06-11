@@ -10,21 +10,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.staticanalyzer.staticanalyzer.entity.user.User;
 
-@SpringBootTest
 @Transactional
 @Rollback
+@SpringBootTest
 public class UserServiceTest {
 
     @Autowired
     private UserService userService;
 
-    @org.junit.Test
-    public void TestUserBasic() {
+    @org.junit.jupiter.api.Test
+    public void testUserFormat() {
         User badUser = new User();
         badUser.setId(8);
         badUser.setUsername("test");
         badUser.setPassword("8888");
-        assertDoesNotThrow(() -> userService.checkUserInfoFormat(badUser));
+        userService.checkUserInfoFormat(badUser);
 
         User newUser = new User();
         newUser.setId(1000);

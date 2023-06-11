@@ -2,22 +2,23 @@ package com.staticanalyzer.staticanalyzer.utils;
 
 import static org.junit.Assert.assertEquals;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.crypto.spec.SecretKeySpec;
 
-import com.staticanalyzer.staticanalyzer.config.jwt.JwtProperties;
+import io.jsonwebtoken.SignatureAlgorithm;
 
+// 本测试与Spring Boot无关
 public class JwtTest {
-
-    @Autowired
-    private JwtProperties jwtProperties;
 
     @org.junit.Test
     public void testJwt() {
-        java.util.Random random = new java.util.Random(0xdeadbeef);
-        java.security.Key key = jwtProperties.getKey();
-        java.time.Duration expiration = jwtProperties.getExpiration();
+        java.util.Random random = new java.util.Random();
+        byte[] keyBytes = new byte[256];
 
         // 随机化测试
+        random.nextBytes(keyBytes);
+        java.security.Key key = new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
+        java.time.Duration expiration = java.time.Duration.parse(String.format("PT%dS", random.nextInt(600)));
+
         for (int i = 0; i < 100; i++) {
             int id = random.nextInt();
             String jws = JwtUtils.generateJws(key, expiration, id);

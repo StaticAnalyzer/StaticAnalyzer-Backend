@@ -3,11 +3,8 @@ package com.staticanalyzer.staticanalyzer.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.staticanalyzer.algservice.AlgAnalyseResult;
 import com.staticanalyzer.algservice.AnalyseResponse;
-import com.staticanalyzer.algservice.FileAnalyseResults;
 
-import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult;
 import com.staticanalyzer.staticanalyzer.entity.file.SrcFileAnalysis;
 import com.staticanalyzer.staticanalyzer.entity.file.SrcFile;
 import com.staticanalyzer.staticanalyzer.service.error.ServiceError;
@@ -23,8 +20,14 @@ import com.staticanalyzer.staticanalyzer.utils.TarGzUtils;
 @Service
 public class PlaygroundService {
 
+    private static String DEFAULT_SRCDIR = "";
+    private static String DEFAULT_SRCFILE = "main.cpp";
+
     @Autowired
     private AlgorithmService algorithmService;
+
+    @Autowired
+    private ProjectService projectService;
 
     /**
      * 单文件即时测试
@@ -42,7 +45,7 @@ public class PlaygroundService {
         SrcFile srcFile;
         try {
             srcFile = new SrcFile();
-            srcFile.setName("main.cpp");
+            srcFile.setName(DEFAULT_SRCFILE);
             srcFile.setSrc(code);
             analyseResponse = algorithmService.Analyse(TarGzUtils.compressSingle(srcFile), config);
         } catch (java.io.IOException ioException) {
@@ -50,29 +53,9 @@ public class PlaygroundService {
         }
 
         SrcFileAnalysis analysis = new SrcFileAnalysis(srcFile);
-
-        // 设置特殊结果：main.cpp
-        if (analyseResponse != null && analyseResponse.getCode() == 0) {
-            java.util.List<AlgAnalyseResult> algAnalyseResultList = analyseResponse.getAlgAnalyseResultsList();
-            for (AlgAnalyseResult algAnalyseResult : algAnalyseResultList) {
-                if (algAnalyseResult.getCode() != 0)
-                    continue;
-
-                java.util.Map<String, FileAnalyseResults> fileAnalyseResults = algAnalyseResult
-                        .getFileAnalyseResultsMap();
-                if (!fileAnalyseResults.containsKey("main.cpp"))
-                    continue;
-
-                java.util.List<AnalysisResult> newAnalysisResultList = fileAnalyseResults.get("main.cpp")
-                        .getAnalyseResultsList()
-                        .stream().map(r -> new AnalysisResult(r))
-                        .collect(java.util.stream.Collectors.toList());
-                if (newAnalysisResultList.size() > 0) {
-                    analysis.getAnalyseResults().addAll(newAnalysisResultList);
-                }
-
-            }
-        }
+        java.util.Map<String, SrcFileAnalysis> simpleAnalysis = new java.util.HashMap<>();
+        simpleAnalysis.put(DEFAULT_SRCDIR + analysis.getName(), analysis);
+        projectService.parseAnalyseResponse(simpleAnalysis, analyseResponse);
 
         return analysis;
     }
