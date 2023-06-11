@@ -59,8 +59,6 @@ public class ProjectService {
                 // 先删缓存再更新
                 String hashKey = CACHE_KEY_PROJECT + project.getId();
                 redisTemplate.delete(hashKey);
-                String listKey = CACHE_KEY_PROJECTVO + project.getUserId();
-                redisTemplate.delete(listKey);
                 projectMapper.updateById(project);
             }
         }
@@ -104,6 +102,9 @@ public class ProjectService {
         project.setSourceCode(sourceCode);
         project.setConfig(config);
 
+        // 先删缓存再更新
+        String listKey = CACHE_KEY_PROJECTVO + project.getUserId();
+        redisTemplate.delete(listKey);
         projectMapper.insert(project);
         return project;
     }
