@@ -1,9 +1,5 @@
 package com.staticanalyzer.staticanalyzer.controller;
 
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,94 +8,68 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.staticanalyzer.staticanalyzer.entities.Result;
-import com.staticanalyzer.staticanalyzer.entities.User;
-import com.staticanalyzer.staticanalyzer.mapper.UserMapper;
-import com.staticanalyzer.staticanalyzer.security.JWTHelper;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+import com.staticanalyzer.staticanalyzer.entity.Result;
+import com.staticanalyzer.staticanalyzer.entity.user.User;
+import com.staticanalyzer.staticanalyzer.entity.user.UserWithJwt;
+import com.staticanalyzer.staticanalyzer.service.UserService;
+import com.staticanalyzer.staticanalyzer.service.error.ServiceError;
+
 @RestController
-@Api("用户控制器")
+@Api(description = "用户控制器")
 public class UserController {
-    @Autowired
-    private UserMapper userMapper;
 
     @Autowired
-    private JWTHelper jwtHelper;
-
-    private static String RegularExpressionUsername = "[0-9a-zA-Z_-]{2,8}";
-    private static String RegularExpressionPassword = ".{8,20}";
-
-    private boolean verify(User user) {
-        Pattern patternUsername = Pattern.compile(RegularExpressionUsername);
-        Matcher matcherUsername = patternUsername.matcher(user.getUsername());
-        if (!matcherUsername.matches())
-            return false;
-
-        Pattern patternPassword = Pattern.compile(RegularExpressionPassword);
-        Matcher matcherPassword = patternPassword.matcher(user.getPassword());
-        if (!matcherPassword.matches())
-            return false;
-
-        return true;
-    }
+    private UserService userService;
 
     @PostMapping("/login")
-    @ApiOperation("用户登录")
-    public Result login(@RequestBody User user) {
-        String username = user.getUsername();
-        String password = user.getPassword();
-        User dataBaseUser = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
-
-        if (dataBaseUser == null)
-            return new Result(Result.REJECTED, Map.of("msg", "登录失败，用户不存在"));
-
-        if (!dataBaseUser.getPassword().equals(password))
-            return new Result(Result.REJECTED, Map.of("msg", "登录失败，密码错误"));
-
-        String token = jwtHelper.generate(dataBaseUser.getId());
-        return new Result(Result.ACCEPTED, Map.of("user", dataBaseUser, "token", token));
+    @ApiOperation(value = "用户登录接口")
+    public Result<UserWithJwt> login(@RequestBody User user) {
+        try {
+            User databaseUser = userService.login(user);
+            String jws = userService.getSignature(databaseUser.getId());
+            return Result.ok("登录成功", new UserWithJwt(databaseUser, jws));
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
     }
 
     @PostMapping("/user")
-    @ApiOperation("用户注册")
-    public Result add(@RequestBody User user) {
-        if (!verify(user))
-            return new Result(Result.REJECTED, Map.of("msg", "注册失败，格式错误"));
-
-        if (userMapper.selectOne(new QueryWrapper<User>().eq("username", user.getUsername())) != null)
-            return new Result(Result.REJECTED, Map.of("msg", "注册失败，用户重名"));
-
-        userMapper.insert(user);
-        String token = jwtHelper.generate(user.getId());
-        return new Result(Result.ACCEPTED, Map.of("user", user, "token", token));
+    @ApiOperation(value = "用户注册接口")
+    public Result<UserWithJwt> createUser(@RequestBody User user) {
+        try {
+            userService.createUser(user);
+            String jws = userService.getSignature(user.getId());
+            return Result.ok("注册成功", new UserWithJwt(user, jws));
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
     }
 
-    @GetMapping("/user/{id}")
-    @ApiOperation("查询用户信息")
-    public Result query(@PathVariable int id) {
-        User dataBaseUser = userMapper.selectById(id);
-        if (dataBaseUser == null)
-            return new Result(Result.REJECTED, Map.of("msg", "查询失败，找不到用户"));
-
-        return new Result(Result.ACCEPTED, Map.of("user", dataBaseUser));
+    @GetMapping("/user/{uid}")
+    @ApiOperation(value = "用户查询接口")
+    public Result<User> getUserInfo(@PathVariable("uid") int userId) {
+        try {
+            User databaseUser = userService.getUserById(userId);
+            return Result.ok("查询成功", databaseUser);
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
     }
 
-    @PutMapping("/user/{id}")
-    @ApiOperation("修改用户密码")
-    public Result update(@PathVariable int id, @RequestBody String password) {
-        User dataBaseUser = userMapper.selectById(id);
-        if (dataBaseUser == null)
-            return new Result(Result.REJECTED, Map.of("msg", "更新失败，找不到用户"));
-
-        dataBaseUser.setPassword(password);
-        if (!verify(dataBaseUser))
-            return new Result(Result.REJECTED, Map.of("msg", "更新失败，格式错误"));
-
-        userMapper.updateById(dataBaseUser);
-        return new Result(Result.ACCEPTED, Map.of("msg", "更新成功"));
+    @PutMapping("/user/{uid}")
+    @ApiOperation(value = "用户修改接口")
+    public Result<?> updateUserInfo(@PathVariable("uid") int userId, @RequestBody String password) {
+        try {
+            User databaseUser = userService.getUserById(userId);
+            databaseUser.setPassword(password);
+            userService.updateUser(databaseUser);
+            return Result.ok("修改成功");
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
     }
+
 }

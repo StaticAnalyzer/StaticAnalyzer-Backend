@@ -1,102 +1,91 @@
 package com.staticanalyzer.staticanalyzer.controller;
 
-import java.io.IOException;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisProblem;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.staticanalyzer.staticanalyzer.entities.Project;
-import com.staticanalyzer.staticanalyzer.entities.Result;
-import com.staticanalyzer.staticanalyzer.mapper.ProjectMapper;
-import com.staticanalyzer.staticanalyzer.service.AlgorithmService;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.staticanalyzer.staticanalyzer.entity.Result;
+import com.staticanalyzer.staticanalyzer.entity.file.SrcDirectory;
+import com.staticanalyzer.staticanalyzer.entity.file.SrcFileAnalysis;
+import com.staticanalyzer.staticanalyzer.entity.project.Project;
+import com.staticanalyzer.staticanalyzer.entity.project.ProjectVO;
+import com.staticanalyzer.staticanalyzer.service.ProjectService;
+import com.staticanalyzer.staticanalyzer.service.error.ServiceError;
+import com.staticanalyzer.staticanalyzer.service.error.ServiceErrorType;
 
 @RestController
-@Api("项目控制器")
+@Api(description = "项目控制器")
 public class ProjectController {
-    @Autowired
-    private AlgorithmService algorithmService;
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectService projectService;
 
-    private static Logger logger = LoggerFactory.getLogger(ProjectController.class);
-    private static ExecutorService taskPool = Executors.newFixedThreadPool(10);
-
-    class Task implements Runnable {
-        private Project project;
-
-        public Task(Project project) {
-            this.project = project;
-        }
-
-        public Project getProject() {
-            return project;
-        }
-
-        public void setProject(Project project) {
-            this.project = project;
-        }
-
-        @Override
-        public void run() {
-            logger.info("Started task " + project.getId());
-            project.setAnalyseResult(algorithmService.JustReturn(project.getSourceCode(), project.getConfig()));
-            projectMapper.updateById(project);
-            logger.info("Task " + project.getId() + " finished");
-        }
-    }
-
-    @PostMapping("/user/{id}/project")
-    @ApiOperation("文件上传")
-    public Result upload(@PathVariable int id, @RequestParam(value = "sourceCode") MultipartFile sourceCode,
-                         @RequestParam(value = "config") String config) {
-        Project project = new Project();
-
-        System.out.println(sourceCode.getSize());
-        System.out.println(config);
-
+    @PostMapping("/user/{uid}/project")
+    @ApiOperation(value = "项目上传接口")
+    public Result<?> uploadProject(
+            @PathVariable("uid") int userId,
+            @RequestParam(value = "sourceCode") MultipartFile sourceCode,
+            @RequestParam(value = "config") String config) {
         try {
-            project.setUserId(id);
-            project.setSourceCode(sourceCode.getBytes());
-            project.setConfig(config);
-        } catch (IOException ioe) {
-            return new Result(Result.REJECTED, Map.of("msg", "上传失败，文件错误"));
+            Project project = projectService.createProject(userId, sourceCode.getBytes(), config);
+            projectService.testComplex(project);
+            return Result.ok("上传成功");
+        } catch (java.io.IOException ioException) {
+            return Result.error(ServiceErrorType.BAD_PROJECT.getMsg());
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
         }
-
-        projectMapper.insert(project);
-        taskPool.submit(new Task(project));
-        return new Result(Result.ACCEPTED, Map.of("msg", "上传成功，编号" + project.getId()));
     }
 
-    @GetMapping("/user/{id}/project")
-    @ApiOperation("查询已上传的任务编号")
-    public Result queryAll(@PathVariable int id) {
-        List<Integer> dataBaseProjectIdList = projectMapper.selectIdByUserId(id);
-        return new Result(Result.ACCEPTED, Map.of("project_id", dataBaseProjectIdList));
+    @GetMapping("/user/{uid}/project")
+    @ApiOperation(value = "项目查询接口")
+    public Result<java.util.List<ProjectVO>> getAllProjects(@PathVariable("uid") int userId) {
+        java.util.List<ProjectVO> projectList = projectService.getProjectInfo(userId);
+        return Result.ok("查询成功", projectList);
     }
 
-    @GetMapping("/user/{id}/project/{projectId}")
-    @ApiOperation("查询任务结果")
-    public Result query(@PathVariable int id, @PathVariable int projectId) {
-        Project dataBaseProject = projectMapper.selectById(projectId);
-        if (dataBaseProject == null)
-            return new Result(Result.REJECTED, Map.of("msg", "查询失败，任务不存在"));
-
-        if (dataBaseProject.getUserId() != id)
-            return new Result(Result.REJECTED, Map.of("msg", "查询失败，用户无权限"));
-
-        return new Result(Result.ACCEPTED, Map.of("project", dataBaseProject));
+    @GetMapping("/user/{uid}/project/{pid}")
+    @ApiOperation(value = "项目目录查询接口")
+    public Result<SrcDirectory> getAllAnalysis(
+            @PathVariable("uid") int userId,
+            @PathVariable("pid") int projectId) {
+        try {
+            SrcDirectory projDirectory = projectService.getAllInfo(projectId);
+            return Result.ok("目录查询成功", projDirectory);
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
     }
+
+    @GetMapping("/user/{uid}/project/{pid}/file")
+    @ApiOperation(value = "文件查询接口")
+    public Result<SrcFileAnalysis> getFileAnalysis(
+            @PathVariable("uid") int userId,
+            @PathVariable("pid") int projectId,
+            @RequestParam(value = "path") String path) {
+        try {
+            SrcFileAnalysis analysis = projectService.getFileInfo(projectId, path);
+            return Result.ok("文件查询成功", analysis);
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
+    }
+
+    @GetMapping("/user/{uid}/project/{pid}/problem")
+    @ApiOperation(value = "问题查询接口")
+    public Result<java.util.List<AnalysisProblem>> getProblems(
+            @PathVariable("uid") int userId,
+            @PathVariable("pid") int projectId){
+        try {
+            java.util.List<AnalysisProblem> analysisProblems = projectService.getProblems(projectId);
+            return Result.ok("问题查询成功", analysisProblems);
+        } catch (ServiceError serviceError) {
+            return Result.error(serviceError.getMessage());
+        }
+    }
+
 }

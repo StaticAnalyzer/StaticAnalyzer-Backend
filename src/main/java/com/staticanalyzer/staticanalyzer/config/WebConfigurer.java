@@ -9,6 +9,7 @@ import com.staticanalyzer.staticanalyzer.interceptor.UserInterceptor;
 
 @Configuration
 public class WebConfigurer implements WebMvcConfigurer {
+
     @Autowired
     private UserInterceptor userInterceptor;
 
@@ -16,6 +17,7 @@ public class WebConfigurer implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/user/**")
-                .excludePathPatterns("/user");
+                .excludePathPatterns("/user"); /* 需要忽略注册接口 */
     }
+
 }
