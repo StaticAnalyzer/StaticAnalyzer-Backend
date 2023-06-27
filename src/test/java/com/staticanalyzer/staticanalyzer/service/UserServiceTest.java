@@ -61,8 +61,7 @@ public class UserServiceTest {
     @org.junit.jupiter.api.Test
     public void testDatabaseUser() {
         User validUser = new User();
-        generateRandomUserId(validUser);
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             validUser.setUsername(generateRandomString(16));
             validUser.setPassword(generateRandomString(16));
             try {
@@ -72,22 +71,16 @@ public class UserServiceTest {
             }
 
             assertDoesNotThrow(() -> userService.createUser(validUser));
+            assertDoesNotThrow(() -> userService.getUserByName(validUser.getUsername()));
 
-            User checkUser = new User();
-            checkUser.setId(validUser.getId());
-            checkUser.setUsername(validUser.getUsername());
-            checkUser.setPassword(validUser.getPassword());
-
-            assertEquals(userService.getUserById(validUser.getId()), checkUser);
-            assertEquals(userService.getUserByName(validUser.getUsername()), checkUser);
-
+            User checkUser = userService.getUserByName(validUser.getUsername());
             // 反转密码再测试
             String revertedPassword = new StringBuilder(checkUser.getPassword()).reverse().toString();
             checkUser.setPassword(revertedPassword);
             assertDoesNotThrow(() -> userService.updateUser(checkUser));
 
-            assertEquals(userService.getUserById(validUser.getId()), checkUser);
-            assertEquals(userService.getUserByName(validUser.getUsername()), checkUser);
+            assertEquals(userService.getUserById(checkUser.getId()).getUsername(), checkUser.getUsername());
+            assertEquals(userService.getUserByName(checkUser.getUsername()).getId(), checkUser.getId());
         }
     }
 

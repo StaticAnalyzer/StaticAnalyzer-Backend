@@ -24,7 +24,9 @@ public class JwtTest {
             int id = JWT_RANDOM.nextInt(32768);
             String jws = JwtUtils.generateJws(key, expiration, id);
             assertEquals(JwtUtils.parseJws(key, jws), id);
+            System.out.println(String.format("JWS verified with id = %d", id));
         }
+        System.out.println("JWS test passed!");
     }
 
 }

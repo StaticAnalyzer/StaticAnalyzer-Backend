@@ -44,11 +44,14 @@ public class TarGzTest {
                 String content = new String(Files.readAllBytes(file));
                 String src = extractedFile.getSrc();
                 assertEquals(src, content); // 需要内容相等
+                System.out.println("File " + extractedFile.getName() + " passed the test!");
 
                 return FileVisitResult.CONTINUE;
             }
 
         });
+
+        System.out.println("(De)Compression test passed!");
     }
 
     @org.junit.Test
