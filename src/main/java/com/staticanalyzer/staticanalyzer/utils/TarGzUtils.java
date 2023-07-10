@@ -22,6 +22,8 @@ import com.staticanalyzer.staticanalyzer.entity.file.SrcFile;
  */
 public class TarGzUtils {
 
+    private static int BYTE_BUFFER_SIZE = 8192;
+
     /**
      * 将文件集压缩成tar.gz项目包
      * <p>
@@ -72,12 +74,13 @@ public class TarGzUtils {
 
         TarArchiveOutputStream tarArchiveOutputStream = new TarArchiveOutputStream(gzipOutputStream);
         TarArchiveEntry tarArchiveEntry = new TarArchiveEntry(srcFile.getName());
-        tarArchiveEntry.setSize(srcFile.getSrc().length());
+        byte[] srcFileBytes = srcFile.getSrc().getBytes();
+        tarArchiveEntry.setSize(srcFileBytes.length);
         byte[] tarGzProjBytes;
 
         try (tarArchiveOutputStream) {
             tarArchiveOutputStream.putArchiveEntry(tarArchiveEntry);
-            tarArchiveOutputStream.write(srcFile.getSrc().getBytes());
+            tarArchiveOutputStream.write(srcFileBytes);
             tarArchiveOutputStream.closeArchiveEntry();
             tarArchiveOutputStream.finish();
         }
@@ -109,7 +112,7 @@ public class TarGzUtils {
 
         try (tarArchiveInputStream) {
             int byteCount;
-            byte[] byteBuffer = new byte[8192];
+            byte[] byteBuffer = new byte[BYTE_BUFFER_SIZE];
             while ((tarArchiveEntry = tarArchiveInputStream.getNextTarEntry()) != null) {
                 if (tarArchiveEntry.isFile()) {
                     byteArrayOutputStream.reset();

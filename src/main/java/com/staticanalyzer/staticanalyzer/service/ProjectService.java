@@ -1,7 +1,5 @@
 package com.staticanalyzer.staticanalyzer.service;
 
-import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisProblem;
-import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -11,6 +9,7 @@ import com.staticanalyzer.algservice.AnalyseResponse;
 import com.staticanalyzer.algservice.FileAnalyseResults;
 
 import com.staticanalyzer.staticanalyzer.config.project.ProjectProperties;
+import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisProblem;
 import com.staticanalyzer.staticanalyzer.entity.analysis.AnalysisResult;
 import com.staticanalyzer.staticanalyzer.entity.file.SrcFileAnalysis;
 import com.staticanalyzer.staticanalyzer.entity.file.SrcFileDigest;
@@ -195,7 +194,7 @@ public class ProjectService {
      * @return {@code fileAnalyses}源文件集，如果未查到，该映射大小为0
      * @throws ServiceError
      */
-    private java.util.Map<String, SrcFileAnalysis> fetchFromCache(int projectId) throws ServiceError {
+    public java.util.Map<String, SrcFileAnalysis> fetchFromCache(int projectId) throws ServiceError {
         String hashKey = CACHE_KEY_PROJECT + projectId;
         java.util.Map<String, SrcFileAnalysis> analyses = redisTemplate.opsForHash().entries(hashKey);
         if (analyses != null && analyses.size() > 0) // 直接读取缓存

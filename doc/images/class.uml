@@ -1,0 +1,35 @@
+@startuml
+abstract class SrcFile
+class SrcFileAnalysis
+class SrcFileDigest
+class SrcDirectory
+
+SrcFile -o SrcDirectory
+SrcFileAnalysis --|> SrcFile
+SrcFileDigest --|> SrcFile
+Analysis --o SrcFileAnalysis
+AnalysisStatus --o SrcFileDigest
+
+class Analysis
+class AnalysisProblem
+class AnalysisResult
+class AnalysisStatus
+
+AnalysisStatus --o Analysis
+AnalysisStatus --o AnalysisResult
+AnalysisProblem --|> AnalysisResult
+
+class Project
+class ProjectStatus
+class ProjectVO
+class SimpleProject
+
+ProjectVO ..> Project
+ProjectStatus --o ProjectVO
+
+class User
+class UserWithJwt
+User --o UserWithJwt
+
+class Result
+@enduml

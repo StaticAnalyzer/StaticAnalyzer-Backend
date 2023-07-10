@@ -41,39 +41,59 @@ public class UserServiceTest {
     @Autowired
     private UserService userService;
 
+    private static String GOOD_USERNAME = "gooduser";
+    private static String GOOD_PASSWORD = "12345678";
+
     @org.junit.jupiter.api.Test
-    public void testUserValidation() {
-        User badFormattedUser = new User();
+    public void testSignature() {
+        User goodUser = new User();
+        goodUser.setUsername(GOOD_USERNAME);
+        goodUser.setPassword(GOOD_PASSWORD);
+
+        userService.createUser(goodUser);
+        User databaseUser = userService.getUserByName(GOOD_USERNAME);
+        assertDoesNotThrow(() -> userService.checkSignature(
+                userService.getSignature(databaseUser.getId()), databaseUser.getId()));
+
+        System.out.println("User " + databaseUser.getId() + " passed signature test!");
+    }
+
+    @org.junit.jupiter.api.Test
+    public void testFormat() {
+        User badUser = new User();
         // 非法格式用户
-        generateRandomUserId(badFormattedUser);
+        generateRandomUserId(badUser);
         for (int i = 0; i < 100; i++) {
-            badFormattedUser.setUsername(generateRandomString(16));
-            badFormattedUser.setPassword(generateRandomString(16));
+            badUser.setUsername(generateRandomString(16));
+            badUser.setPassword(generateRandomString(16));
             try {
-                userService.checkUserInfoFormat(badFormattedUser);
+                userService.checkUserInfoFormat(badUser);
             } catch (ServiceError serviceError) {
-                assertTrue(!badFormattedUser.getUsername().matches(userProperties.getUsernameFormat()) ||
-                        !badFormattedUser.getPassword().matches(userProperties.getPasswordFormat()));
+                assertTrue(!badUser.getUsername().matches(userProperties.getUsernameFormat()) ||
+                        !badUser.getPassword().matches(userProperties.getPasswordFormat()));
             }
+
+            System.out.println("Bad user " + badUser.getUsername() + "with password " + badUser.getPassword()
+                    + " passed format test!");
         }
     }
 
     @org.junit.jupiter.api.Test
-    public void testDatabaseUser() {
-        User validUser = new User();
-        for (int i = 0; i < 10; i++) {
-            validUser.setUsername(generateRandomString(16));
-            validUser.setPassword(generateRandomString(16));
+    public void testUpdate() {
+        User randomUser = new User();
+        for (int i = 0; i < 20; i++) {
+            randomUser.setUsername(generateRandomString(16));
+            randomUser.setPassword(generateRandomString(16));
             try {
-                userService.checkUserInfoFormat(validUser);
+                userService.checkUserInfoFormat(randomUser);
             } catch (ServiceError serviceError) {
                 continue;
             }
 
-            assertDoesNotThrow(() -> userService.createUser(validUser));
-            assertDoesNotThrow(() -> userService.getUserByName(validUser.getUsername()));
+            assertDoesNotThrow(() -> userService.createUser(randomUser));
+            assertDoesNotThrow(() -> userService.getUserByName(randomUser.getUsername()));
 
-            User checkUser = userService.getUserByName(validUser.getUsername());
+            User checkUser = userService.getUserByName(randomUser.getUsername());
             // 反转密码再测试
             String revertedPassword = new StringBuilder(checkUser.getPassword()).reverse().toString();
             checkUser.setPassword(revertedPassword);
@@ -81,6 +101,7 @@ public class UserServiceTest {
 
             assertEquals(userService.getUserById(checkUser.getId()).getUsername(), checkUser.getUsername());
             assertEquals(userService.getUserByName(checkUser.getUsername()).getId(), checkUser.getId());
+            System.out.println("Random user " + checkUser.getId() + " passed update test!");
         }
     }
 
