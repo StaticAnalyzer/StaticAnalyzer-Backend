@@ -1,35 +1,99 @@
 @startuml
-abstract class SrcFile
-class SrcFileAnalysis
-class SrcFileDigest
-class SrcDirectory
+abstract class SrcFile {
+  name : string
+  src : string
+}
+class SrcFileAnalysis {
+  analyseResults : list<AnalysisResult>
+}
+class SrcFileDigest {
+  severity : AnalysisStatus
+}
+class SrcDirectory {
+  name : string
+  files : map<string, SrcFile>
+  directories : map<string, SrcDirectory>
+}
 
-SrcFile -o SrcDirectory
-SrcFileAnalysis --|> SrcFile
-SrcFileDigest --|> SrcFile
-Analysis --o SrcFileAnalysis
-AnalysisStatus --o SrcFileDigest
+SrcFile --o SrcDirectory : "belongs to"
+SrcDirectory --o SrcDirectory : "belongs to"
+SrcFileAnalysis --|> SrcFile : "extends"
+SrcFileDigest --|> SrcFile : "extends"
+Analysis --o SrcFileAnalysis : "belongs to"
+AnalysisStatus --o SrcFileDigest : "belongs to"
 
-class Analysis
-class AnalysisProblem
-class AnalysisResult
-class AnalysisStatus
+class Analysis {
+  analyseType : string
+  status : AnalysisStatus
+}
+class AnalysisProblem {
+  file : string
+}
+class AnalysisResult {
+  startLine : integer
+  startColumn : integer
+  endLine : integer
+  endColumn : integer
+  severity : AnalysisStatus
+  message : string
+  type : string
+}
+enum AnalysisStatus {
+  AnalyseError,
+  Pass,
+  Hint,
+  Info,
+  Warning,
+  Error
+}
 
-AnalysisStatus --o Analysis
-AnalysisStatus --o AnalysisResult
-AnalysisProblem --|> AnalysisResult
+AnalysisStatus --o Analysis : "belongs to"
+AnalysisStatus --o AnalysisResult : "belongs to"
+AnalysisProblem --|> AnalysisResult : "extends"
 
-class Project
-class ProjectStatus
-class ProjectVO
-class SimpleProject
+class Project {
+  id : integer
+  userId : integer
+  timestamp : date
+  sourceCode : byte[]
+  config : string
+  analyseResult : string(json)
+}
+enum ProjectStatus {
+  Complete,
+  Queueing,
+  Error
+}
+class ProjectVO {
+  id : integer
+  timestamp : date
+  status : ProjectStatus
+  config : string
+  analyseBrief : list<Analysis>
+}
+class SimpleProject {
+  code : string
+  config : string
+}
 
-ProjectVO ..> Project
-ProjectStatus --o ProjectVO
+Analysis --o ProjectVO : "belongs to"
+ProjectVO ..> Project : "depends"
+ProjectStatus --o ProjectVO : "belongs to"
 
-class User
-class UserWithJwt
-User --o UserWithJwt
+class User {
+  id : integer
+  username : string
+  password : string
+}
+class UserWithJwt {
+  user : User
+  token : string
+}
+User --o UserWithJwt : "belongs to"
 
-class Result
+class Result {
+  code : integer
+  msg : string
+  data : object
+}
 @enduml
